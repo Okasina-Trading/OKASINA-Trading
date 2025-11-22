@@ -19,7 +19,7 @@ export const AuthProvider = ({ children }) => {
     const ADMIN_EMAILS = [
         'info@okasinatrading.com',
         'admin@okasinatrading.com',
-        'omranahamd@yahoo.com'
+        'omranahmad@yahoo.com'
     ];
 
     useEffect(() => {
