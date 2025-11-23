@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Heart, User, ShoppingCart, Menu, X } from 'lucide-react';
+import { useCart } from '../contexts/CartContext';
 
 export default function Header() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const { cart } = useCart();
+
+    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
 
     return (
         <header className="bg-white shadow-sm sticky top-0 z-50 font-sans">
@@ -49,6 +53,11 @@ export default function Header() {
                         </Link>
                         <Link to="/cart" className="hover:text-black transition-colors relative">
                             <ShoppingCart size={20} />
+                            {totalItems > 0 && (
+                                <span className="absolute -top-2 -right-2 bg-black text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full">
+                                    {totalItems}
+                                </span>
+                            )}
                         </Link>
 
                         {/* Mobile Menu Button */}
