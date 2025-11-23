@@ -54,7 +54,9 @@ export default function CheckoutPage() {
                 name: item.name,
                 quantity: item.quantity,
                 price: item.price_mur || (Number(item.price) * 45),
-                selectedSize: item.selectedSize
+                selectedSize: item.selectedSize,
+                color: item.color,
+                image: item.image_url || item.image
             })),
             status: 'pending',
             created_at: new Date().toISOString()
