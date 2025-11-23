@@ -58,7 +58,7 @@ export default function AdminOrdersPage() {
         const completed = orderData.filter(o => o.status === 'completed').length;
         const revenue = orderData
             .filter(o => o.status === 'completed')
-            .reduce((sum, o) => sum + (o.total || 0), 0);
+            .reduce((sum, o) => sum + (o.total_amount || 0), 0);
 
         setStats({ total, pending, processing, completed, revenue });
     };
@@ -179,7 +179,7 @@ export default function AdminOrdersPage() {
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm text-gray-600">Revenue</p>
-                                <p className="text-3xl font-bold text-green-600 mt-2">${stats.revenue.toFixed(2)}</p>
+                                <p className="text-3xl font-bold text-green-600 mt-2">Rs {stats.revenue.toLocaleString()}</p>
                             </div>
                             <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
                                 <DollarSign className="text-green-600" size={24} />
@@ -264,7 +264,7 @@ export default function AdminOrdersPage() {
                                     filteredOrders.map((order) => (
                                         <tr key={order.id} className="hover:bg-gray-50 transition-colors">
                                             <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                                                #{order.id}
+                                                #{order.id.slice(0, 8)}...
                                             </td>
                                             <td className="px-6 py-4">
                                                 <div>
@@ -276,7 +276,7 @@ export default function AdminOrdersPage() {
                                                 {new Date(order.created_at).toLocaleDateString()}
                                             </td>
                                             <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                                                ${order.total?.toFixed(2)}
+                                                Rs {order.total_amount?.toLocaleString()}
                                             </td>
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center gap-2">

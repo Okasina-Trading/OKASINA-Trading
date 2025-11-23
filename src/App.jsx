@@ -5,6 +5,7 @@ import ShopPage from './pages/ShopPage';
 import ProductPage from './pages/ProductPage';
 import CheckoutPage from './pages/CheckoutPage';
 import CartPage from './pages/CartPage';
+import OrdersPage from './pages/OrdersPage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import TermsOfServicePage from './pages/TermsOfServicePage';
 import LoginPage from './pages/LoginPage';
@@ -37,6 +38,7 @@ export default function App() {
                                 <Route path="/product/:id" element={<ProductPage />} />
                                 <Route path="/cart" element={<CartPage />} />
                                 <Route path="/checkout" element={<CheckoutPage />} />
+                                <Route path="/orders" element={<OrdersPage />} />
                                 <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
                                 <Route path="/terms-of-service" element={<TermsOfServicePage />} />
                                 <Route path="/login" element={<LoginPage />} />
