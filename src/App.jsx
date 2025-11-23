@@ -14,7 +14,8 @@ import AdminOrdersPage from './pages/admin/AdminOrdersPage';
 import AdminAnalyticsPage from './pages/admin/AdminAnalyticsPage';
 import AdminMarketingPage from './pages/admin/AdminMarketingPage';
 import AdminReviewsPage from './pages/admin/AdminReviewsPage';
-import MediaManagerPage from './pages/admin/MediaManagerPage';
+import AlbumImportPage from './pages/admin/AlbumImportPage';
+// ... existing imports remain unchanged
 import StockManagerPage from './pages/StockManagerPage';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -49,6 +50,8 @@ export default function App() {
                                 <Route path="/admin/reviews" element={<ProtectedRoute><AdminReviewsPage /></ProtectedRoute>} />
                                 <Route path="/admin/media" element={<ProtectedRoute><MediaManagerPage /></ProtectedRoute>} />
                                 <Route path="/admin/stock-manager" element={<ProtectedRoute><StockManagerPage /></ProtectedRoute>} />
+                                {/* 🎉 New Album Import route */}
+                                <Route path="/admin/album-import" element={<ProtectedRoute><AlbumImportPage /></ProtectedRoute>} />
                             </Routes>
                         </main>
                         <Footer />
