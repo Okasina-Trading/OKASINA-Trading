@@ -13,6 +13,7 @@ export default async function handler(req, res) {
         SUPABASE_STORAGE_BUCKET,
         VITE_SUPABASE_URL,
         VITE_SUPABASE_ANON_KEY,
+        SUPABASE_SERVICE_ROLE_KEY, // Add this
     } = process.env;
 
     const logs = [];
@@ -21,12 +22,18 @@ export default async function handler(req, res) {
         logs.push(msg);
     };
 
+    // Diagnostic: Check which project we are connecting to
+    const projectRef = VITE_SUPABASE_URL ? VITE_SUPABASE_URL.split('.')[0].split('//')[1] : 'UNKNOWN';
+    log(`Connecting to Supabase Project: ${projectRef}`);
+
     log(`Starting import for album: ${albumId} (${albumName})`);
 
     if (!albumId) return res.status(400).json({ error: 'Missing albumId', logs });
     if (!FB_ACCESS_TOKEN) return res.status(500).json({ error: 'Missing FB_ACCESS_TOKEN', logs });
 
-    const supabase = createClient(VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY);
+    // Use Service Role Key if available to bypass RLS, otherwise fall back to Anon Key
+    const supabaseKey = SUPABASE_SERVICE_ROLE_KEY || VITE_SUPABASE_ANON_KEY;
+    const supabase = createClient(VITE_SUPABASE_URL, supabaseKey);
 
     try {
         // 1. Fetch photos from Facebook (limit to 10 to avoid timeout)
@@ -136,6 +143,7 @@ export default async function handler(req, res) {
             csv: csvRows.join('\n'),
             logs,
             errors: errors.length > 0 ? errors : undefined,
+            projectRef, // Diagnostic info
         });
     } catch (error) {
         log(`Fatal Error: ${error.message}`);
