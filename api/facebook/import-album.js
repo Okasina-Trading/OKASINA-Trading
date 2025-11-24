@@ -22,9 +22,18 @@ export default async function handler(req, res) {
         logs.push(msg);
     };
 
+    // Validate required environment variables
+    if (!SUPABASE_STORAGE_BUCKET) {
+        return res.status(500).json({
+            error: 'Missing SUPABASE_STORAGE_BUCKET environment variable. Please configure it in your environment.',
+            logs
+        });
+    }
+
     // Diagnostic: Check which project we are connecting to
     const projectRef = VITE_SUPABASE_URL ? VITE_SUPABASE_URL.split('.')[0].split('//')[1] : 'UNKNOWN';
     log(`Connecting to Supabase Project: ${projectRef}`);
+    log(`Using Storage Bucket: ${SUPABASE_STORAGE_BUCKET}`);
 
     log(`Starting import for album: ${albumId} (${albumName})`);
 
