@@ -14,6 +14,7 @@ import { Play, Save } from 'lucide-react';
 import Sidebar from './Sidebar';
 import { TriggerNode, ActionNode } from './CustomNodes';
 import { useToast } from '../../../contexts/ToastContext';
+import { workflowTemplates } from './workflowTemplates';
 
 const nodeTypes = {
     trigger: TriggerNode,
@@ -37,6 +38,7 @@ const AutomationBuilderContent = () => {
     const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
     const [reactFlowInstance, setReactFlowInstance] = useState(null);
+    const [selectedTemplate, setSelectedTemplate] = useState('');
     const { addToast } = useToast();
 
     const onConnect = useCallback(
@@ -108,11 +110,34 @@ const AutomationBuilderContent = () => {
         }, 500);
     };
 
+    const loadTemplate = (templateId) => {
+        const template = workflowTemplates.find(t => t.id === templateId);
+        if (!template) return;
+
+        setNodes(template.nodes);
+        setEdges(template.edges);
+        addToast(`Loaded template: ${template.name}`, 'success');
+        setSelectedTemplate('');
+    };
+
     return (
         <div className="flex h-[calc(100vh-100px)] bg-gray-50">
             <Sidebar />
             <div className="flex-1 relative" ref={reactFlowWrapper}>
-                <div className="absolute top-4 right-4 z-10 flex gap-2">
+                <div className="absolute top-4 left-4 right-4 z-10 flex gap-2 items-center">
+                    <select
+                        value={selectedTemplate}
+                        onChange={(e) => loadTemplate(e.target.value)}
+                        className="bg-white text-gray-700 px-4 py-2 rounded-lg shadow-lg border border-gray-200 text-sm font-medium"
+                    >
+                        <option value="">Load Template...</option>
+                        {workflowTemplates.map(template => (
+                            <option key={template.id} value={template.id}>
+                                {template.name}
+                            </option>
+                        ))}
+                    </select>
+                    <div className="flex-1" />
                     <button
                         onClick={handleRun}
                         className="bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-green-700 flex items-center gap-2 font-medium"
