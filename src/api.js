@@ -38,9 +38,6 @@ api.interceptors.request.use(config => {
     return config;
 }, error => Promise.reject(error));
 
-export { api };
-export default api;
-
 // Response Interceptor (Retry Logic)
 api.interceptors.response.use(response => {
     // Successful response, reset failures if it was an AI endpoint
@@ -88,4 +85,5 @@ api.interceptors.response.use(response => {
     return Promise.reject(error);
 });
 
+export { api };
 export default api;
