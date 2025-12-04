@@ -17,8 +17,9 @@ export default defineConfig({
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom', 'react-router-dom'],
-          ui: ['lucide-react', 'framer-motion'],
-          supabase: ['@supabase/supabase-js']
+          ui: ['lucide-react', 'framer-motion', '@heroicons/react'],
+          supabase: ['@supabase/supabase-js'],
+          utils: ['axios', 'date-fns', 'lodash']
         }
       }
     },

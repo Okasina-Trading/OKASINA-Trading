@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
 import { Trash2, Plus, Minus, ArrowRight, Truck, Home } from 'lucide-react';
+import RecommendedProducts from '../components/products/RecommendedProducts';
 
 export default function CartPage() {
     const { cart, removeFromCart, updateQuantity } = useCart();
@@ -176,6 +177,15 @@ export default function CartPage() {
                             </Link>
                         </div>
                     </div>
+                </div>
+
+                {/* AI Recommendations */}
+                <div className="mt-16">
+                    <RecommendedProducts
+                        title="Complete Your Look"
+                        contextType="cart"
+                        cartItems={cart}
+                    />
                 </div>
             </div>
         </div>

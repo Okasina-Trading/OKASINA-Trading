@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, ShoppingBag } from 'lucide-react';
 import { supabase } from '../supabase';
+import NewsletterSignup from '../components/NewsletterSignup';
+import RecommendedProducts from '../components/products/RecommendedProducts';
 
 export default function HomePage() {
     const [products, setProducts] = useState([]);
@@ -125,6 +127,16 @@ export default function HomePage() {
                     </Link>
                 </div>
             </section>
+
+            {/* AI Recommendations */}
+            <div className="container mx-auto px-4">
+                <RecommendedProducts
+                    title="Trending Now"
+                    contextType="home"
+                />
+            </div>
+
+            <NewsletterSignup />
         </div>
     );
 }

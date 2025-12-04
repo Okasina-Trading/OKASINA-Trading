@@ -71,20 +71,30 @@ export default function MediaManagerPage() {
     const handleDownloadCSV = () => {
         // Group images by SKU
         const groupedBySKU = {};
+        let maxImages = 0;
+
         uploadedImages.forEach(img => {
             if (img.error) return; // Skip errors
-            if (!groupedBySKU[img.sku]) {
-                groupedBySKU[img.sku] = [];
+
+            // Use filename as SKU if detection failed or returned UNKNOWN
+            const skuKey = (img.sku === 'UNKNOWN' || !img.sku) ? img.filename : img.sku;
+
+            if (!groupedBySKU[skuKey]) {
+                groupedBySKU[skuKey] = [];
             }
-            groupedBySKU[img.sku].push(img.url);
+            groupedBySKU[skuKey].push(img.url);
+
+            // Track max images for dynamic headers
+            maxImages = Math.max(maxImages, groupedBySKU[skuKey].length);
         });
 
-        // Generate CSV rows
-        const headers = ['sku', 'image_url_1', 'image_url_2', 'image_url_3', 'image_url_4', 'image_url_5'];
+        // Generate dynamic headers based on max images found
+        const imageHeaders = Array.from({ length: maxImages }, (_, i) => `image_url_${i + 1}`);
+        const headers = ['sku', ...imageHeaders];
         const rows = [headers.join(',')];
 
         Object.entries(groupedBySKU).forEach(([sku, urls]) => {
-            const row = [sku, ...urls.slice(0, 5)]; // Max 5 images
+            const row = [sku, ...urls];
             rows.push(row.join(','));
         });
 

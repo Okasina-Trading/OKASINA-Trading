@@ -5,11 +5,13 @@ import LazyImage from './common/LazyImage';
 import { useCart } from '../contexts/CartContext';
 import { useToast } from '../contexts/ToastContext';
 import { useComparison } from '../contexts/ComparisonContext';
+import { useCurrency } from '../contexts/CurrencyContext';
 
 const ProductCard = memo(({ product, onQuickView }) => {
     const { addToCart } = useCart();
     const { addToast } = useToast();
     const { isInComparison, toggleComparison } = useComparison();
+    const { formatPrice } = useCurrency();
 
     const isCompared = isInComparison(product.id);
 
@@ -105,11 +107,11 @@ const ProductCard = memo(({ product, onQuickView }) => {
                 </div>
                 <div className="flex items-baseline gap-2 mt-2">
                     <p className="text-lg font-bold text-gray-900">
-                        Rs {product.price_mur.toLocaleString()}
+                        {formatPrice(product.price)}
                     </p>
                     {product.mrp > product.price_mur && (
                         <p className="text-sm text-gray-400 line-through">
-                            Rs {product.mrp.toLocaleString()}
+                            {formatPrice(product.mrp)}
                         </p>
                     )}
                 </div>

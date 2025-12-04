@@ -4,6 +4,7 @@ import { supabase } from '../supabase';
 import { useCart } from '../contexts/CartContext';
 import { useToast } from '../contexts/ToastContext';
 import { useComparison } from '../contexts/ComparisonContext';
+import { useCurrency } from '../contexts/CurrencyContext';
 import { Helmet } from 'react-helmet-async';
 import { Star, Truck, ShieldCheck, ArrowLeft, Ruler, ZoomIn, ArrowRightLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -13,18 +14,22 @@ import SizeGuideModal from '../components/product/SizeGuideModal';
 import SocialShare from '../components/product/SocialShare';
 import RecentlyViewed, { addToRecentlyViewed } from '../components/product/RecentlyViewed';
 import ProductTabs from '../components/product/ProductTabs';
+import RecommendedProducts from '../components/products/RecommendedProducts';
+import { useAnalytics } from '../hooks/useAnalytics';
 
 export default function ProductPage() {
     const { id } = useParams();
     const { addToCart } = useCart();
     const { addToast } = useToast();
     const { addToCompare } = useComparison();
+    const { formatPrice } = useCurrency();
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
     const [selectedSize, setSelectedSize] = useState('');
     const [showSizeGuide, setShowSizeGuide] = useState(false);
     const [isZoomed, setIsZoomed] = useState(false);
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+    const { trackViewProduct } = useAnalytics();
 
     useEffect(() => {
         fetchProduct();
@@ -45,6 +50,7 @@ export default function ProductPage() {
         } else {
             setProduct(data);
             addToRecentlyViewed(data);
+            trackViewProduct(data);
         }
         setLoading(false);
     };
@@ -124,7 +130,7 @@ export default function ProductPage() {
                         </div>
 
                         <p className="text-2xl font-medium text-gray-900 mb-8">
-                            Rs {product.price_mur?.toLocaleString() || (product.price * 45).toLocaleString()}
+                            {formatPrice(product.price)}
                         </p>
 
                         {/* Tabbed Content */}
@@ -211,6 +217,13 @@ export default function ProductPage() {
 
                 {/* Related Products */}
                 <RelatedProducts currentProductId={id} category={product.category} />
+
+                {/* AI Recommendations */}
+                <RecommendedProducts
+                    title="You May Also Like"
+                    contextType="product"
+                    contextId={id}
+                />
 
                 {/* Reviews Section */}
                 <ReviewSection productId={id} />

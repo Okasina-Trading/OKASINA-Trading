@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingCart, User, Heart, Menu, X } from 'lucide-react';
+import { ShoppingCart, User, Heart, Menu, X, Globe } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
+import { useCurrency } from '../contexts/CurrencyContext';
 import MobileMenu from './MobileMenu';
 
 import SearchBar from './SearchBar';
@@ -9,6 +10,7 @@ import SearchBar from './SearchBar';
 // HeaderNew component with mobile menu and search
 export default function HeaderNew() {
     const { cart } = useCart();
+    const { currency, setCurrency, isMauritius, symbols } = useCurrency();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     // Calculate total items safely
@@ -36,6 +38,23 @@ export default function HeaderNew() {
 
                 {/* Right Icons */}
                 <div className="flex items-center gap-6">
+                    {/* Currency Selector */}
+                    <div className="hidden sm:flex items-center gap-1">
+                        <Globe size={16} className="text-gray-400" />
+                        <select
+                            value={currency}
+                            onChange={(e) => setCurrency(e.target.value)}
+                            disabled={isMauritius}
+                            className={`bg-transparent text-sm font-medium focus:outline-none cursor-pointer ${isMauritius ? 'text-gray-400 cursor-not-allowed' : 'text-gray-700 hover:text-black'}`}
+                            title={isMauritius ? "Currency locked to MUR for your region" : "Select Currency"}
+                        >
+                            <option value="USD">USD ($)</option>
+                            <option value="EUR">EUR (€)</option>
+                            <option value="MUR">MUR (Rs)</option>
+                            <option value="GBP">GBP (£)</option>
+                        </select>
+                    </div>
+
                     <Link to="/wishlist" className="text-gray-400 hover:text-black transition-colors hidden sm:block" aria-label="Wishlist">
                         <Heart size={20} />
                     </Link>

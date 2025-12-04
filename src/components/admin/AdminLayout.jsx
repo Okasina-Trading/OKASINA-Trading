@@ -14,6 +14,7 @@ import {
     LogOut,
     UploadCloud,
     Workflow,
+    Bot,
 } from 'lucide-react';
 
 export default function AdminLayout({ children }) {
@@ -39,6 +40,7 @@ export default function AdminLayout({ children }) {
         { name: 'Automation', href: '/admin/automation', icon: Workflow },
         { name: 'Album Import', href: '/admin/album-import', icon: UploadCloud },
         { name: 'Stock Manager', href: '/admin/stock-manager', icon: Package },
+        { name: 'AI Team', href: '/admin/ai-employees', icon: Bot },
     ];
 
     const isActive = href => {

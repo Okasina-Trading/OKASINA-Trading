@@ -69,7 +69,10 @@ export default function CheckoutPage() {
                     ${paymentMethod === 'juice' ? `
                     <div style="background: #fff3cd; padding: 15px; border-radius: 8px; border: 1px solid #ffeeba; color: #856404;">
                         <strong>Payment Required (Juice):</strong><br/>
-                        Please transfer <strong>Rs ${total.toLocaleString()}</strong> to MCB Account: <strong>000448283928</strong><br/>
+                        Please transfer <strong>Rs ${total.toLocaleString()}</strong> to:<br/>
+                        <strong>A-ONE GLOBAL RESOUR LTD</strong><br/>
+                        MCB Account: <strong>000449347214</strong><br/>
+                        IBAN: <strong>MU39MCBL0901000449347214000MUR</strong><br/>
                         Reference: Order #${orderId.slice(0, 8).toUpperCase()}
                     </div>
                     ` : ''}
@@ -205,7 +208,9 @@ export default function CheckoutPage() {
                                             <div className="ml-7 mt-2 text-sm text-gray-600 bg-white p-3 border border-gray-200 rounded">
                                                 <p className="font-medium text-black mb-1">Instructions:</p>
                                                 <p>1. Open Juice App</p>
-                                                <p>2. Pay to MCB Account: <strong>000448283928</strong></p>
+                                                <p>2. Pay to: <strong>A-ONE GLOBAL RESOUR LTD</strong></p>
+                                                <p>   MCB Account: <strong>000449347214</strong></p>
+                                                <p>   IBAN: <strong>MU39MCBL0901000449347214000MUR</strong></p>
                                                 <p>3. Use your Name as reference</p>
                                                 <p className="mt-2 text-xs text-gray-500">* Order will be processed after payment confirmation.</p>
                                             </div>
