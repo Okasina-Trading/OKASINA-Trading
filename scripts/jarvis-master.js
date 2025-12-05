@@ -15,10 +15,19 @@ import path from 'path';
 const execAsync = promisify(exec);
 dotenv.config();
 
-const supabase = createClient(
-    process.env.VITE_SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY
-);
+// Validate required environment variables
+const SUPABASE_URL = process.env.VITE_SUPABASE_URL;
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
+
+if (!SUPABASE_URL || !SUPABASE_KEY) {
+    console.error('❌ CRITICAL: Missing Supabase environment variables');
+    console.error('   Required: VITE_SUPABASE_URL and (SUPABASE_SERVICE_ROLE_KEY or VITE_SUPABASE_ANON_KEY)');
+    console.error('   Please set these in GitHub Secrets or .env file');
+    process.exit(1);
+}
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
 
 console.log('🤖 JARVIS MASTER ORCHESTRATOR');
 console.log('='.repeat(70));
