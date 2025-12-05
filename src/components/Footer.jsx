@@ -1,9 +1,38 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Facebook, Instagram, Twitter } from 'lucide-react';
+import { Facebook, Instagram, Twitter, Youtube, MessageCircle } from 'lucide-react';
 import NewsletterSignup from './NewsletterSignup';
+import { supabase } from '../supabase';
 
 export default function Footer() {
+    const [socialMedia, setSocialMedia] = useState({
+        facebook: '',
+        instagram: '',
+        twitter: '',
+        youtube: '',
+        whatsapp: ''
+    });
+
+    useEffect(() => {
+        fetchSocialMedia();
+    }, []);
+
+    const fetchSocialMedia = async () => {
+        try {
+            const { data } = await supabase
+                .from('settings')
+                .select('value')
+                .eq('key', 'social_media')
+                .single();
+
+            if (data?.value) {
+                setSocialMedia(data.value);
+            }
+        } catch (error) {
+            console.error('Error fetching social media:', error);
+        }
+    };
+
     return (
         <footer className="bg-[#111111] text-white pt-20 pb-10 font-sans">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -15,9 +44,31 @@ export default function Footer() {
                             Redefining elegance with a curated collection of modern Indian wear. Tradition meets contemporary style.
                         </p>
                         <div className="flex space-x-4">
-                            <a href="#" className="text-gray-400 hover:text-white transition-colors"><Facebook size={18} /></a>
-                            <a href="#" className="text-gray-400 hover:text-white transition-colors"><Instagram size={18} /></a>
-                            <a href="#" className="text-gray-400 hover:text-white transition-colors"><Twitter size={18} /></a>
+                            {socialMedia.facebook && (
+                                <a href={socialMedia.facebook} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+                                    <Facebook size={18} />
+                                </a>
+                            )}
+                            {socialMedia.instagram && (
+                                <a href={socialMedia.instagram} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+                                    <Instagram size={18} />
+                                </a>
+                            )}
+                            {socialMedia.twitter && (
+                                <a href={socialMedia.twitter} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+                                    <Twitter size={18} />
+                                </a>
+                            )}
+                            {socialMedia.youtube && (
+                                <a href={socialMedia.youtube} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+                                    <Youtube size={18} />
+                                </a>
+                            )}
+                            {socialMedia.whatsapp && (
+                                <a href={`https://wa.me/${socialMedia.whatsapp.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+                                    <MessageCircle size={18} />
+                                </a>
+                            )}
                         </div>
                     </div>
 

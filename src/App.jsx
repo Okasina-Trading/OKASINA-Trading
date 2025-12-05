@@ -26,6 +26,7 @@ import AdminAutomationPage from './pages/admin/AdminAutomationPage';
 import AdminAiEmployeesPage from './pages/admin/AdminAiEmployeesPage';
 import StockManagerPage from './pages/StockManagerPage';
 import ComparePage from './pages/ComparePage';
+import AdminSocialMediaPage from './pages/admin/AdminSocialMediaPage';
 import HeaderNew from './components/HeaderNew';
 import Footer from './components/Footer';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -87,6 +88,7 @@ export default function App() {
                                                     <Route path="/admin/automation" element={<ProtectedRoute><AdminAutomationPage /></ProtectedRoute>} />
                                                     <Route path="/admin/ai-employees" element={<ProtectedRoute><AdminAiEmployeesPage /></ProtectedRoute>} />
                                                     <Route path="/admin/album-import" element={<ProtectedRoute><AlbumImportPage /></ProtectedRoute>} />
+                                                    <Route path="/admin/social-media" element={<ProtectedRoute><AdminSocialMediaPage /></ProtectedRoute>} />
                                                 </Routes>
                                             </main>
                                             <ProductComparisonBar />

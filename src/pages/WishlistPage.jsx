@@ -67,6 +67,15 @@ export default function WishlistPage() {
                         const product = item.products;
                         if (!product) return null; // Handle case where product might be deleted
 
+                        // Check stock status
+                        const isOutOfStock = product.stock_qty === 0;
+                        const isLowStock = product.stock_qty > 0 && product.stock_qty <= 5;
+
+                        // Check if product has sizes
+                        const DEFAULT_SIZES = ['XS', 'S', 'M', 'L', 'XL'];
+                        const rawSizes = product.sizes ? (typeof product.sizes === 'string' ? product.sizes.split(',') : product.sizes).map(s => s.trim()) : [];
+                        const hasSizes = rawSizes.length > 0 || (product.category !== 'Accessories');
+
                         return (
                             <div key={item.id} className="group relative">
                                 <div className="aspect-[3/4] overflow-hidden bg-gray-100 mb-4 relative">
@@ -75,6 +84,19 @@ export default function WishlistPage() {
                                         alt={product.name}
                                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                     />
+
+                                    {/* Stock Status Badge */}
+                                    {isOutOfStock && (
+                                        <div className="absolute top-2 left-2 bg-red-600 text-white px-3 py-1 text-xs font-bold uppercase">
+                                            Out of Stock
+                                        </div>
+                                    )}
+                                    {isLowStock && !isOutOfStock && (
+                                        <div className="absolute top-2 left-2 bg-orange-500 text-white px-3 py-1 text-xs font-bold uppercase">
+                                            Only {product.stock_qty} Left
+                                        </div>
+                                    )}
+
                                     <button
                                         onClick={() => removeFromWishlist(item.id)}
                                         className="absolute top-2 right-2 p-2 bg-white rounded-full shadow-md hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors"
@@ -82,21 +104,52 @@ export default function WishlistPage() {
                                         <Trash2 size={16} />
                                     </button>
                                 </div>
+
                                 <Link to={`/product/${product.id}`}>
                                     <h3 className="font-medium text-gray-900 group-hover:text-gray-600 transition-colors">{product.name}</h3>
                                 </Link>
-                                <p className="text-gray-500 mt-1 mb-3">
+
+                                <p className="text-gray-500 mt-1 mb-2">
                                     Rs {product.price_mur?.toLocaleString() || (product.price * 45).toLocaleString()}
                                 </p>
-                                <button
-                                    onClick={() => {
-                                        addToCart(product);
-                                        addToast(`Added ${product.name} to cart`);
-                                    }}
-                                    className="w-full border border-black py-2 text-sm font-bold uppercase hover:bg-black hover:text-white transition-colors flex items-center justify-center"
-                                >
-                                    <ShoppingBag size={16} className="mr-2" /> Add to Cart
-                                </button>
+
+                                {/* Stock Status Text */}
+                                <div className="mb-3 text-sm">
+                                    {isOutOfStock ? (
+                                        <p className="text-red-600 font-medium">⚠️ Currently unavailable</p>
+                                    ) : isLowStock ? (
+                                        <p className="text-orange-600 font-medium">⚡ Low stock - order soon!</p>
+                                    ) : (
+                                        <p className="text-green-600 font-medium">✓ In stock</p>
+                                    )}
+                                </div>
+
+                                {/* Add to Cart Button */}
+                                {isOutOfStock ? (
+                                    <Link
+                                        to={`/product/${product.id}`}
+                                        className="w-full border border-gray-300 py-2 text-sm font-bold uppercase text-gray-400 cursor-not-allowed flex items-center justify-center"
+                                    >
+                                        View Product
+                                    </Link>
+                                ) : hasSizes ? (
+                                    <Link
+                                        to={`/product/${product.id}`}
+                                        className="w-full border border-black py-2 text-sm font-bold uppercase hover:bg-black hover:text-white transition-colors flex items-center justify-center"
+                                    >
+                                        <ShoppingBag size={16} className="mr-2" /> Select Size & Add
+                                    </Link>
+                                ) : (
+                                    <button
+                                        onClick={() => {
+                                            addToCart(product);
+                                            addToast(`Added ${product.name} to cart`);
+                                        }}
+                                        className="w-full border border-black py-2 text-sm font-bold uppercase hover:bg-black hover:text-white transition-colors flex items-center justify-center"
+                                    >
+                                        <ShoppingBag size={16} className="mr-2" /> Add to Cart
+                                    </button>
+                                )}
                             </div>
                         );
                     })}
