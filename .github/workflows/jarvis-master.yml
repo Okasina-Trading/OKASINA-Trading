@@ -1,0 +1,84 @@
+name: JARVIS Master System
+
+on:
+    # Run every 6 hours
+    schedule:
+        - cron: "0 */6 * * *"
+
+    # Run on every push to main
+    push:
+        branches: [main]
+
+    # Run on pull requests
+    pull_request:
+        branches: [main]
+
+    # Allow manual trigger
+    workflow_dispatch:
+
+jobs:
+    jarvis-master:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v3
+              with:
+                  node-version: "18"
+                  cache: "npm"
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Run JARVIS Master Orchestrator
+              env:
+                  VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+                  VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+                  SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+                  GOOGLE_AI_KEY: ${{ secrets.GOOGLE_AI_KEY }}
+                  CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
+                  CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
+                  CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+              run: npm run jarvis:master
+
+            - name: Upload JARVIS Report
+              if: always()
+              uses: actions/upload-artifact@v3
+              with:
+                  name: jarvis-report
+                  path: .jarvis/last-run.json
+
+            - name: Comment on PR (if applicable)
+              if: github.event_name == 'pull_request'
+              uses: actions/github-script@v6
+              with:
+                  script: |
+                      const fs = require('fs');
+                      const report = JSON.parse(fs.readFileSync('.jarvis/last-run.json', 'utf8'));
+
+                      const comment = `## 🤖 JARVIS System Report
+
+                      **Status**: ${report.totalIssues === 0 ? '✅ All systems operational' : '⚠️ Issues detected'}
+
+                      - 🔍 Issues Found: ${report.totalIssues}
+                      - 🔧 Auto-Fixed: ${report.totalFixed}
+                      - ⚠️ Warnings: ${report.totalWarnings}
+
+                      **Duration**: ${((new Date(report.endTime) - new Date(report.startTime)) / 1000).toFixed(2)}s
+                      `;
+
+                      github.rest.issues.createComment({
+                        issue_number: context.issue.number,
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        body: comment
+                      });
+
+            - name: Fail if critical issues found
+              if: failure()
+              run: |
+                  echo "::error::JARVIS detected critical issues that need attention"
+                  exit 1

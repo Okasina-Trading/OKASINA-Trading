@@ -12,7 +12,8 @@
     "jarvis:repair": "node scripts/jarvis-auto-repair.js",
     "jarvis:full": "node scripts/jarvis-auto-repair.js && node scripts/jarvis-health-check.js",
     "jarvis:comprehensive": "node scripts/jarvis-comprehensive.js",
-    "jarvis:vision": "node scripts/jarvis-vision.js"
+    "jarvis:vision": "node scripts/jarvis-vision.js",
+    "jarvis:master": "node scripts/jarvis-master.js"
   },
   "dependencies": {
     "@google-cloud/vision": "^5.2.0",
