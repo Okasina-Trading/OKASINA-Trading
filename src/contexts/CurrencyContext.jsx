@@ -10,10 +10,10 @@ export const CurrencyProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     const rates = {
-        USD: 1,
-        EUR: 0.92,
-        MUR: 45.0, // Fixed rate for now, ideally fetch live
-        GBP: 0.79
+        USD: 0.022, // 1 MUR = 0.022 USD
+        EUR: 0.020,
+        MUR: 1, // Base Currency
+        GBP: 0.017
     };
 
     const symbols = {
@@ -59,16 +59,20 @@ export const CurrencyProvider = ({ children }) => {
         localStorage.setItem('currency', newCurrency);
     };
 
-    const formatPrice = (priceInUSD) => {
-        if (!priceInUSD) return symbols[currency] + '0.00';
+    const formatPrice = (priceInMUR) => {
+        if (!priceInMUR) return symbols[currency] + '0.00';
 
+        // Price is now stored in MUR in the DB
+        // If target currency is MUR, rate is 1.
+        // If target is USD, rate is 0.022.
         const rate = rates[currency];
-        const converted = priceInUSD * rate;
+        const converted = priceInMUR * rate;
 
         return new Intl.NumberFormat('en-US', {
             style: 'currency',
             currency: currency,
-            minimumFractionDigits: 2
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2
         }).format(converted);
     };
 

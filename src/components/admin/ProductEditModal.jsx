@@ -168,7 +168,7 @@ export default function ProductEditModal({ product, isOpen, onClose, onUpdate })
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Price (USD) *
+                                Price (MUR) *
                             </label>
                             <input
                                 type="number"
@@ -183,7 +183,7 @@ export default function ProductEditModal({ product, isOpen, onClose, onUpdate })
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Price (MUR) *
+                                Auto-Calced (Hidden)
                             </label>
                             <input
                                 type="number"
