@@ -186,54 +186,53 @@ app.post('/api/stylist-chat', async (req, res) => {
     If they ask for "Lehenga", "Saree", "Kurta", or "Sherwani", suggest relevant items.
     Keep responses concise (under 50 words unless detailed advice is needed).`;
 
-    // 2. Call Gemini API (using fetch to avoid adding new dependencies)
-    // If GOOGLE_AI_KEY is not set, return a fallback response
-    if (!process.env.GOOGLE_AI_KEY && !process.env.VITE_GEMINI_API_KEY) {
-      console.warn('GOOGLE_AI_KEY or VITE_GEMINI_API_KEY not set. Returning fallback response.');
+    // 2. Call Gemini API
+    const apiKey = process.env.GOOGLE_AI_KEY || process.env.VITE_GEMINI_API_KEY;
+
+    if (!apiKey) {
+      console.warn('AI Key missing. Returning fallback.');
       return res.json({
-        replyText: "I can certainly help with that! Our collection features exquisite designs. (Note: AI Key missing, this is a placeholder response).",
+        replyText: "I'm currently in 'Offline Mode' as my AI brain key is missing. I recommend checking out our 'New Arrivals' section!",
         suggestedProductIds: []
       });
     }
 
-    const apiKey = process.env.GOOGLE_AI_KEY || process.env.VITE_GEMINI_API_KEY;
+    try {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [
+            { role: 'user', parts: [{ text: systemPrompt + "\n\nUser: " + message }] }
+          ]
+        })
+      });
 
-    // Updated to use gemini-1.5-flash (latest stable model)
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [
-          { role: 'user', parts: [{ text: systemPrompt + "\n\nUser: " + message }] }
-        ]
-      })
-    });
+      const data = await response.json();
 
-    const data = await response.json();
+      if (!response.ok) {
+        console.error('Gemini API Error details:', data);
+        // Fallback on API error
+        return res.json({
+          replyText: "I'm having a brief connection hiccup with the fashion cloud. However, I think you'd look great in our latest Silk Saree collection!",
+          suggestedProductIds: []
+        });
+      }
 
-    if (!response.ok) {
-      console.error('Gemini API Error:', data);
-      throw new Error(data.error?.message || 'Gemini API Error');
+      const replyText = data.candidates?.[0]?.content?.parts?.[0]?.text || "I'm sorry, I didn't catch that.";
+
+      res.json({
+        replyText,
+        suggestedProductIds: []
+      });
+
+    } catch (fetchError) {
+      console.error('Gemini Fetch Error:', fetchError);
+      res.json({
+        replyText: "My connection is a bit spotty. While I reconnect, please enjoy browsing our Accessories.",
+        suggestedProductIds: []
+      });
     }
-
-    const replyText = data.candidates?.[0]?.content?.parts?.[0]?.text || "I'm sorry, I didn't catch that.";
-
-    // 3. Extract product keywords to find suggestions (Simple keyword matching for now)
-    // In a real app, we'd use embeddings or a more structured LLM output
-    let suggestedProductIds = [];
-    const keywords = ['lehenga', 'saree', 'gown', 'kurta', 'sherwani', 'accessories'];
-    const lowerMsg = message.toLowerCase();
-
-    // Fetch a few random products from Supabase that match keywords
-    // Note: We are inside the server, so we can use the supabase client if initialized, 
-    // but here we might need to rely on a separate helper or just return empty for now if complex.
-    // For simplicity/speed, we'll return empty suggestions here and let the frontend handle it 
-    // or implement a basic lookup if we had the supabase client ready in this scope.
-
-    res.json({
-      replyText,
-      suggestedProductIds
-    });
 
   } catch (error) {
     console.error('Stylist Chat Error:', error);
