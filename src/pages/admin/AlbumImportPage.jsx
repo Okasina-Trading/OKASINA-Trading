@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { Loader2, RefreshCw, UploadCloud, Sparkles, Check, X } from 'lucide-react';
+import { Loader2, RefreshCw, UploadCloud, Sparkles, Check, X, Facebook } from 'lucide-react';
 import AdminLayout from '../../components/admin/AdminLayout';
+import { metaService } from '../../services/metaService';
 
 export default function AlbumImportPage() {
     const { isAdmin, loading: authLoading } = useAuth();

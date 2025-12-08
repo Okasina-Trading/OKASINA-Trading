@@ -10,6 +10,7 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { Play, Save } from 'lucide-react';
+import { supabase } from '../../../supabase';
 
 import Sidebar from './Sidebar';
 import { TriggerNode, ActionNode } from './CustomNodes';
@@ -80,34 +81,97 @@ const AutomationBuilderContent = () => {
         [reactFlowInstance, setNodes],
     );
 
-    const handleRun = () => {
+    const handleRun = async () => {
         addToast('Starting workflow execution...', 'info');
 
-        // Simple simulation of execution
-        setTimeout(() => {
+        try {
             const triggerNode = nodes.find(n => n.type === 'trigger');
-            if (!triggerNode) {
-                addToast('No trigger node found!', 'error');
-                return;
-            }
+            if (!triggerNode) throw new Error('No trigger node found!');
 
-            // Find connected nodes
             const connectedEdges = edges.filter(e => e.source === triggerNode.id);
-            if (connectedEdges.length === 0) {
-                addToast('Workflow completed (No actions connected)', 'success');
-                return;
+            if (connectedEdges.length === 0) throw new Error('No actions connected!');
+
+            // 1. Get initial products (All active for now, or filter by trigger context if we had one)
+            // For "Manual Start", we assume all active products
+            let { data: products, error } = await supabase.from('products').select('*');
+            if (error) throw error;
+
+            console.log(`Starting with ${products.length} products`);
+
+            // 2. Process Nodes Sequentially
+            // We need to traverse the graph. For simplicity, we assume a linear chain for this hotfix.
+            // Trigger -> Action1 -> Action2...
+
+            let currentNode = triggerNode;
+            let currentProducts = products;
+
+            while (true) {
+                const edge = edges.find(e => e.source === currentNode.id);
+                if (!edge) break; // End of chain
+
+                const nextNode = nodes.find(n => n.id === edge.target);
+                if (!nextNode) break;
+
+                addToast(`Executing: ${nextNode.data.label}`, 'info');
+
+                // Execute Action
+                const actionType = nextNode.data.actionType; // e.g., 'filter_category', 'decrease_price'
+                // Note: The drag-and-drop data needs to populate 'actionType'. 
+                // We'll infer from label if missing for this hotfix.
+                const label = nextNode.data.label.toLowerCase();
+                const value = nextNode.data.description; // User entered value
+
+                if (label.includes('filter')) {
+                    // Filter Logic
+                    if (label.includes('category')) {
+                        const cat = value || 'Accessories'; // Default
+                        currentProducts = currentProducts.filter(p => p.category === cat);
+                    }
+                    if (label.includes('stock')) {
+                        currentProducts = currentProducts.filter(p => p.stock_qty <= 5);
+                    }
+                } else if (label.includes('price')) {
+                    // Price Logic
+                    if (label.includes('decrease')) {
+                        const percent = parseInt(value) || 10;
+                        // Execute Update on DB
+                        const ids = currentProducts.map(p => p.id);
+                        if (ids.length > 0) {
+                            // We can't do bulk update with different values easily in one query valid for all dialects
+                            // But here we apply same math. Supabase doesn't support "update x = x * 0.9" easily via JS client without RPC.
+                            // We'll use RPC or individual updates. RPC is better.
+                            // For hotfix: loop top 50 to avoid timeouts? Or just simple approach.
+                            // Let's just update the local state to show "Simulated Success" effectively,
+                            // OR actually update them.
+                            // User wants it to WORK.
+                            // RPC 'decrease_price' likely doesn't exist.
+                            // We will loop.
+                            for (const p of currentProducts) {
+                                const newPrice = Math.floor(p.price * (1 - percent / 100));
+                                await supabase.from('products').update({ price: newPrice }).eq('id', p.id);
+                            }
+                        }
+                    }
+                } else if (label.includes('tag')) {
+                    // Add Tag
+                    const tag = value || 'Sale';
+                    for (const p of currentProducts) {
+                        const newTags = [...(p.tags || []), tag];
+                        await supabase.from('products').update({ tags: newTags }).eq('id', p.id);
+                    }
+                }
+
+                currentNode = nextNode;
+                // Wait a bit for visual effect
+                await new Promise(r => setTimeout(r, 500));
             }
 
-            // Simulate processing actions
-            connectedEdges.forEach(edge => {
-                const targetNode = nodes.find(n => n.id === edge.target);
-                if (targetNode) {
-                    setTimeout(() => {
-                        addToast(`Executed: ${targetNode.data.label}`, 'success');
-                    }, 1000);
-                }
-            });
-        }, 500);
+            addToast(`Workflow completed on ${currentProducts.length} products!`, 'success');
+
+        } catch (err) {
+            console.error(err);
+            addToast(err.message, 'error');
+        }
     };
 
     const loadTemplate = (templateId) => {
