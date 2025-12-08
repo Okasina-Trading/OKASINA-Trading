@@ -1,0 +1,33 @@
+{
+    "project_name": "Okasina Fashion Store",
+    "project_id": "az_okasina_v1",
+    "repo_path": "C:\\Users\\ICL  ZAMBIA\\Desktop\\okasina-fashion-store-vite",
+    "master_control_plane": "AION-ZERO",
+    "agents": {
+        "code_agent": {
+            "enabled": true,
+            "model": "cloud-hybrid"
+        },
+        "test_agent": {
+            "enabled": true,
+            "guardrails": [
+                "cart",
+                "stock",
+                "smoke"
+            ]
+        },
+        "reflex_engine": {
+            "enabled": true,
+            "mode": "soft-fix"
+        },
+        "deploy_agent": {
+            "target": "vercel",
+            "auto_rollback": true
+        }
+    },
+    "health_checks": {
+        "endpoint": "/api/health",
+        "interval_seconds": 3600
+    },
+    "version": "4.1.0"
+}

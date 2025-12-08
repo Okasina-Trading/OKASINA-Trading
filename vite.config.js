@@ -24,5 +24,12 @@ export default defineConfig({
       }
     },
     chunkSizeWarningLimit: 1000
+  },
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: './src/tests/setup.js',
+    css: true,
+    exclude: ['**/node_modules/**', '**/dist/**', '**/.{idea,git,cache,output,temp}/**', '**/okasina-backup/**'],
   }
 })

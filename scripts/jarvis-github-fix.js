@@ -4,7 +4,6 @@
  * Automatically detects and fixes GitHub Actions workflow errors
  */
 
-import { Octokit } from '@octokit/rest';
 import fs from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';

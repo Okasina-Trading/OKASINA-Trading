@@ -1,0 +1,255 @@
+jarvis-master	Set up job	﻿2025-12-08T16:33:00.6551306Z Current runner version: '2.329.0'
+jarvis-master	Set up job	2025-12-08T16:33:00.6575061Z ##[group]Runner Image Provisioner
+jarvis-master	Set up job	2025-12-08T16:33:00.6576002Z Hosted Compute Agent
+jarvis-master	Set up job	2025-12-08T16:33:00.6576514Z Version: 20251124.448
+jarvis-master	Set up job	2025-12-08T16:33:00.6577096Z Commit: fda5086b43ec66ade217e5fcd18146c879571177
+jarvis-master	Set up job	2025-12-08T16:33:00.6577852Z Build Date: 2025-11-24T21:16:26Z
+jarvis-master	Set up job	2025-12-08T16:33:00.6578397Z ##[endgroup]
+jarvis-master	Set up job	2025-12-08T16:33:00.6578945Z ##[group]Operating System
+jarvis-master	Set up job	2025-12-08T16:33:00.6579529Z Ubuntu
+jarvis-master	Set up job	2025-12-08T16:33:00.6580007Z 24.04.3
+jarvis-master	Set up job	2025-12-08T16:33:00.6580479Z LTS
+jarvis-master	Set up job	2025-12-08T16:33:00.6580977Z ##[endgroup]
+jarvis-master	Set up job	2025-12-08T16:33:00.6581419Z ##[group]Runner Image
+jarvis-master	Set up job	2025-12-08T16:33:00.6581984Z Image: ubuntu-24.04
+jarvis-master	Set up job	2025-12-08T16:33:00.6582524Z Version: 20251126.144.1
+jarvis-master	Set up job	2025-12-08T16:33:00.6583639Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20251126.144/images/ubuntu/Ubuntu2404-Readme.md
+jarvis-master	Set up job	2025-12-08T16:33:00.6585029Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20251126.144
+jarvis-master	Set up job	2025-12-08T16:33:00.6586260Z ##[endgroup]
+jarvis-master	Set up job	2025-12-08T16:33:00.6587383Z ##[group]GITHUB_TOKEN Permissions
+jarvis-master	Set up job	2025-12-08T16:33:00.6589370Z Contents: read
+jarvis-master	Set up job	2025-12-08T16:33:00.6589889Z Metadata: read
+jarvis-master	Set up job	2025-12-08T16:33:00.6590442Z Packages: read
+jarvis-master	Set up job	2025-12-08T16:33:00.6590912Z ##[endgroup]
+jarvis-master	Set up job	2025-12-08T16:33:00.6592826Z Secret source: Actions
+jarvis-master	Set up job	2025-12-08T16:33:00.6593670Z Prepare workflow directory
+jarvis-master	Set up job	2025-12-08T16:33:00.6910310Z Prepare all required actions
+jarvis-master	Set up job	2025-12-08T16:33:00.6950089Z Getting action download info
+jarvis-master	Set up job	2025-12-08T16:33:01.1789489Z Download action repository 'actions/checkout@v4' (SHA:34e114876b0b11c390a56381ad16ebd13914f8d5)
+jarvis-master	Set up job	2025-12-08T16:33:01.8390543Z Download action repository 'actions/setup-node@v4' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+jarvis-master	Set up job	2025-12-08T16:33:01.9600025Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+jarvis-master	Set up job	2025-12-08T16:33:02.0732084Z Download action repository 'actions/github-script@v7' (SHA:f28e40c7f34bde8b3046d885e986cb6290c5673b)
+jarvis-master	Set up job	2025-12-08T16:33:02.7233484Z Complete job name: jarvis-master
+jarvis-master	Checkout code	﻿2025-12-08T16:33:02.8011449Z ##[group]Run actions/checkout@v4
+jarvis-master	Checkout code	2025-12-08T16:33:02.8012766Z with:
+jarvis-master	Checkout code	2025-12-08T16:33:02.8014231Z   repository: Omran1983/okasinatrading.com
+jarvis-master	Checkout code	2025-12-08T16:33:02.8015635Z   token: ***
+jarvis-master	Checkout code	2025-12-08T16:33:02.8016382Z   ssh-strict: true
+jarvis-master	Checkout code	2025-12-08T16:33:02.8017151Z   ssh-user: git
+jarvis-master	Checkout code	2025-12-08T16:33:02.8017956Z   persist-credentials: true
+jarvis-master	Checkout code	2025-12-08T16:33:02.8018838Z   clean: true
+jarvis-master	Checkout code	2025-12-08T16:33:02.8019640Z   sparse-checkout-cone-mode: true
+jarvis-master	Checkout code	2025-12-08T16:33:02.8020638Z   fetch-depth: 1
+jarvis-master	Checkout code	2025-12-08T16:33:02.8021412Z   fetch-tags: false
+jarvis-master	Checkout code	2025-12-08T16:33:02.8022218Z   show-progress: true
+jarvis-master	Checkout code	2025-12-08T16:33:02.8023028Z   lfs: false
+jarvis-master	Checkout code	2025-12-08T16:33:02.8024023Z   submodules: false
+jarvis-master	Checkout code	2025-12-08T16:33:02.8024857Z   set-safe-directory: true
+jarvis-master	Checkout code	2025-12-08T16:33:02.8026104Z ##[endgroup]
+jarvis-master	Checkout code	2025-12-08T16:33:02.9092970Z Syncing repository: Omran1983/okasinatrading.com
+jarvis-master	Checkout code	2025-12-08T16:33:02.9096015Z ##[group]Getting Git version info
+jarvis-master	Checkout code	2025-12-08T16:33:02.9097558Z Working directory is '/home/runner/work/okasinatrading.com/okasinatrading.com'
+jarvis-master	Checkout code	2025-12-08T16:33:02.9099765Z [command]/usr/bin/git version
+jarvis-master	Checkout code	2025-12-08T16:33:02.9167122Z git version 2.52.0
+jarvis-master	Checkout code	2025-12-08T16:33:02.9192891Z ##[endgroup]
+jarvis-master	Checkout code	2025-12-08T16:33:02.9207087Z Temporarily overriding HOME='/home/runner/work/_temp/3757940d-f2d8-49a9-b158-70c0de04a449' before making global git config changes
+jarvis-master	Checkout code	2025-12-08T16:33:02.9209841Z Adding repository directory to the temporary git global config as a safe directory
+jarvis-master	Checkout code	2025-12-08T16:33:02.9219392Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/okasinatrading.com/okasinatrading.com
+jarvis-master	Checkout code	2025-12-08T16:33:02.9257897Z Deleting the contents of '/home/runner/work/okasinatrading.com/okasinatrading.com'
+jarvis-master	Checkout code	2025-12-08T16:33:02.9260768Z ##[group]Initializing the repository
+jarvis-master	Checkout code	2025-12-08T16:33:02.9265551Z [command]/usr/bin/git init /home/runner/work/okasinatrading.com/okasinatrading.com
+jarvis-master	Checkout code	2025-12-08T16:33:02.9380971Z hint: Using 'master' as the name for the initial branch. This default branch name
+jarvis-master	Checkout code	2025-12-08T16:33:02.9383988Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+jarvis-master	Checkout code	2025-12-08T16:33:02.9386692Z hint: to use in all of your new repositories, which will suppress this warning,
+jarvis-master	Checkout code	2025-12-08T16:33:02.9389303Z hint: call:
+jarvis-master	Checkout code	2025-12-08T16:33:02.9390601Z hint:
+jarvis-master	Checkout code	2025-12-08T16:33:02.9392463Z hint: 	git config --global init.defaultBranch <name>
+jarvis-master	Checkout code	2025-12-08T16:33:02.9394695Z hint:
+jarvis-master	Checkout code	2025-12-08T16:33:02.9396614Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+jarvis-master	Checkout code	2025-12-08T16:33:02.9399839Z hint: 'development'. The just-created branch can be renamed via this command:
+jarvis-master	Checkout code	2025-12-08T16:33:02.9402232Z hint:
+jarvis-master	Checkout code	2025-12-08T16:33:02.9403633Z hint: 	git branch -m <name>
+jarvis-master	Checkout code	2025-12-08T16:33:02.9404696Z hint:
+jarvis-master	Checkout code	2025-12-08T16:33:02.9405878Z hint: Disable this message with "git config set advice.defaultBranchName false"
+jarvis-master	Checkout code	2025-12-08T16:33:02.9408095Z Initialized empty Git repository in /home/runner/work/okasinatrading.com/okasinatrading.com/.git/
+jarvis-master	Checkout code	2025-12-08T16:33:02.9413790Z [command]/usr/bin/git remote add origin https://github.com/Omran1983/okasinatrading.com
+jarvis-master	Checkout code	2025-12-08T16:33:02.9438964Z ##[endgroup]
+jarvis-master	Checkout code	2025-12-08T16:33:02.9441542Z ##[group]Disabling automatic garbage collection
+jarvis-master	Checkout code	2025-12-08T16:33:02.9443976Z [command]/usr/bin/git config --local gc.auto 0
+jarvis-master	Checkout code	2025-12-08T16:33:02.9472322Z ##[endgroup]
+jarvis-master	Checkout code	2025-12-08T16:33:02.9474846Z ##[group]Setting up auth
+jarvis-master	Checkout code	2025-12-08T16:33:02.9479747Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+jarvis-master	Checkout code	2025-12-08T16:33:02.9509858Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+jarvis-master	Checkout code	2025-12-08T16:33:02.9834587Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+jarvis-master	Checkout code	2025-12-08T16:33:02.9862589Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+jarvis-master	Checkout code	2025-12-08T16:33:03.0076068Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+jarvis-master	Checkout code	2025-12-08T16:33:03.0104695Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+jarvis-master	Checkout code	2025-12-08T16:33:03.0329746Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+jarvis-master	Checkout code	2025-12-08T16:33:03.0363096Z ##[endgroup]
+jarvis-master	Checkout code	2025-12-08T16:33:03.0365686Z ##[group]Fetching the repository
+jarvis-master	Checkout code	2025-12-08T16:33:03.0374812Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +498688e53f05e9afa0b9c2b55036df84713e713b:refs/remotes/origin/main
+jarvis-master	Checkout code	2025-12-08T16:33:04.8715211Z From https://github.com/Omran1983/okasinatrading.com
+jarvis-master	Checkout code	2025-12-08T16:33:04.8717372Z  * [new ref]         498688e53f05e9afa0b9c2b55036df84713e713b -> origin/main
+jarvis-master	Checkout code	2025-12-08T16:33:04.8748939Z ##[endgroup]
+jarvis-master	Checkout code	2025-12-08T16:33:04.8749697Z ##[group]Determining the checkout info
+jarvis-master	Checkout code	2025-12-08T16:33:04.8751863Z ##[endgroup]
+jarvis-master	Checkout code	2025-12-08T16:33:04.8757487Z [command]/usr/bin/git sparse-checkout disable
+jarvis-master	Checkout code	2025-12-08T16:33:04.8798496Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+jarvis-master	Checkout code	2025-12-08T16:33:04.8825924Z ##[group]Checking out the ref
+jarvis-master	Checkout code	2025-12-08T16:33:04.8829610Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+jarvis-master	Checkout code	2025-12-08T16:33:04.9867371Z Switched to a new branch 'main'
+jarvis-master	Checkout code	2025-12-08T16:33:04.9869377Z branch 'main' set up to track 'origin/main'.
+jarvis-master	Checkout code	2025-12-08T16:33:04.9885884Z ##[endgroup]
+jarvis-master	Checkout code	2025-12-08T16:33:04.9928262Z [command]/usr/bin/git log -1 --format=%H
+jarvis-master	Checkout code	2025-12-08T16:33:04.9951110Z 498688e53f05e9afa0b9c2b55036df84713e713b
+jarvis-master	Setup Node.js	﻿2025-12-08T16:33:05.0181868Z ##[group]Run actions/setup-node@v4
+jarvis-master	Setup Node.js	2025-12-08T16:33:05.0182170Z with:
+jarvis-master	Setup Node.js	2025-12-08T16:33:05.0182349Z   node-version: 18
+jarvis-master	Setup Node.js	2025-12-08T16:33:05.0182534Z   cache: npm
+jarvis-master	Setup Node.js	2025-12-08T16:33:05.0182704Z   always-auth: false
+jarvis-master	Setup Node.js	2025-12-08T16:33:05.0182918Z   check-latest: false
+jarvis-master	Setup Node.js	2025-12-08T16:33:05.0183729Z   token: ***
+jarvis-master	Setup Node.js	2025-12-08T16:33:05.0183929Z ##[endgroup]
+jarvis-master	Setup Node.js	2025-12-08T16:33:05.1914075Z Attempting to download 18...
+jarvis-master	Setup Node.js	2025-12-08T16:33:06.1024261Z Acquiring 18.20.8 - x64 from https://github.com/actions/node-versions/releases/download/18.20.8-14110393767/node-18.20.8-linux-x64.tar.gz
+jarvis-master	Setup Node.js	2025-12-08T16:33:06.5800918Z Extracting ...
+jarvis-master	Setup Node.js	2025-12-08T16:33:06.5902819Z [command]/usr/bin/tar xz --strip 1 --warning=no-unknown-keyword --overwrite -C /home/runner/work/_temp/8efa103f-393b-464f-b970-55b12716f5dc -f /home/runner/work/_temp/3f7b9fb5-2708-419e-be21-62062ab7903e
+jarvis-master	Setup Node.js	2025-12-08T16:33:07.5211741Z Adding to the cache ...
+jarvis-master	Setup Node.js	2025-12-08T16:33:09.1021366Z ##[group]Environment details
+jarvis-master	Setup Node.js	2025-12-08T16:33:09.3307932Z node: v18.20.8
+jarvis-master	Setup Node.js	2025-12-08T16:33:09.3308627Z npm: 10.8.2
+jarvis-master	Setup Node.js	2025-12-08T16:33:09.3308943Z yarn: 1.22.22
+jarvis-master	Setup Node.js	2025-12-08T16:33:09.3309525Z ##[endgroup]
+jarvis-master	Setup Node.js	2025-12-08T16:33:09.3328097Z [command]/opt/hostedtoolcache/node/18.20.8/x64/bin/npm config get cache
+jarvis-master	Setup Node.js	2025-12-08T16:33:09.4475328Z /home/runner/.npm
+jarvis-master	Setup Node.js	2025-12-08T16:33:09.7539917Z npm cache is not found
+jarvis-master	Install dependencies	﻿2025-12-08T16:33:09.7748526Z ##[group]Run npm ci
+jarvis-master	Install dependencies	2025-12-08T16:33:09.7748779Z [36;1mnpm ci[0m
+jarvis-master	Install dependencies	2025-12-08T16:33:09.7788887Z shell: /usr/bin/bash -e {0}
+jarvis-master	Install dependencies	2025-12-08T16:33:09.7789140Z ##[endgroup]
+jarvis-master	Install dependencies	2025-12-08T16:33:10.3732569Z npm warn EBADENGINE Unsupported engine {
+jarvis-master	Install dependencies	2025-12-08T16:33:10.3733280Z npm warn EBADENGINE   package: 'okasina-fashion-store-vite@0.0.0',
+jarvis-master	Install dependencies	2025-12-08T16:33:10.3734202Z npm warn EBADENGINE   required: { node: '22.x' },
+jarvis-master	Install dependencies	2025-12-08T16:33:10.3734749Z npm warn EBADENGINE   current: { node: 'v18.20.8', npm: '10.8.2' }
+jarvis-master	Install dependencies	2025-12-08T16:33:10.3735161Z npm warn EBADENGINE }
+jarvis-master	Install dependencies	2025-12-08T16:33:10.3747035Z npm warn EBADENGINE Unsupported engine {
+jarvis-master	Install dependencies	2025-12-08T16:33:10.3747564Z npm warn EBADENGINE   package: '@supabase/auth-js@2.86.0',
+jarvis-master	Install dependencies	2025-12-08T16:33:10.3747991Z npm warn EBADENGINE   required: { node: '>=20.0.0' },
+jarvis-master	Install dependencies	2025-12-08T16:33:10.3748434Z npm warn EBADENGINE   current: { node: 'v18.20.8', npm: '10.8.2' }
+jarvis-master	Install dependencies	2025-12-08T16:33:10.3748777Z npm warn EBADENGINE }
+jarvis-master	Install dependencies	2025-12-08T16:33:10.3751248Z npm warn EBADENGINE Unsupported engine {
+jarvis-master	Install dependencies	2025-12-08T16:33:10.3751822Z npm warn EBADENGINE   package: '@supabase/functions-js@2.86.0',
+jarvis-master	Install dependencies	2025-12-08T16:33:10.3752261Z npm warn EBADENGINE   required: { node: '>=20.0.0' },
+jarvis-master	Install dependencies	2025-12-08T16:33:10.3752727Z npm warn EBADENGINE   current: { node: 'v18.20.8', npm: '10.8.2' }
+jarvis-master	Install dependencies	2025-12-08T16:33:10.3753078Z npm warn EBADENGINE }
+jarvis-master	Install dependencies	2025-12-08T16:33:10.3754789Z npm warn EBADENGINE Unsupported engine {
+jarvis-master	Install dependencies	2025-12-08T16:33:10.3755352Z npm warn EBADENGINE   package: '@supabase/postgrest-js@2.86.0',
+jarvis-master	Install dependencies	2025-12-08T16:33:10.3755806Z npm warn EBADENGINE   required: { node: '>=20.0.0' },
+jarvis-master	Install dependencies	2025-12-08T16:33:10.3756271Z npm warn EBADENGINE   current: { node: 'v18.20.8', npm: '10.8.2' }
+jarvis-master	Install dependencies	2025-12-08T16:33:10.3756628Z npm warn EBADENGINE }
+jarvis-master	Install dependencies	2025-12-08T16:33:10.3757942Z npm warn EBADENGINE Unsupported engine {
+jarvis-master	Install dependencies	2025-12-08T16:33:10.3758497Z npm warn EBADENGINE   package: '@supabase/realtime-js@2.86.0',
+jarvis-master	Install dependencies	2025-12-08T16:33:10.3758942Z npm warn EBADENGINE   required: { node: '>=20.0.0' },
+jarvis-master	Install dependencies	2025-12-08T16:33:10.3759412Z npm warn EBADENGINE   current: { node: 'v18.20.8', npm: '10.8.2' }
+jarvis-master	Install dependencies	2025-12-08T16:33:10.3759775Z npm warn EBADENGINE }
+jarvis-master	Install dependencies	2025-12-08T16:33:10.3760703Z npm warn EBADENGINE Unsupported engine {
+jarvis-master	Install dependencies	2025-12-08T16:33:10.3761421Z npm warn EBADENGINE   package: '@supabase/storage-js@2.86.0',
+jarvis-master	Install dependencies	2025-12-08T16:33:10.3762047Z npm warn EBADENGINE   required: { node: '>=20.0.0' },
+jarvis-master	Install dependencies	2025-12-08T16:33:10.3762759Z npm warn EBADENGINE   current: { node: 'v18.20.8', npm: '10.8.2' }
+jarvis-master	Install dependencies	2025-12-08T16:33:10.3763145Z npm warn EBADENGINE }
+jarvis-master	Install dependencies	2025-12-08T16:33:10.3763544Z npm warn EBADENGINE Unsupported engine {
+jarvis-master	Install dependencies	2025-12-08T16:33:10.3763933Z npm warn EBADENGINE   package: '@supabase/supabase-js@2.86.0',
+jarvis-master	Install dependencies	2025-12-08T16:33:10.3764335Z npm warn EBADENGINE   required: { node: '>=20.0.0' },
+jarvis-master	Install dependencies	2025-12-08T16:33:10.3764741Z npm warn EBADENGINE   current: { node: 'v18.20.8', npm: '10.8.2' }
+jarvis-master	Install dependencies	2025-12-08T16:33:10.3765061Z npm warn EBADENGINE }
+jarvis-master	Install dependencies	2025-12-08T16:33:10.3783472Z npm warn EBADENGINE Unsupported engine {
+jarvis-master	Install dependencies	2025-12-08T16:33:10.3784228Z npm warn EBADENGINE   package: 'iceberg-js@0.8.0',
+jarvis-master	Install dependencies	2025-12-08T16:33:10.3784618Z npm warn EBADENGINE   required: { node: '>=20.0.0' },
+jarvis-master	Install dependencies	2025-12-08T16:33:10.3785032Z npm warn EBADENGINE   current: { node: 'v18.20.8', npm: '10.8.2' }
+jarvis-master	Install dependencies	2025-12-08T16:33:10.3785354Z npm warn EBADENGINE }
+jarvis-master	Install dependencies	2025-12-08T16:33:10.3794290Z npm warn EBADENGINE Unsupported engine {
+jarvis-master	Install dependencies	2025-12-08T16:33:10.3794760Z npm warn EBADENGINE   package: 'react-router@7.9.6',
+jarvis-master	Install dependencies	2025-12-08T16:33:10.3795151Z npm warn EBADENGINE   required: { node: '>=20.0.0' },
+jarvis-master	Install dependencies	2025-12-08T16:33:10.3795570Z npm warn EBADENGINE   current: { node: 'v18.20.8', npm: '10.8.2' }
+jarvis-master	Install dependencies	2025-12-08T16:33:10.3795888Z npm warn EBADENGINE }
+jarvis-master	Install dependencies	2025-12-08T16:33:10.3796763Z npm warn EBADENGINE Unsupported engine {
+jarvis-master	Install dependencies	2025-12-08T16:33:10.3797270Z npm warn EBADENGINE   package: 'react-router-dom@7.9.6',
+jarvis-master	Install dependencies	2025-12-08T16:33:10.3797655Z npm warn EBADENGINE   required: { node: '>=20.0.0' },
+jarvis-master	Install dependencies	2025-12-08T16:33:10.3798070Z npm warn EBADENGINE   current: { node: 'v18.20.8', npm: '10.8.2' }
+jarvis-master	Install dependencies	2025-12-08T16:33:10.3798400Z npm warn EBADENGINE }
+jarvis-master	Install dependencies	2025-12-08T16:33:12.1224057Z npm warn deprecated q@1.5.1: You or someone you depend on is using Q, the JavaScript Promise library that gave JavaScript developers strong feelings about promises. They can almost certainly migrate to the native JavaScript promise now. Thank you literally everyone for joining me in this bet against the odds. Be excellent to each other.
+jarvis-master	Install dependencies	2025-12-08T16:33:12.1226273Z npm warn deprecated
+jarvis-master	Install dependencies	2025-12-08T16:33:12.1227011Z npm warn deprecated (For a CapTP with native promises, see @endo/eventual-send and @endo/captp)
+jarvis-master	Install dependencies	2025-12-08T16:33:13.1878918Z npm warn deprecated node-domexception@1.0.0: Use your platform's native DOMException instead
+jarvis-master	Install dependencies	2025-12-08T16:33:13.2502860Z npm warn deprecated @types/long@5.0.0: This is a stub types definition. long provides its own type definitions, so you do not need this installed.
+jarvis-master	Install dependencies	2025-12-08T16:33:17.8147561Z 
+jarvis-master	Install dependencies	2025-12-08T16:33:17.8152202Z added 527 packages, and audited 528 packages in 8s
+jarvis-master	Install dependencies	2025-12-08T16:33:17.8156721Z 
+jarvis-master	Install dependencies	2025-12-08T16:33:17.8160644Z 84 packages are looking for funding
+jarvis-master	Install dependencies	2025-12-08T16:33:17.8165352Z   run `npm fund` for details
+jarvis-master	Install dependencies	2025-12-08T16:33:17.8347173Z 
+jarvis-master	Install dependencies	2025-12-08T16:33:17.8354398Z 10 vulnerabilities (2 low, 3 moderate, 4 high, 1 critical)
+jarvis-master	Install dependencies	2025-12-08T16:33:17.8355820Z 
+jarvis-master	Install dependencies	2025-12-08T16:33:17.8356370Z To address all issues, run:
+jarvis-master	Install dependencies	2025-12-08T16:33:17.8356752Z   npm audit fix
+jarvis-master	Install dependencies	2025-12-08T16:33:17.8356940Z 
+jarvis-master	Install dependencies	2025-12-08T16:33:17.8357115Z Run `npm audit` for details.
+jarvis-master	Run JARVIS Master Orchestrator	﻿2025-12-08T16:33:17.8696502Z ##[group]Run npm run jarvis:master
+jarvis-master	Run JARVIS Master Orchestrator	2025-12-08T16:33:17.8696806Z [36;1mnpm run jarvis:master[0m
+jarvis-master	Run JARVIS Master Orchestrator	2025-12-08T16:33:17.8728880Z shell: /usr/bin/bash -e {0}
+jarvis-master	Run JARVIS Master Orchestrator	2025-12-08T16:33:17.8729108Z env:
+jarvis-master	Run JARVIS Master Orchestrator	2025-12-08T16:33:17.8729270Z   VITE_SUPABASE_URL: 
+jarvis-master	Run JARVIS Master Orchestrator	2025-12-08T16:33:17.8729475Z   VITE_SUPABASE_ANON_KEY: 
+jarvis-master	Run JARVIS Master Orchestrator	2025-12-08T16:33:17.8729679Z   SUPABASE_SERVICE_ROLE_KEY: 
+jarvis-master	Run JARVIS Master Orchestrator	2025-12-08T16:33:17.8729898Z   GOOGLE_AI_KEY: 
+jarvis-master	Run JARVIS Master Orchestrator	2025-12-08T16:33:17.8730080Z   CLOUDINARY_CLOUD_NAME: 
+jarvis-master	Run JARVIS Master Orchestrator	2025-12-08T16:33:17.8730281Z   CLOUDINARY_API_KEY: 
+jarvis-master	Run JARVIS Master Orchestrator	2025-12-08T16:33:17.8730493Z   CLOUDINARY_API_SECRET: 
+jarvis-master	Run JARVIS Master Orchestrator	2025-12-08T16:33:17.8730684Z ##[endgroup]
+jarvis-master	Run JARVIS Master Orchestrator	2025-12-08T16:33:18.0000770Z 
+jarvis-master	Run JARVIS Master Orchestrator	2025-12-08T16:33:18.0001517Z > okasina-fashion-store-vite@0.0.0 jarvis:master
+jarvis-master	Run JARVIS Master Orchestrator	2025-12-08T16:33:18.0002198Z > node scripts/jarvis-master.js
+jarvis-master	Run JARVIS Master Orchestrator	2025-12-08T16:33:18.0002485Z 
+jarvis-master	Run JARVIS Master Orchestrator	2025-12-08T16:33:18.0906523Z ⚠️  Node.js 18 and below are deprecated and will no longer be supported in future versions of @supabase/supabase-js. Please upgrade to Node.js 20 or later. For more information, visit: https://github.com/orgs/supabase/discussions/37217
+jarvis-master	Run JARVIS Master Orchestrator	2025-12-08T16:33:18.0954654Z ❌ CRITICAL: Missing Supabase environment variables
+jarvis-master	Run JARVIS Master Orchestrator	2025-12-08T16:33:18.0955887Z    Required: VITE_SUPABASE_URL and (SUPABASE_SERVICE_ROLE_KEY or VITE_SUPABASE_ANON_KEY)
+jarvis-master	Run JARVIS Master Orchestrator	2025-12-08T16:33:18.0957472Z    Please set these in GitHub Secrets or .env file
+jarvis-master	Run JARVIS Master Orchestrator	2025-12-08T16:33:18.1109260Z ##[error]Process completed with exit code 1.
+jarvis-master	Upload JARVIS Report	﻿2025-12-08T16:33:18.1201404Z ##[group]Run actions/upload-artifact@v4
+jarvis-master	Upload JARVIS Report	2025-12-08T16:33:18.1201815Z with:
+jarvis-master	Upload JARVIS Report	2025-12-08T16:33:18.1202069Z   name: jarvis-report
+jarvis-master	Upload JARVIS Report	2025-12-08T16:33:18.1202613Z   path: .jarvis/last-run.json
+jarvis-master	Upload JARVIS Report	2025-12-08T16:33:18.1202958Z   if-no-files-found: warn
+jarvis-master	Upload JARVIS Report	2025-12-08T16:33:18.1203281Z   compression-level: 6
+jarvis-master	Upload JARVIS Report	2025-12-08T16:33:18.1203817Z   overwrite: false
+jarvis-master	Upload JARVIS Report	2025-12-08T16:33:18.1204117Z   include-hidden-files: false
+jarvis-master	Upload JARVIS Report	2025-12-08T16:33:18.1204453Z ##[endgroup]
+jarvis-master	Upload JARVIS Report	2025-12-08T16:33:18.3457918Z With the provided path, there will be 1 file uploaded
+jarvis-master	Upload JARVIS Report	2025-12-08T16:33:18.3464136Z Artifact name is valid!
+jarvis-master	Upload JARVIS Report	2025-12-08T16:33:18.3464605Z Root directory input is valid!
+jarvis-master	Upload JARVIS Report	2025-12-08T16:33:18.6704908Z Beginning upload of artifact content to blob storage
+jarvis-master	Upload JARVIS Report	2025-12-08T16:33:18.9807170Z Uploaded bytes 1481
+jarvis-master	Upload JARVIS Report	2025-12-08T16:33:19.0565312Z Finished uploading artifact content to blob storage!
+jarvis-master	Upload JARVIS Report	2025-12-08T16:33:19.0568654Z SHA256 digest of uploaded artifact zip is c1b141914b5df479154c06540511de0a2b88d3b87bba309e239a7a66c72ca8f5
+jarvis-master	Upload JARVIS Report	2025-12-08T16:33:19.0570537Z Finalizing artifact upload
+jarvis-master	Upload JARVIS Report	2025-12-08T16:33:19.2184286Z Artifact jarvis-report.zip successfully finalized. Artifact ID 4799958138
+jarvis-master	Upload JARVIS Report	2025-12-08T16:33:19.2186178Z Artifact jarvis-report has been successfully uploaded! Final size is 1481 bytes. Artifact ID is 4799958138
+jarvis-master	Upload JARVIS Report	2025-12-08T16:33:19.2192823Z Artifact download URL: https://github.com/Omran1983/okasinatrading.com/actions/runs/20035333562/artifacts/4799958138
+jarvis-master	Fail if critical issues found	﻿2025-12-08T16:33:19.2299954Z ##[group]Run echo "::error::JARVIS detected critical issues that need attention"
+jarvis-master	Fail if critical issues found	2025-12-08T16:33:19.2300771Z [36;1mecho "::error::JARVIS detected critical issues that need attention"[0m
+jarvis-master	Fail if critical issues found	2025-12-08T16:33:19.2301330Z [36;1mexit 1[0m
+jarvis-master	Fail if critical issues found	2025-12-08T16:33:19.2342170Z shell: /usr/bin/bash -e {0}
+jarvis-master	Fail if critical issues found	2025-12-08T16:33:19.2342532Z ##[endgroup]
+jarvis-master	Fail if critical issues found	2025-12-08T16:33:19.2418179Z ##[error]JARVIS detected critical issues that need attention
+jarvis-master	Fail if critical issues found	2025-12-08T16:33:19.2420240Z ##[error]Process completed with exit code 1.
+jarvis-master	Post Checkout code	﻿2025-12-08T16:33:19.2489811Z Post job cleanup.
+jarvis-master	Post Checkout code	2025-12-08T16:33:19.3456776Z [command]/usr/bin/git version
+jarvis-master	Post Checkout code	2025-12-08T16:33:19.3499896Z git version 2.52.0
+jarvis-master	Post Checkout code	2025-12-08T16:33:19.3549057Z Temporarily overriding HOME='/home/runner/work/_temp/b2b86b72-c9c2-42f4-8793-1c0ca32c7393' before making global git config changes
+jarvis-master	Post Checkout code	2025-12-08T16:33:19.3550390Z Adding repository directory to the temporary git global config as a safe directory
+jarvis-master	Post Checkout code	2025-12-08T16:33:19.3555888Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/okasinatrading.com/okasinatrading.com
+jarvis-master	Post Checkout code	2025-12-08T16:33:19.3592982Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+jarvis-master	Post Checkout code	2025-12-08T16:33:19.3626415Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+jarvis-master	Post Checkout code	2025-12-08T16:33:19.3853997Z fatal: No url found for submodule path 'okasina-backup/okasina-fashion-store' in .gitmodules
+jarvis-master	Post Checkout code	2025-12-08T16:33:19.3884720Z ##[warning]The process '/usr/bin/git' failed with exit code 128
+jarvis-master	Complete job	﻿2025-12-08T16:33:19.3976147Z Cleaning up orphan processes

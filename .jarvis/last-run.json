@@ -2,23 +2,23 @@
   "modules": {
     "Health Check": {
       "success": false,
-      "duration": 3076,
+      "duration": 3264,
       "error": "Command failed: node scripts/jarvis-health-check.js\n"
     },
     "Comprehensive Check": {
       "success": true,
-      "duration": 32149,
+      "duration": 31466,
       "output": "🤖 JARVIS Comprehensive System Check\n\nChecking ALL aspects of your website...\n\n\n============================================================\n📋 Database & Data Integrity\n============================================================\n\n============================================================\n📋 Frontend Validation\n============================================================\n\n============================================================\n📋 Backend API Health\n============================================================\n\n============================================================\n📋 Environment & Configuration\n============================================================\n\n============================================================\n📋 Security Checks\n============================================================\n\n============================================================\n📋 Performance & SEO\n============================================================\n\n============================================================\n📋 Deployment Status\n============================================================\n✅ Database connection successful\n✅ Found 95 products in database\n✅ All products have sizes\n⚠️ 95 products missing original_price\n🔧 Set original_price for 95 products\n✅ All products have valid stock levels\n✅ All products have categories\n⚠️ 6 products missing images\n✅ No duplicate SKUs found\n✅ src/App.jsx exists\n✅ src/main.jsx exists\n✅ src/index.css exists\n✅ index.html exists\n✅ vite.config.js exists\n✅ package.json exists\n✅ App.jsx imports look valid\n✅ react is installed\n✅ react-dom is installed\n✅ react-router-dom is installed\n✅ @supabase/supabase-js is installed\n✅ server.js exists\n✅ Endpoint /api/update-product is defined\n✅ Endpoint /api/delete-product is defined\n✅ Endpoint /api/stylist-chat is defined\n✅ Endpoint /api/upload-image is defined\n✅ Endpoint /api/facebook/list-albums is defined\n✅ Endpoint /api/facebook/import-album is defined\n✅ VITE_SUPABASE_URL is set\n✅ VITE_SUPABASE_ANON_KEY is set\n✅ SUPABASE_SERVICE_ROLE_KEY is set\n⚠️ GOOGLE_AI_KEY not set (optional feature disabled)\n⚠️ VITE_GEMINI_API_KEY not set (optional feature disabled)\n✅ CLOUDINARY_CLOUD_NAME is set (optional)\n✅ CLOUDINARY_API_KEY is set (optional)\n✅ CLOUDINARY_API_SECRET is set (optional)\n✅ .env file exists\n✅ .env is in .gitignore (security)\n✅ src/supabase.js looks secure\n✅ src/api.js uses environment variables correctly\n✅ RLS policies allow necessary operations\n✅ src/index.css size is optimal (0.00MB)\n✅ index.html has title tag\n⚠️ index.html missing meta description (SEO)\n✅ index.html has viewport meta (mobile)\n✅ Site is accessible (https://okasinatrading.com)\n✅ vercel.json exists\n✅ Vercel rewrites configured\n\n============================================================\n📊 COMPREHENSIVE CHECK SUMMARY\n============================================================\n✅ Passed: 41\n❌ Failed: 0\n⚠️  Warnings: 5\n🔧 Auto-Fixed: 1\n============================================================\n\n✨ JARVIS automatically fixed 1 issues!\n\n🎉 All critical checks passed!\n\n⚠️  5 warnings - review recommended\n\n🤖 JARVIS Comprehensive Check Complete\n\n"
     },
     "Auto-Repair": {
       "success": true,
-      "duration": 4157,
+      "duration": 3582,
       "output": "🤖 JARVIS Auto-Repair System Starting...\n\n🔧 Running Auto-Repair Sequence...\n\n✅ Site is accessible\n\n==================================================\n📊 Auto-Repair Summary:\n   🔍 Issues Detected: 0\n   🔧 Issues Fixed: 0\n   ❌ Failed: 0\n==================================================\n\n🤖 JARVIS Auto-Repair Complete\n\n"
     }
   },
   "totalIssues": 0,
   "totalFixed": 0,
   "totalWarnings": 4,
-  "startTime": "2025-12-05T16:55:53.772Z",
-  "endTime": "2025-12-05T16:56:36.832Z"
+  "startTime": "2025-12-08T19:41:38.439Z",
+  "endTime": "2025-12-08T19:42:19.886Z"
 }
