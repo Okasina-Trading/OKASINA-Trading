@@ -16,7 +16,9 @@ export default function ShopPage() {
         category: searchParams.get('category') || null,
         subcategory: searchParams.get('subcategory') || null,
         search: searchParams.get('search') || null,
+        sale: searchParams.get('sale') === 'true',
         priceRange: null,
+        availability: 'all', // Added availability filter
         sort: 'newest'
     });
 
@@ -26,6 +28,7 @@ export default function ShopPage() {
         if (filters.category) params.category = filters.category;
         if (filters.subcategory) params.subcategory = filters.subcategory;
         if (filters.search) params.search = filters.search;
+        if (filters.sale) params.sale = 'true';
         setSearchParams(params);
     }, [filters, setSearchParams]);
 
@@ -38,11 +41,13 @@ export default function ShopPage() {
     // Helper to format title
     const title = filters.search
         ? `Search results for "${filters.search}"`
-        : filters.subcategory
-            ? filters.subcategory
-            : filters.category
-                ? filters.category
-                : "Our Collection";
+        : filters.sale
+            ? "On Sale"
+            : filters.subcategory
+                ? filters.subcategory
+                : filters.category
+                    ? filters.category
+                    : "Our Collection";
 
     return (
         <div className="min-h-screen bg-white">
@@ -56,8 +61,8 @@ export default function ShopPage() {
                             <button
                                 onClick={() => handleViewModeChange('grid')}
                                 className={`p-2 rounded transition-colors ${viewMode === 'grid'
-                                        ? 'bg-white text-black shadow-sm'
-                                        : 'text-gray-500 hover:text-gray-700'
+                                    ? 'bg-white text-black shadow-sm'
+                                    : 'text-gray-500 hover:text-gray-700'
                                     }`}
                                 title="Grid View"
                             >
@@ -66,8 +71,8 @@ export default function ShopPage() {
                             <button
                                 onClick={() => handleViewModeChange('list')}
                                 className={`p-2 rounded transition-colors ${viewMode === 'list'
-                                        ? 'bg-white text-black shadow-sm'
-                                        : 'text-gray-500 hover:text-gray-700'
+                                    ? 'bg-white text-black shadow-sm'
+                                    : 'text-gray-500 hover:text-gray-700'
                                     }`}
                                 title="List View"
                             >
@@ -89,8 +94,8 @@ export default function ShopPage() {
                 </div>
 
                 <section aria-labelledby="products-heading" className="pt-6 pb-24">
-                    <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-4">
-                        {/* Filters */}
+                    <div className="flex flex-col gap-y-6">
+                        {/* Filters - Now at the top */}
                         <ProductFilters
                             filters={filters}
                             setFilters={setFilters}
@@ -98,8 +103,8 @@ export default function ShopPage() {
                             setMobileOpen={setMobileFiltersOpen}
                         />
 
-                        {/* Product Grid */}
-                        <div className="lg:col-span-3">
+                        {/* Product Grid - Full width */}
+                        <div className="w-full">
                             <ProductList filters={filters} viewMode={viewMode} />
                         </div>
                     </div>

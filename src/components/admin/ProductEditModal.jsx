@@ -51,8 +51,10 @@ export default function ProductEditModal({ product, isOpen, onClose, onUpdate })
             const updateData = {
                 ...formData,
                 price: parseFloat(formData.price),
-                price_mur: parseFloat(formData.price_mur),
+                price_mur: parseFloat(formData.price_mur) || 0, // Handle hidden field
                 stock_qty: parseInt(formData.stock_qty),
+                // Fix for Unique Constraint: Send NULL if SKU is empty string
+                sku: formData.sku && formData.sku.trim() !== '' ? formData.sku.trim() : null,
                 sizes: formData.sizes.split(',').map(s => s.trim()).filter(s => s)
             };
 

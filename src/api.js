@@ -1,11 +1,9 @@
 import axios from 'axios';
 import { logger } from './services/logger';
-
-const isDevelopment = import.meta.env.MODE === 'development';
-export const API_URL = isDevelopment ? 'http://localhost:3001' : '';
+import { API_BASE_URL } from './config';
 
 const api = axios.create({
-    baseURL: API_URL,
+    baseURL: API_BASE_URL,
     timeout: 30000, // Increased timeout for AI endpoints
     headers: {
         'Content-Type': 'application/json'

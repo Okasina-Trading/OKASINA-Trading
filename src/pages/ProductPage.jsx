@@ -5,8 +5,9 @@ import { useCart } from '../contexts/CartContext';
 import { useToast } from '../contexts/ToastContext';
 import { useComparison } from '../contexts/ComparisonContext';
 import { useCurrency } from '../contexts/CurrencyContext';
+import { useWishlist } from '../contexts/WishlistContext';
 import { Helmet } from 'react-helmet-async';
-import { Star, Truck, ShieldCheck, ArrowLeft, Ruler, ZoomIn, ArrowRightLeft } from 'lucide-react';
+import { Star, Truck, ShieldCheck, ArrowLeft, Ruler, ZoomIn, ArrowRightLeft, Heart } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import ReviewSection from '../components/reviews/ReviewSection';
 import RelatedProducts from '../components/product/RelatedProducts';
@@ -23,6 +24,7 @@ export default function ProductPage() {
     const { addToast } = useToast();
     const { addToCompare } = useComparison();
     const { formatPrice } = useCurrency();
+    const { isInWishlist, toggleWishlist } = useWishlist();
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
     const [selectedSize, setSelectedSize] = useState('');
@@ -214,6 +216,17 @@ export default function ProductPage() {
                                 className="w-full border border-gray-300 text-gray-700 py-3 text-sm font-bold uppercase tracking-widest hover:border-black hover:text-black transition-colors flex items-center justify-center"
                             >
                                 <ArrowRightLeft size={16} className="mr-2" /> Compare Product
+                            </button>
+
+                            <button
+                                onClick={() => toggleWishlist(product)}
+                                className={`w-full border py-3 text-sm font-bold uppercase tracking-widest transition-colors flex items-center justify-center ${isInWishlist(product.id)
+                                    ? 'border-red-500 text-red-500 hover:bg-red-50'
+                                    : 'border-gray-300 text-gray-700 hover:border-black hover:text-black'
+                                    }`}
+                            >
+                                <Heart size={16} className={`mr-2 ${isInWishlist(product.id) ? 'fill-current' : ''}`} />
+                                {isInWishlist(product.id) ? 'Remove from Wishlist' : 'Add to Wishlist'}
                             </button>
                         </div>
 

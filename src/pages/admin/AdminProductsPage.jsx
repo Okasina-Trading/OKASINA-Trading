@@ -16,7 +16,10 @@ import {
     AlertCircle,
     CheckCircle,
     Facebook,
-    Zap
+    Zap,
+    ArrowUp,
+    ArrowDown,
+    ArrowUpDown
 } from 'lucide-react';
 import { API_URL } from '../../api';
 
@@ -98,11 +101,42 @@ export default function AdminProductsPage() {
                 throw new Error(result.error || 'Delete failed');
             }
 
+            // Remove from selected if it was selected
+            if (selectedProducts.includes(productId)) {
+                setSelectedProducts(prev => prev.filter(id => id !== productId));
+            }
+
             fetchProducts();
-            alert('Product deleted successfully');
         } catch (error) {
             console.error('Error deleting product:', error);
             alert('Failed to delete product: ' + error.message);
+        }
+    };
+
+    const handleBulkDelete = async () => {
+        if (!confirm(`Are you sure you want to delete ${selectedProducts.length} products? This action cannot be undone.`)) return;
+
+        try {
+            setLoading(true);
+            const results = await Promise.all(
+                selectedProducts.map(id =>
+                    fetch(`${API_URL}/api/delete-product`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ productId: id })
+                    }).then(res => res.json())
+                )
+            );
+
+            console.log('Bulk delete results:', results);
+            alert('Products deleted successfully');
+            setSelectedProducts([]);
+            fetchProducts();
+        } catch (error) {
+            console.error('Bulk delete error:', error);
+            alert('Failed to delete some products');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -188,12 +222,49 @@ export default function AdminProductsPage() {
         }
     };
 
-    const filteredProducts = products.filter(product => {
-        const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            product.sku?.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesCategory = categoryFilter === 'all' || product.category === categoryFilter;
-        return matchesSearch && matchesCategory;
-    });
+    const [sortConfig, setSortConfig] = useState({ key: 'created_at', direction: 'desc' });
+
+    const handleSort = (key) => {
+        let direction = 'asc';
+        if (sortConfig.key === key && sortConfig.direction === 'asc') {
+            direction = 'desc';
+        }
+        setSortConfig({ key, direction });
+    };
+
+    const filteredProducts = products
+        .filter(product => {
+            const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                product.sku?.toLowerCase().includes(searchTerm.toLowerCase());
+            const matchesCategory = categoryFilter === 'all' || product.category === categoryFilter;
+            return matchesSearch && matchesCategory;
+        })
+        .sort((a, b) => {
+            if (!sortConfig.key) return 0;
+
+            let aValue = a[sortConfig.key];
+            let bValue = b[sortConfig.key];
+
+            // Handle special cases
+            if (sortConfig.key === 'price') {
+                aValue = Number(aValue) || 0;
+                bValue = Number(bValue) || 0;
+            } else if (sortConfig.key === 'stock_qty') {
+                aValue = Number(aValue) || 0;
+                bValue = Number(bValue) || 0;
+            } else if (sortConfig.key === 'name' || sortConfig.key === 'category' || sortConfig.key === 'sku') {
+                aValue = (aValue || '').toString().toLowerCase();
+                bValue = (bValue || '').toString().toLowerCase();
+            }
+
+            if (aValue < bValue) {
+                return sortConfig.direction === 'asc' ? -1 : 1;
+            }
+            if (aValue > bValue) {
+                return sortConfig.direction === 'asc' ? 1 : -1;
+            }
+            return 0;
+        });
 
     const categories = [...new Set(products.map(p => p.category))];
 
@@ -248,43 +319,6 @@ export default function AdminProductsPage() {
         } catch (error) {
             console.error('Error updating categories:', error);
             alert('Failed to update categories: ' + error.message);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleBulkDelete = async () => {
-        if (!confirm(`Are you sure you want to delete ${selectedProducts.length} products? This cannot be undone.`)) return;
-
-        try {
-            setLoading(true);
-            let successCount = 0;
-            let failCount = 0;
-
-            for (const productId of selectedProducts) {
-                try {
-                    const response = await fetch(`${API_URL}/api/delete-product`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ productId })
-                    });
-
-                    if (response.ok) {
-                        successCount++;
-                    } else {
-                        failCount++;
-                    }
-                } catch (err) {
-                    failCount++;
-                }
-            }
-
-            alert(`Deleted ${successCount} products successfully.${failCount > 0 ? ` ${failCount} failed.` : ''}`);
-            setSelectedProducts([]);
-            fetchProducts();
-        } catch (error) {
-            console.error('Error deleting products:', error);
-            alert('Failed to delete products: ' + error.message);
         } finally {
             setLoading(false);
         }
@@ -429,7 +463,7 @@ export default function AdminProductsPage() {
                                         className="text-xs bg-red-600 text-white px-3 py-1.5 rounded hover:bg-red-700 transition-colors flex items-center gap-1"
                                     >
                                         <Trash2 size={12} />
-                                        Delete
+                                        Delete Selected
                                     </button>
                                 </div>
                             )}
@@ -519,24 +553,29 @@ export default function AdminProductsPage() {
                                             className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
                                         />
                                     </th>
-                                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Product
-                                    </th>
-                                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        SKU
-                                    </th>
-                                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Category
-                                    </th>
-                                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Price
-                                    </th>
-                                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Stock
-                                    </th>
-                                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Status
-                                    </th>
+                                    {[
+                                        { key: 'name', label: 'Product' },
+                                        { key: 'sku', label: 'SKU' },
+                                        { key: 'category', label: 'Category' },
+                                        { key: 'price', label: 'Price' },
+                                        { key: 'stock_qty', label: 'Stock' },
+                                        { key: 'status', label: 'Status' }
+                                    ].map((col) => (
+                                        <th
+                                            key={col.key}
+                                            className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors select-none"
+                                            onClick={() => handleSort(col.key)}
+                                        >
+                                            <div className="flex items-center gap-1">
+                                                {col.label}
+                                                {sortConfig.key === col.key ? (
+                                                    sortConfig.direction === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />
+                                                ) : (
+                                                    <ArrowUpDown size={14} className="text-gray-300" />
+                                                )}
+                                            </div>
+                                        </th>
+                                    ))}
                                     <th className="px-6 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Actions
                                     </th>
@@ -586,7 +625,10 @@ export default function AdminProductsPage() {
                                                 {product.category}
                                             </td>
                                             <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                                                Rs {product.price?.toLocaleString()}
+                                                {(() => {
+                                                    const price = product.price_mur || (product.price * 45);
+                                                    return `Rs ${price?.toLocaleString()}`;
+                                                })()}
                                             </td>
                                             <td className="px-6 py-4 text-sm text-gray-600">
                                                 {product.stock_qty}

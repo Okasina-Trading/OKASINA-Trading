@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { supabase } from '../services/logger'; // Re-use supabase client from logger
+import { supabase } from '../supabase'; // Shared supabase client
 import { logger } from '../services/logger';
 // Simple UUID generator to avoid adding 'uuid' dependency
 const generateUUID = () => {

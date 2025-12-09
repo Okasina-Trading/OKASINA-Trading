@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import { ChevronDown, X } from 'lucide-react';
 
 export default function ProductFilters({ filters, setFilters, mobileOpen, setMobileOpen }) {
     const categories = [
@@ -32,12 +33,40 @@ export default function ProductFilters({ filters, setFilters, mobileOpen, setMob
         { label: 'Over Rs 5,000', min: 5000, max: 100000 }
     ];
 
+    const availabilityOptions = [
+        { label: 'All Items', value: 'all' },
+        { label: 'In Stock', value: 'in_stock' },
+        { label: 'Out of Stock', value: 'out_of_stock' }
+    ];
+
+    // Dropdown states for desktop
+    const [activeDropdown, setActiveDropdown] = useState(null);
+    const dropdownRef = useRef(null);
+
+    // Close dropdowns when clicking outside
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setActiveDropdown(null);
+            }
+        }
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
+
+    const toggleDropdown = (name) => {
+        setActiveDropdown(activeDropdown === name ? null : name);
+    };
+
     const handleCategoryChange = (category, subcategory = null) => {
         setFilters(prev => ({
             ...prev,
             category: category,
             subcategory: subcategory === prev.subcategory ? null : subcategory
         }));
+        if (!subcategory) setActiveDropdown(null); // Close if just selecting main category, optional
     };
 
     const handlePriceChange = (range) => {
@@ -45,40 +74,81 @@ export default function ProductFilters({ filters, setFilters, mobileOpen, setMob
             ...prev,
             priceRange: prev.priceRange?.label === range.label ? null : range
         }));
+        setActiveDropdown(null);
     };
+
+    const handleAvailabilityChange = (value) => {
+        setFilters(prev => ({
+            ...prev,
+            availability: value
+        }));
+        setActiveDropdown(null);
+    };
+
+    const clearFilters = () => {
+        setFilters(prev => ({
+            ...prev,
+            category: null,
+            subcategory: null,
+            priceRange: null,
+            availability: 'all'
+        }));
+        setActiveDropdown(null);
+    };
+
+    const hasActiveFilters = filters.category || filters.priceRange || filters.availability !== 'all';
 
     return (
         <>
             {/* Mobile Filter Dialog Overlay */}
             {mobileOpen && (
-                <div className="fixed inset-0 z-40 flex lg:hidden">
-                    <div className="fixed inset-0 bg-black bg-opacity-25" onClick={() => setMobileOpen(false)}></div>
-                    <div className="relative ml-auto flex h-full w-full max-w-xs flex-col overflow-y-auto bg-white py-4 pb-12 shadow-xl">
-                        <div className="flex items-center justify-between px-4">
+                <div className="fixed inset-0 z-50 flex lg:hidden">
+                    <div className="fixed inset-0 bg-black/50 transition-opacity" onClick={() => setMobileOpen(false)}></div>
+                    <div className="relative ml-auto flex h-full w-full max-w-xs flex-col overflow-y-auto bg-white py-4 pb-12 shadow-xl animate-slide-in">
+                        <div className="flex items-center justify-between px-4 pb-4 border-b border-gray-200">
                             <h2 className="text-lg font-medium text-gray-900">Filters</h2>
                             <button
                                 type="button"
                                 className="-mr-2 flex h-10 w-10 items-center justify-center rounded-md bg-white p-2 text-gray-400"
                                 onClick={() => setMobileOpen(false)}
                             >
-                                <span className="sr-only">Close menu</span>
-                                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                                </svg>
+                                <X size={24} />
                             </button>
                         </div>
 
-                        {/* Mobile Filters */}
-                        <form className="mt-4 border-t border-gray-200">
-                            <div className="px-4 py-6">
+                        {/* Mobile Filters Content */}
+                        <form className="mt-4">
+                            {/* Availability */}
+                            <div className="px-4 py-6 border-b border-gray-200">
+                                <h3 className="text-sm font-medium text-gray-900">Availability</h3>
+                                <div className="mt-4 space-y-4">
+                                    {availabilityOptions.map((option) => (
+                                        <div key={option.value} className="flex items-center">
+                                            <input
+                                                id={`mobile-availability-${option.value}`}
+                                                name="availability"
+                                                type="radio"
+                                                checked={filters.availability === option.value}
+                                                onChange={() => handleAvailabilityChange(option.value)}
+                                                className="h-4 w-4 border-gray-300 text-yellow-600 focus:ring-yellow-500"
+                                            />
+                                            <label htmlFor={`mobile-availability-${option.value}`} className="ml-3 text-sm text-gray-600">
+                                                {option.label}
+                                            </label>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="px-4 py-6 border-b border-gray-200">
                                 <h3 className="text-sm font-medium text-gray-900">Categories</h3>
-                                <ul role="list" className="mt-4 space-y-4">
+                                <ul className="mt-4 space-y-4">
                                     {categories.map((category) => (
                                         <li key={category.name}>
                                             <button
                                                 type="button"
                                                 onClick={() => handleCategoryChange(category.name)}
-                                                className={`text-sm ${filters.category === category.name ? 'font-bold text-yellow-600' : 'text-gray-600'}`}
+                                                className={`text-sm block w-full text-left ${filters.category === category.name ? 'font-bold text-yellow-600' : 'text-gray-600'}`}
                                             >
                                                 {category.name}
                                             </button>
@@ -102,87 +172,150 @@ export default function ProductFilters({ filters, setFilters, mobileOpen, setMob
                                 </ul>
                             </div>
 
-                            <div className="border-t border-gray-200 px-4 py-6">
+                            <div className="px-4 py-6 border-b border-gray-200">
                                 <h3 className="text-sm font-medium text-gray-900">Price</h3>
-                                <ul role="list" className="mt-4 space-y-4">
+                                <div className="mt-4 space-y-4">
                                     {priceRanges.map((range) => (
-                                        <li key={range.label} className="flex items-center">
+                                        <div key={range.label} className="flex items-center">
                                             <input
-                                                id={`price-${range.label}-mobile`}
-                                                name="price[]"
-                                                type="checkbox"
+                                                id={`mobile-price-${range.label}`}
+                                                name="price"
+                                                type="radio"
                                                 checked={filters.priceRange?.label === range.label}
                                                 onChange={() => handlePriceChange(range)}
-                                                className="h-4 w-4 rounded border-gray-300 text-yellow-600 focus:ring-yellow-500"
+                                                className="h-4 w-4 border-gray-300 text-yellow-600 focus:ring-yellow-500"
                                             />
-                                            <label htmlFor={`price-${range.label}-mobile`} className="ml-3 text-sm text-gray-600">
+                                            <label htmlFor={`mobile-price-${range.label}`} className="ml-3 text-sm text-gray-600">
                                                 {range.label}
                                             </label>
-                                        </li>
+                                        </div>
                                     ))}
-                                </ul>
+                                </div>
                             </div>
                         </form>
                     </div>
                 </div>
             )}
 
-            {/* Desktop Filters */}
-            <div className="hidden lg:block lg:w-64 lg:flex-shrink-0">
-                <form className="space-y-10 divide-y divide-gray-200">
-                    <div>
-                        <h3 className="text-sm font-medium text-gray-900">Categories</h3>
-                        <ul role="list" className="mt-4 space-y-4">
-                            {categories.map((category) => (
-                                <li key={category.name}>
-                                    <button
-                                        type="button"
-                                        onClick={() => handleCategoryChange(category.name)}
-                                        className={`text-sm block w-full text-left ${filters.category === category.name ? 'font-bold text-yellow-600' : 'text-gray-600 hover:text-gray-900'}`}
-                                    >
-                                        {category.name}
-                                    </button>
-                                    {filters.category === category.name && (
-                                        <ul className="mt-2 ml-4 space-y-2 border-l-2 border-gray-100 pl-4">
-                                            {category.subcategories.map((sub) => (
-                                                <li key={sub}>
+            {/* Desktop Horizontal Filters */}
+            <div className="hidden lg:block w-full" ref={dropdownRef}>
+                <div className="flex items-center gap-4 border-b border-gray-200 pb-4">
+                    <span className="text-sm font-medium text-gray-700">Filter by:</span>
+
+                    {/* Category Dropdown */}
+                    <div className="relative">
+                        <button
+                            type="button"
+                            onClick={() => toggleDropdown('category')}
+                            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full border transition-colors ${filters.category
+                                    ? 'border-yellow-600 text-yellow-700 bg-yellow-50'
+                                    : 'border-gray-300 text-gray-700 hover:border-gray-400'
+                                }`}
+                        >
+                            {filters.category || 'Category'}
+                            <ChevronDown size={16} />
+                        </button>
+
+                        {activeDropdown === 'category' && (
+                            <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-100 z-30 p-2">
+                                {categories.map((category) => (
+                                    <div key={category.name} className="mb-2 last:mb-0">
+                                        <button
+                                            onClick={() => handleCategoryChange(category.name)}
+                                            className={`w-full text-left px-3 py-2 text-sm rounded-md hover:bg-gray-50 ${filters.category === category.name ? 'font-bold text-yellow-700 bg-yellow-50' : 'text-gray-700'
+                                                }`}
+                                        >
+                                            {category.name}
+                                        </button>
+                                        {filters.category === category.name && (
+                                            <div className="pl-4 mt-1 space-y-1">
+                                                {category.subcategories.map((sub) => (
                                                     <button
-                                                        type="button"
+                                                        key={sub}
                                                         onClick={() => handleCategoryChange(category.name, sub)}
-                                                        className={`text-sm block w-full text-left transition-colors ${filters.subcategory === sub ? 'text-yellow-600 font-medium' : 'text-gray-500 hover:text-gray-900'}`}
+                                                        className={`w-full text-left px-3 py-1.5 text-sm rounded-md hover:text-yellow-700 ${filters.subcategory === sub ? 'text-yellow-600 font-medium' : 'text-gray-500'
+                                                            }`}
                                                     >
                                                         {sub}
                                                     </button>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    )}
-                                </li>
-                            ))}
-                        </ul>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
 
-                    <div className="pt-10">
-                        <h3 className="text-sm font-medium text-gray-900">Price</h3>
-                        <ul role="list" className="mt-4 space-y-4">
-                            {priceRanges.map((range) => (
-                                <li key={range.label} className="flex items-center">
-                                    <input
-                                        id={`price-${range.label}`}
-                                        name="price[]"
-                                        type="checkbox"
-                                        checked={filters.priceRange?.label === range.label}
-                                        onChange={() => handlePriceChange(range)}
-                                        className="h-4 w-4 rounded border-gray-300 text-yellow-600 focus:ring-yellow-500 cursor-pointer"
-                                    />
-                                    <label htmlFor={`price-${range.label}`} className="ml-3 text-sm text-gray-600 cursor-pointer">
+                    {/* Price Dropdown */}
+                    <div className="relative">
+                        <button
+                            type="button"
+                            onClick={() => toggleDropdown('price')}
+                            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full border transition-colors ${filters.priceRange
+                                    ? 'border-yellow-600 text-yellow-700 bg-yellow-50'
+                                    : 'border-gray-300 text-gray-700 hover:border-gray-400'
+                                }`}
+                        >
+                            {filters.priceRange ? filters.priceRange.label : 'Price'}
+                            <ChevronDown size={16} />
+                        </button>
+
+                        {activeDropdown === 'price' && (
+                            <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-100 z-30 p-2">
+                                {priceRanges.map((range) => (
+                                    <button
+                                        key={range.label}
+                                        onClick={() => handlePriceChange(range)}
+                                        className={`w-full text-left px-3 py-2 text-sm rounded-md hover:bg-gray-50 ${filters.priceRange?.label === range.label ? 'font-medium text-yellow-700 bg-yellow-50' : 'text-gray-700'
+                                            }`}
+                                    >
                                         {range.label}
-                                    </label>
-                                </li>
-                            ))}
-                        </ul>
+                                    </button>
+                                ))}
+                            </div>
+                        )}
                     </div>
-                </form>
+
+                    {/* Availability Dropdown */}
+                    <div className="relative">
+                        <button
+                            type="button"
+                            onClick={() => toggleDropdown('availability')}
+                            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full border transition-colors ${filters.availability !== 'all'
+                                    ? 'border-yellow-600 text-yellow-700 bg-yellow-50'
+                                    : 'border-gray-300 text-gray-700 hover:border-gray-400'
+                                }`}
+                        >
+                            {availabilityOptions.find(o => o.value === filters.availability)?.label || 'Availability'}
+                            <ChevronDown size={16} />
+                        </button>
+
+                        {activeDropdown === 'availability' && (
+                            <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 z-30 p-2">
+                                {availabilityOptions.map((option) => (
+                                    <button
+                                        key={option.value}
+                                        onClick={() => handleAvailabilityChange(option.value)}
+                                        className={`w-full text-left px-3 py-2 text-sm rounded-md hover:bg-gray-50 ${filters.availability === option.value ? 'font-medium text-yellow-700 bg-yellow-50' : 'text-gray-700'
+                                            }`}
+                                    >
+                                        {option.label}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    {hasActiveFilters && (
+                        <button
+                            onClick={clearFilters}
+                            className="ml-auto text-sm text-red-600 hover:text-red-700 font-medium underline"
+                        >
+                            Clear All
+                        </button>
+                    )}
+                </div>
             </div>
         </>
     );

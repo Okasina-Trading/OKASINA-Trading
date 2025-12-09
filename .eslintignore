@@ -1,0 +1,9 @@
+node_modules
+dist
+build
+legacy_api
+api_backup_*
+scripts
+server
+.jarvis
+okasina-backup

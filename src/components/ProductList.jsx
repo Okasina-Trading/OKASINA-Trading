@@ -57,7 +57,14 @@ export default function ProductList({ filters, viewMode = 'grid' }) {
                 }
             }
 
-            // 4. Price Filter
+            // 4. Sale Filter
+            if (filters?.sale) {
+                if (!product.original_price || product.price >= product.original_price) {
+                    return false;
+                }
+            }
+
+            // 5. Price Filter
             if (filters?.priceRange) {
                 const price = product.price_mur;
                 if (price < filters.priceRange.min || price > filters.priceRange.max) {
@@ -65,8 +72,14 @@ export default function ProductList({ filters, viewMode = 'grid' }) {
                 }
             }
 
-            // 5. Sort
-            // (Sorting logic can be added here if passed via filters)
+            // 6. Availability Filter
+            if (filters?.availability && filters.availability !== 'all') {
+                if (filters.availability === 'in_stock') {
+                    if ((product.stock_qty || 0) <= 0) return false;
+                } else if (filters.availability === 'out_of_stock') {
+                    if ((product.stock_qty || 0) > 0) return false;
+                }
+            }
 
             return true;
         });

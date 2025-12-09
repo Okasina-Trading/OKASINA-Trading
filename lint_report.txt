@@ -1,0 +1,650 @@
+
+> okasina-fashion-store-vite@0.0.0 lint
+> eslint .
+
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\api_backup_20251123191729\ai\analyze-product.js
+   9:32  error  'process' is not defined                no-undef
+  67:18  error  'parseError' is defined but never used  no-unused-vars
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\api_backup_20251123191729\debug\product_sample.js
+  5:59  error  'process' is not defined  no-undef
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\api_backup_20251123191729\debug\schema.js
+  5:59  error  'process' is not defined  no-undef
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\api_backup_20251123191729\debug_schema.js
+  5:59  error  'process' is not defined  no-undef
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\api_backup_20251123191729\facebook\data-deletion.js
+   5:23  error  'process' is not defined       no-undef
+  16:17  error  'Buffer' is not defined        no-undef
+  17:21  error  'Buffer' is not defined        no-undef
+  24:14  error  'e' is defined but never used  no-unused-vars
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\api_backup_20251123191729\facebook\debug-connection.js
+  4:45  error  'process' is not defined  no-undef
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\api_backup_20251123191729\facebook\debug-import.js
+  11:9   error  'process' is not defined                                                                    no-undef
+  56:24  error  'Buffer' is not defined                                                                     no-undef
+  65:23  error  'uploadData' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\api_backup_20251123191729\facebook\debug-token.js
+  4:33  error  'process' is not defined  no-undef
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\api_backup_20251123191729\facebook\import-album.js
+   10:33  error  'useAI' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u           no-unused-vars
+   10:48  error  'createProducts' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+   16:9   error  'process' is not defined                                                                        no-undef
+   72:32  error  'Buffer' is not defined                                                                         no-undef
+  145:55  error  'imageUrl' is defined but never used                                                            no-unused-vars
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\api_backup_20251123191729\facebook\import-feedback.js
+  11:103  error  'process' is not defined                                                                  no-undef
+  17:11   error  'supabase' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\api_backup_20251123191729\facebook\list-albums.js
+  8:45  error  'process' is not defined  no-undef
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\api_backup_20251123191729\facebook\metrics.js
+  10:60  error  'process' is not defined                                                                        no-undef
+  16:11  error  'appSecretProof' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\api_backup_20251123191729\facebook\post-product.js
+  11:60  error  'process' is not defined  no-undef
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\check_product_data.js
+   5:10  error  'fileURLToPath' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+   8:36  error  'process' is not defined                                                              no-undef
+  10:21  error  'process' is not defined                                                              no-undef
+  11:25  error  'process' is not defined                                                              no-undef
+  15:5   error  'process' is not defined                                                              no-undef
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\debug_product.js
+  10:21  error  'process' is not defined  no-undef
+  11:25  error  'process' is not defined  no-undef
+  15:5   error  'process' is not defined  no-undef
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\fix-rls.js
+   7:21  error  'process' is not defined  no-undef
+   8:21  error  'process' is not defined  no-undef
+   8:62  error  'process' is not defined  no-undef
+  12:5   error  'process' is not defined  no-undef
+  77:17  error  'process' is not defined  no-undef
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\fix_sizes.js
+  10:21  error  'process' is not defined  no-undef
+  11:21  error  'process' is not defined  no-undef
+  11:67  error  'process' is not defined  no-undef
+  15:5   error  'process' is not defined  no-undef
+  18:32  error  'process' is not defined  no-undef
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\legacy_api\ai-agent\jarvis\vision.js
+  48:18  error  'execError' is defined but never used  no-unused-vars
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\legacy_api\ai\analyze-product.js
+   9:32  error  'process' is not defined                no-undef
+  67:18  error  'parseError' is defined but never used  no-unused-vars
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\legacy_api\create-product.js
+  3:21  error  'process' is not defined  no-undef
+  4:28  error  'process' is not defined  no-undef
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\legacy_api\debug\[mode].js
+  11:9   error  'process' is not defined       no-undef
+  11:35  error  'process' is not defined       no-undef
+  67:14  error  'e' is defined but never used  no-unused-vars
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\legacy_api\delete-product.js
+  3:21  error  'process' is not defined  no-undef
+  4:28  error  'process' is not defined  no-undef
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\legacy_api\facebook\data-deletion.js
+   5:23  error  'process' is not defined       no-undef
+  16:17  error  'Buffer' is not defined        no-undef
+  17:21  error  'Buffer' is not defined        no-undef
+  24:14  error  'e' is defined but never used  no-unused-vars
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\legacy_api\facebook\import-album.js
+   10:33  error  'useAI' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u           no-unused-vars
+   10:48  error  'createProducts' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+   17:9   error  'process' is not defined                                                                        no-undef
+   88:32  error  'Buffer' is not defined                                                                         no-undef
+  164:55  error  'imageUrl' is defined but never used                                                            no-unused-vars
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\legacy_api\facebook\import-feedback.js
+  11:103  error  'process' is not defined                                                                  no-undef
+  17:11   error  'supabase' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\legacy_api\facebook\list-albums.js
+  8:45  error  'process' is not defined  no-undef
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\legacy_api\facebook\metrics.js
+  10:60  error  'process' is not defined                                                                        no-undef
+  16:11  error  'appSecretProof' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\legacy_api\facebook\post-product.js
+  11:60  error  'process' is not defined  no-undef
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\legacy_api\fix-products.js
+   8:9   error  'process' is not defined                                                                    no-undef
+  16:56  error  'count' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u       no-unused-vars
+  25:43  error  'checkError' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\legacy_api\publish-drafts.js
+   8:9   error  'process' is not defined                                                               no-undef
+  16:30  error  'count' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\legacy_api\send-email.js
+  26:60  error  'process' is not defined  no-undef
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\legacy_api\update-category.js
+  3:21  error  'process' is not defined  no-undef
+  4:28  error  'process' is not defined  no-undef
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\legacy_api\update-product.js
+  3:21  error  'process' is not defined  no-undef
+  4:28  error  'process' is not defined  no-undef
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\legacy_api\upload-image.js
+  60:21  error  'Buffer' is not defined  no-undef
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\okasina-backup\okasina-fashion-store\build\service-worker.js
+  14:1   error  'importScripts' is not defined  no-undef
+  16:1   error  'importScripts' is not defined  no-undef
+  26:1   error  'workbox' is not defined        no-undef
+  34:1   error  'workbox' is not defined        no-undef
+  36:1   error  'workbox' is not defined        no-undef
+  36:41  error  'workbox' is not defined        no-undef
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\okasina-backup\okasina-fashion-store\build\static\js\2.ca150098.chunk.js
+  1:114     error  'n' is defined but never used                                              no-unused-vars
+  1:196     error  'r' is defined but never used                                              no-unused-vars
+  1:344     error  Unexpected comma in middle of array                                        no-sparse-arrays
+  1:358     error  't' is defined but never used                                              no-unused-vars
+  1:1802    error  Do not access Object.prototype method 'hasOwnProperty' from target object  no-prototype-builtins
+  1:4906    error  Do not access Object.prototype method 'hasOwnProperty' from target object  no-prototype-builtins
+  1:6895    error  '__REACT_DEVTOOLS_GLOBAL_HOOK__' is not defined                            no-undef
+  1:6939    error  '__REACT_DEVTOOLS_GLOBAL_HOOK__' is not defined                            no-undef
+  1:7984    error  Unexpected combined character in character class                           no-misleading-character-class
+  1:9542    error  Unnecessary escape character: \-                                           no-useless-escape
+  1:9624    error  Do not access Object.prototype method 'hasOwnProperty' from target object  no-prototype-builtins
+  1:14152   error  Expected a conditional expression and instead saw an assignment            no-cond-assign
+  1:15580   error  'r' is defined but never used                                              no-unused-vars
+  1:15582   error  Empty block statement                                                      no-empty
+  1:16346   error  Do not access Object.prototype method 'hasOwnProperty' from target object  no-prototype-builtins
+  1:17085   error  'n' is defined but never used                                              no-unused-vars
+  1:17806   error  Do not access Object.prototype method 'hasOwnProperty' from target object  no-prototype-builtins
+  1:17846   error  Do not access Object.prototype method 'hasOwnProperty' from target object  no-prototype-builtins
+  1:18010   error  Do not access Object.prototype method 'hasOwnProperty' from target object  no-prototype-builtins
+  1:18037   error  Do not access Object.prototype method 'hasOwnProperty' from target object  no-prototype-builtins
+  1:18624   error  Do not access Object.prototype method 'hasOwnProperty' from target object  no-prototype-builtins
+  1:20258   error  'MSApp' is not defined                                                     no-undef
+  1:20301   error  't' is defined but never used                                              no-unused-vars
+  1:20303   error  'r' is defined but never used                                              no-unused-vars
+  1:20306   error  'MSApp' is not defined                                                     no-undef
+  1:21269   error  Do not access Object.prototype method 'hasOwnProperty' from target object  no-prototype-builtins
+  1:21362   error  Do not access Object.prototype method 'hasOwnProperty' from target object  no-prototype-builtins
+  1:22565   error  Expected a conditional expression and instead saw an assignment            no-cond-assign
+  1:23587   error  Expected to return a value in method 'get'                                 getter-return
+  1:23696   error  'se' is defined but never used                                             no-unused-vars
+  1:23787   error  'e' is defined but never used                                              no-unused-vars
+  1:23789   error  'n' is defined but never used                                              no-unused-vars
+  1:23791   error  't' is defined but never used                                              no-unused-vars
+  1:23793   error  'r' is defined but never used                                              no-unused-vars
+  1:23795   error  'l' is defined but never used                                              no-unused-vars
+  1:23797   error  'a' is defined but never used                                              no-unused-vars
+  1:23799   error  'o' is defined but never used                                              no-unused-vars
+  1:23801   error  'u' is defined but never used                                              no-unused-vars
+  1:23803   error  'i' is defined but never used                                              no-unused-vars
+  1:23835   error  'r' is defined but never used                                              no-unused-vars
+  1:23837   error  'l' is defined but never used                                              no-unused-vars
+  1:23839   error  'a' is defined but never used                                              no-unused-vars
+  1:23841   error  'o' is defined but never used                                              no-unused-vars
+  1:23843   error  'u' is defined but never used                                              no-unused-vars
+  1:23845   error  'i' is defined but never used                                              no-unused-vars
+  1:32929   error  Do not access Object.prototype method 'hasOwnProperty' from target object  no-prototype-builtins
+  1:33249   error  Invalid typeof comparison value                                            valid-typeof
+  1:33423   error  Invalid typeof comparison value                                            valid-typeof
+  1:38927   error  'r' is defined but never used                                              no-unused-vars
+  1:40205   error  Expected a conditional expression and instead saw an assignment            no-cond-assign
+  1:41423   error  Do not access Object.prototype method 'hasOwnProperty' from target object  no-prototype-builtins
+  1:43923   error  'e' is defined but never used                                              no-unused-vars
+  1:43925   error  'n' is defined but never used                                              no-unused-vars
+  1:43927   error  't' is defined but never used                                              no-unused-vars
+  1:43929   error  'r' is defined but never used                                              no-unused-vars
+  1:43931   error  'l' is defined but never used                                              no-unused-vars
+  1:43933   error  'o' is defined but never used                                              no-unused-vars
+  1:43935   error  'u' is defined but never used                                              no-unused-vars
+  1:43937   error  'i' is defined but never used                                              no-unused-vars
+  1:43939   error  's' is defined but never used                                              no-unused-vars
+  1:45877   error  Expected a 'break' statement before 'case'                                 no-fallthrough
+  1:46064   error  Expected a 'break' statement before 'case'                                 no-fallthrough
+  1:47175   error  Expected a conditional expression and instead saw an assignment            no-cond-assign
+  1:47249   error  Expected a conditional expression and instead saw an assignment            no-cond-assign
+  1:48601   error  Expected a 'break' statement before 'case'                                 no-fallthrough
+  1:50584   error  Unexpected control character(s) in regular expression: \x00                no-control-regex
+  1:52188   error  Expected a conditional expression and instead saw an assignment            no-cond-assign
+  1:52288   error  Expected a conditional expression and instead saw an assignment            no-cond-assign
+  1:56558   error  Expected a conditional expression and instead saw an assignment            no-cond-assign
+  1:65288   error  Expected a 'break' statement before 'case'                                 no-fallthrough
+  1:66340   error  Expected a conditional expression and instead saw an assignment            no-cond-assign
+  1:70415   error  'r' is defined but never used                                              no-unused-vars
+  1:71092   error  's' is defined but never used                                              no-unused-vars
+  1:71094   error  Empty block statement                                                      no-empty
+  1:77173   error  Expected a conditional expression and instead saw an assignment            no-cond-assign
+  1:82837   error  Expected a conditional expression and instead saw an assignment            no-cond-assign
+  1:83967   error  Expected a conditional expression and instead saw an assignment            no-cond-assign
+  1:86726   error  Expected a conditional expression and instead saw an assignment            no-cond-assign
+  1:92409   error  Do not access Object.prototype method 'hasOwnProperty' from target object  no-prototype-builtins
+  1:92689   error  Do not access Object.prototype method 'hasOwnProperty' from target object  no-prototype-builtins
+  1:93134   error  Unnecessary escape character: \/                                           no-useless-escape
+  1:94012   error  Do not access Object.prototype method 'hasOwnProperty' from target object  no-prototype-builtins
+  1:94320   error  Do not access Object.prototype method 'hasOwnProperty' from target object  no-prototype-builtins
+  1:99364   error  Do not access Object.prototype method 'hasOwnProperty' from target object  no-prototype-builtins
+  1:99385   error  Do not access Object.prototype method 'hasOwnProperty' from target object  no-prototype-builtins
+  1:99455   error  Do not access Object.prototype method 'hasOwnProperty' from target object  no-prototype-builtins
+  1:99635   error  Do not access Object.prototype method 'hasOwnProperty' from target object  no-prototype-builtins
+  1:99737   error  Do not access Object.prototype method 'hasOwnProperty' from target object  no-prototype-builtins
+  1:99817   error  Do not access Object.prototype method 'hasOwnProperty' from target object  no-prototype-builtins
+  1:99841   error  Do not access Object.prototype method 'hasOwnProperty' from target object  no-prototype-builtins
+  1:99893   error  Do not access Object.prototype method 'hasOwnProperty' from target object  no-prototype-builtins
+  1:100248  error  Do not access Object.prototype method 'hasOwnProperty' from target object  no-prototype-builtins
+  1:102121  error  'u' is defined but never used                                              no-unused-vars
+  1:102123  error  Empty block statement                                                      no-empty
+  1:102158  error  Expected a 'break' statement before 'case'                                 no-fallthrough
+  1:106425  error  Do not access Object.prototype method 'hasOwnProperty' from target object  no-prototype-builtins
+  1:112335  error  'i' is defined but never used                                              no-unused-vars
+  1:118619  error  'w' is defined but never used                                              no-unused-vars
+  1:120100  error  'n' is defined but never used                                              no-unused-vars
+  1:120102  error  Empty block statement                                                      no-empty
+  1:121802  error  'S' is defined but never used                                              no-unused-vars
+  1:121804  error  Empty block statement                                                      no-empty
+  1:131848  error  Expected a conditional expression and instead saw an assignment            no-cond-assign
+  1:133587  error  'Pe' is a function                                                         no-func-assign
+  1:133593  error  'Te' is a function                                                         no-func-assign
+  1:134541  error  '__REACT_DEVTOOLS_GLOBAL_HOOK__' is not defined                            no-undef
+  1:134641  error  'se' is defined but never used                                             no-unused-vars
+  1:134644  error  Empty block statement                                                      no-empty
+  1:143527  error  'n' is defined but never used                                              no-unused-vars
+  1:143825  error  'n' is defined but never used                                              no-unused-vars
+  1:143862  error  'n' is defined but never used                                              no-unused-vars
+  1:143959  error  'e' is defined but never used                                              no-unused-vars
+  1:144026  error  'e' is defined but never used                                              no-unused-vars
+  1:144384  error  'n' is defined but never used                                              no-unused-vars
+  1:144419  error  'n' is defined but never used                                              no-unused-vars
+  1:144976  error  'e' is defined but never used                                              no-unused-vars
+  1:145008  error  'e' is defined but never used                                              no-unused-vars
+  1:145109  error  'e' is defined but never used                                              no-unused-vars
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\okasina-backup\okasina-fashion-store\build\static\js\main.c789b6e0.chunk.js
+  1:70   error  'e' is defined but never used                                                      no-unused-vars
+  1:72   error  't' is defined but never used                                                      no-unused-vars
+  1:74   error  's' is defined but never used                                                      no-unused-vars
+  1:179  error  'e' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  1:181  error  't' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  1:217  error  's' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  1:219  error  'o' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  1:246  error  'c' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  1:248  error  'r' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  1:275  error  'u' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  1:277  error  'i' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  1:304  error  'd' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  1:306  error  'm' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  1:343  error  'p' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  1:372  error  'b' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\okasina-backup\okasina-fashion-store\src\App.js
+   4:10  error  'activeTab' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u          no-unused-vars
+   4:21  error  'setActiveTab' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u       no-unused-vars
+   6:10  error  'chatOpen' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u           no-unused-vars
+   7:10  error  'showModal' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u          no-unused-vars
+   8:10  error  'view' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u               no-unused-vars
+   8:16  error  'setView' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u            no-unused-vars
+   9:24  error  'setSelectedSize' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u    no-unused-vars
+  11:9   error  'fileInputRef' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u       no-unused-vars
+  13:9   error  'handleImageUpload' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  19:9   error  'toggleSidebar' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u      no-unused-vars
+  23:9   error  'openChat' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u           no-unused-vars
+  27:9   error  'closeChat' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u          no-unused-vars
+  31:9   error  'openModal' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u          no-unused-vars
+  35:9   error  'closeModal' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u         no-unused-vars
+  55:10  error  'orders' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u             no-unused-vars
+  61:9   error  'filteredProducts' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u   no-unused-vars
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\okasina-backup\okasina-fashion-store\src\App.test.js
+  4:1  error  'test' is not defined    no-undef
+  7:3  error  'expect' is not defined  no-undef
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\okasina-backup\okasina-fashion-store\src\firebase.js
+  65:7  error  'snapshot' is defined but never used  no-unused-vars
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\scripts\apply-migration.js
+  12:21  error  'process' is not defined  no-undef
+  15:21  error  'process' is not defined  no-undef
+  19:5   error  'process' is not defined  no-undef
+  42:13  error  'process' is not defined  no-undef
+  48:9   error  'process' is not defined  no-undef
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\scripts\automation\check_abandoned_carts.js
+   8:36  error  'process' is not defined                                                                     no-undef
+  10:21  error  'process' is not defined                                                                     no-undef
+  11:21  error  'process' is not defined                                                                     no-undef
+  15:5   error  'process' is not defined                                                                     no-undef
+  21:7   error  'transporter' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  22:11  error  'process' is not defined                                                                     no-undef
+  23:18  error  'process' is not defined                                                                     no-undef
+  26:15  error  'process' is not defined                                                                     no-undef
+  27:15  error  'process' is not defined                                                                     no-undef
+  86:28  error  'process' is not defined                                                                     no-undef
+  90:17  error  'process' is not defined                                                                     no-undef
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\scripts\batch-upload-cloudinary.js
+   3:20  error  'require' is not defined                                                            no-undef
+   4:12  error  'require' is not defined                                                            no-undef
+   5:25  error  'require' is not defined                                                            no-undef
+   6:14  error  'require' is not defined                                                            no-undef
+   7:7   error  'fs' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+   7:12  error  'require' is not defined                                                            no-undef
+  17:30  error  '__dirname' is not defined                                                          no-undef
+  47:21  error  '__dirname' is not defined                                                          no-undef
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\scripts\check_carts.js
+   7:36  error  'process' is not defined  no-undef
+   9:21  error  'process' is not defined  no-undef
+  10:21  error  'process' is not defined  no-undef
+  14:5   error  'process' is not defined  no-undef
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\scripts\debug-env.js
+  13:13  error  'process' is not defined                                                              no-undef
+  14:20  error  'process' is not defined                                                              no-undef
+  15:17  error  'process' is not defined                                                              no-undef
+  26:13  error  'data' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\scripts\deploy-agent.js
+  11:8   error  'fs' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  44:14  error  'e' is defined but never used                                              no-unused-vars
+  54:5   error  'process' is not defined                                                   no-undef
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\scripts\fix-names.js
+   3:8   error  'dotenv' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  21:5   error  'process' is not defined                                                       no-undef
+  22:5   error  'process' is not defined                                                       no-undef
+  23:5   error  'process' is not defined                                                       no-undef
+  28:21  error  'process' is not defined                                                       no-undef
+  29:21  error  'process' is not defined                                                       no-undef
+  29:62  error  'process' is not defined                                                       no-undef
+  36:5   error  'process' is not defined                                                       no-undef
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\scripts\jarvis-api-monitor.js
+  126:35  error  'process' is not defined  no-undef
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\scripts\jarvis-auto-repair.js
+   10:8   error  'fs' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                  no-unused-vars
+   14:7   error  'execAsync' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+   18:5   error  'process' is not defined                                                                   no-undef
+   19:5   error  'process' is not defined                                                                   no-undef
+  151:47  error  'process' is not defined                                                                   no-undef
+  259:5   error  'process' is not defined                                                                   no-undef
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\scripts\jarvis-comprehensive.js
+   11:8   error  'path' is defined but never used. Allowed unused vars must match /^[A-Z_]/u           no-unused-vars
+   16:5   error  'process' is not defined                                                              no-undef
+   17:5   error  'process' is not defined                                                              no-undef
+   49:17  error  'data' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  187:25  error  'process' is not defined                                                              no-undef
+  242:13  error  'process' is not defined                                                              no-undef
+  250:13  error  'process' is not defined                                                              no-undef
+  432:5   error  'process' is not defined                                                              no-undef
+  437:5   error  'process' is not defined                                                              no-undef
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\scripts\jarvis-github-fix.js
+   77:21  error  'name' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  123:13  error  'process' is not defined                                                              no-undef
+  133:13  error  'process' is not defined                                                              no-undef
+  164:14  error  'error' is defined but never used                                                     no-unused-vars
+  207:5   error  'process' is not defined                                                              no-undef
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\scripts\jarvis-health-check.js
+    9:8   error  'fetch' is defined but never used. Allowed unused vars must match /^[A-Z_]/u          no-unused-vars
+   14:5   error  'process' is not defined                                                              no-undef
+   15:5   error  'process' is not defined                                                              no-undef
+   18:17  error  'process' is not defined                                                              no-undef
+   53:13  error  'data' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  169:9   error  'process' is not defined                                                              no-undef
+  177:9   error  'process' is not defined                                                              no-undef
+  228:1   error  'process' is not defined                                                              no-undef
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\scripts\jarvis-master.js
+   19:22  error  'process' is not defined  no-undef
+   20:22  error  'process' is not defined  no-undef
+   20:63  error  'process' is not defined  no-undef
+   26:5   error  'process' is not defined  no-undef
+  224:30  error  'process' is not defined  no-undef
+  225:35  error  'process' is not defined  no-undef
+  226:38  error  'process' is not defined  no-undef
+  230:26  error  'process' is not defined  no-undef
+  231:32  error  'process' is not defined  no-undef
+  232:34  error  'process' is not defined  no-undef
+  233:31  error  'process' is not defined  no-undef
+  234:34  error  'process' is not defined  no-undef
+  377:9   error  'process' is not defined  no-undef
+  381:9   error  'process' is not defined  no-undef
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\scripts\jarvis-vision.js
+   15:5   error  'process' is not defined           no-undef
+   16:5   error  'process' is not defined           no-undef
+   16:46  error  'process' is not defined           no-undef
+   24:10  error  'error' is defined but never used  no-unused-vars
+   66:27  error  'process' is not defined           no-undef
+   66:56  error  'process' is not defined           no-undef
+  316:35  error  'process' is not defined           no-undef
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\scripts\migrate-currency.js
+   3:8   error  'dotenv' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  21:5   error  'process' is not defined                                                       no-undef
+  22:5   error  'process' is not defined                                                       no-undef
+  27:21  error  'process' is not defined                                                       no-undef
+  28:21  error  'process' is not defined                                                       no-undef
+  32:5   error  'process' is not defined                                                       no-undef
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\scripts\seed-products-simple.js
+    9:22  error  'process' is not defined  no-undef
+   10:22  error  'process' is not defined  no-undef
+   15:5   error  'process' is not defined  no-undef
+  163:13  error  'process' is not defined  no-undef
+  177:9   error  'process' is not defined  no-undef
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\scripts\seed-products.js
+  6:22  error  'process' is not defined  no-undef
+  7:22  error  'process' is not defined  no-undef
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\scripts\test-product-update.js
+   6:21  error  'process' is not defined  no-undef
+   8:21  error  'process' is not defined  no-undef
+  12:5   error  'process' is not defined  no-undef
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\scripts\test_email_config.js
+   6:36  error  'process' is not defined  no-undef
+  11:10  error  'process' is not defined  no-undef
+  11:41  error  'process' is not defined  no-undef
+  13:9   error  'process' is not defined  no-undef
+  17:15  error  'process' is not defined  no-undef
+  18:22  error  'process' is not defined  no-undef
+  21:19  error  'process' is not defined  no-undef
+  22:19  error  'process' is not defined  no-undef
+  29:33  error  'process' is not defined  no-undef
+  30:33  error  'process' is not defined  no-undef
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\server.js
+   25:9   error  'process' is not defined                                                                    no-undef
+   32:12  error  'process' is not defined                                                                    no-undef
+   51:15  error  'process' is not defined                                                                    no-undef
+   52:12  error  'process' is not defined                                                                    no-undef
+   53:15  error  'process' is not defined                                                                    no-undef
+   65:17  error  'Buffer' is not defined                                                                     no-undef
+   89:21  error  'process' is not defined                                                                    no-undef
+   90:21  error  'process' is not defined                                                                    no-undef
+   90:62  error  'process' is not defined                                                                    no-undef
+  103:13  error  'data' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u        no-unused-vars
+  119:20  error  'count' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u       no-unused-vars
+  180:22  error  'history' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u     no-unused-vars
+  190:20  error  'process' is not defined                                                                    no-undef
+  190:49  error  'process' is not defined                                                                    no-undef
+  302:27  error  'context' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u     no-unused-vars
+  302:36  error  'url' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u         no-unused-vars
+  302:41  error  'user_agent' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  331:35  error  'useAI' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u       no-unused-vars
+  357:25  error  'error' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u       no-unused-vars
+  369:16  error  'e' is defined but never used                                                               no-unused-vars
+  392:23  error  'process' is not defined                                                                    no-undef
+  392:52  error  'process' is not defined                                                                    no-undef
+  449:14  error  'process' is not defined                                                                    no-undef
+  452:5   error  'process' is not defined                                                                    no-undef
+  452:47  error  'process' is not defined                                                                    no-undef
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\server\ai.js
+  2:17  error  'require' is not defined  no-undef
+  3:14  error  'require' is not defined  no-undef
+  4:15  error  'require' is not defined  no-undef
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\server\email.js
+  1:17  error  'require' is not defined  no-undef
+  2:20  error  'require' is not defined  no-undef
+  3:14  error  'require' is not defined  no-undef
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\src\components\ErrorBoundary.jsx
+   9:37  error  'error' is defined but never used  no-unused-vars
+  39:30  error  'process' is not defined           no-undef
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\src\components\HeaderNew.jsx
+  13:49  error  'symbols' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\src\components\MobileMenu.jsx
+  3:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\src\components\SearchBar.jsx
+  35:29  warning  React Hook useCallback received a function whose dependencies are unknown. Pass an inline function instead  react-hooks/exhaustive-deps
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\src\components\admin\ProductEditModal.jsx
+  3:10  error  'supabase' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\src\components\admin\automation\AutomationBuilder.jsx
+  118:23  error  'actionType' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\src\components\admin\automation\Sidebar.jsx
+  18:31  error  'Icon' is defined but never used  no-unused-vars
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\src\components\common\LazyImage.jsx
+  1:38  error  'useRef' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\src\components\common\SearchBar.jsx
+  35:8  warning  React Hook useEffect has a missing dependency: 'performSearch'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\src\components\product\RecentlyViewed.jsx
+  75:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\src\components\product\RelatedProducts.jsx
+  12:8  warning  React Hook useEffect has a missing dependency: 'fetchRelatedProducts'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\src\components\product\SizeGuideModal.jsx
+  4:59  error  'category' is defined but never used  no-unused-vars
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\src\components\product\SocialShare.jsx
+  10:11  error  'shareImage' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\src\components\reviews\ReviewSection.jsx
+   8:12  error    'loading' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                          no-unused-vars
+  15:8   warning  React Hook useEffect has a missing dependency: 'fetchReviews'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\src\contexts\AuthContext.jsx
+  6:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\src\contexts\CartContext.jsx
+   20:31  error    'error' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                           no-unused-vars
+  109:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\src\contexts\ComparisonContext.jsx
+  6:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\src\contexts\CurrencyContext.jsx
+   5:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+  54:8   warning  React Hook useEffect has a missing dependency: 'rates'. Either include it or remove the dependency array                        react-hooks/exhaustive-deps
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\src\contexts\ToastContext.jsx
+   6:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+  20:8   warning  React Hook useCallback has a missing dependency: 'removeToast'. Either include it or remove the dependency array                react-hooks/exhaustive-deps
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\src\contexts\WishlistContext.jsx
+   8:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+  22:8   warning  React Hook useEffect has a missing dependency: 'fetchWishlist'. Either include it or remove the dependency array                react-hooks/exhaustive-deps
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\src\pages\CheckoutPage.jsx
+   3:10  error  'supabase' is defined but never used. Allowed unused vars must match /^[A-Z_]/u             no-unused-vars
+   9:19  error  'clearCart' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u   no-unused-vars
+  10:11  error  'navigate' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u    no-unused-vars
+  11:13  error  'addToast' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u    no-unused-vars
+  12:21  error  'setLoading' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\src\pages\MyAccountPage.jsx
+  19:8  warning  React Hook useEffect has missing dependencies: 'fetchOrders' and 'navigate'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\src\pages\ProductPage.jsx
+  39:8  warning  React Hook useEffect has a missing dependency: 'fetchProduct'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\src\pages\WishlistPage.jsx
+  23:8  warning  React Hook useEffect has missing dependencies: 'fetchWishlist' and 'navigate'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\src\pages\admin\AdminAnalyticsPage.jsx
+  31:12  error    'loading' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                            no-unused-vars
+  47:8   warning  React Hook useEffect has a missing dependency: 'fetchAnalytics'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\src\pages\admin\AdminMarketingPage.jsx
+   76:26  error  'e' is defined but never used                                                           no-unused-vars
+  136:17  error  'result' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\src\pages\admin\AdminOrdersPage.jsx
+  21:24  error    'setSearchTerm' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                   no-unused-vars
+  22:26  error    'setStatusFilter' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                 no-unused-vars
+  23:12  error    'stats' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                           no-unused-vars
+  33:8   warning  React Hook useEffect has a missing dependency: 'fetchOrders'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\src\pages\admin\AdminProductsPage.jsx
+  49:8  warning  React Hook useEffect has a missing dependency: 'fetchProducts'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\src\pages\admin\AdminReviewsPage.jsx
+  31:8  warning  React Hook useEffect has a missing dependency: 'fetchReviews'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\src\pages\admin\AdminSocialMediaPage.jsx
+  23:8  warning  React Hook useEffect has a missing dependency: 'fetchSettings'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\src\pages\admin\AlbumImportPage.jsx
+   6:10  error  'metaService' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                           no-unused-vars
+  10:11  error  'navigate' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                     no-unused-vars
+  99:5   error  React Hook "useEffect" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?  react-hooks/rules-of-hooks
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\src\pages\admin\MediaManagerPage.jsx
+   4:10  error  'supabase' is defined but never used. Allowed unused vars must match /^[A-Z_]/u        no-unused-vars
+  11:12  error  'error' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\src\pages\api\facebook\list-albums.js
+  11:60  error  'process' is not defined  no-undef
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\src\services\cloudinary.js
+  2:10  error  'quality' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  2:19  error  'format' is defined but never used. Allowed unused vars must match /^[A-Z_]/u   no-unused-vars
+  3:10  error  'improve' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  3:19  error  'sharpen' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\src\utils\aiEnrichment.js
+    8:13  error  'name' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u         no-unused-vars
+   92:29  error  'subcategory' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+   92:50  error  'color' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u        no-unused-vars
+  122:51  error  'name' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u         no-unused-vars
+
+C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\test-crud-flow.js
+  58:15  error  'updateData' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+✖ 447 problems (425 errors, 22 warnings)
+

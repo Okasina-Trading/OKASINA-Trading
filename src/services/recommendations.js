@@ -1,4 +1,4 @@
-import { supabase } from './logger';
+import { supabase } from '../supabase';
 import { logger } from './logger';
 
 /**
