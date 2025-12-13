@@ -65,17 +65,22 @@ export default function AdminOrdersPage() {
 
     const updateOrderStatus = async (orderId, newStatus) => {
         try {
-            const { error } = await supabase
-                .from('orders')
-                .update({ status: newStatus })
-                .eq('id', orderId);
+            // Use server API to bypass RLS policies
+            const res = await fetch('/api/update-order-status', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ orderId, status: newStatus })
+            });
 
-            if (error) throw error;
+            if (!res.ok) {
+                const err = await res.json();
+                throw new Error(err.error || 'Failed to update');
+            }
 
             fetchOrders();
         } catch (error) {
             console.error('Error updating order:', error);
-            alert('Failed to update order status');
+            alert('Failed to update order status: ' + error.message);
         }
     };
 
