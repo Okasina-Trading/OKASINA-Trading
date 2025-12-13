@@ -1,0 +1,30 @@
+{
+  "timestamp": "2025-12-13T19:05:41.907Z",
+  "fixes": {
+    "draftProducts": {
+      "status": "skipped",
+      "reason": "No drafts"
+    },
+    "wishlistTable": {
+      "status": "failed",
+      "error": "Could not find the table 'public.wishlists' in the schema cache"
+    },
+    "envVarWhitespace": {
+      "status": "skipped",
+      "reason": "Already clean"
+    }
+  },
+  "summary": {
+    "successful": 0,
+    "failed": 1,
+    "manual_required": 0,
+    "skipped": 2
+  },
+  "appliedFixes": [],
+  "failures": [
+    {
+      "fix": "wishlist_table",
+      "error": "Could not find the table 'public.wishlists' in the schema cache"
+    }
+  ]
+}

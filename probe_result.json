@@ -1,0 +1,78 @@
+{
+  "excel": {
+    "found": true,
+    "headers": [
+      "Sr No.",
+      "Supplier",
+      "Design Num",
+      "Description",
+      "Particulars",
+      "Size",
+      "Qty",
+      "Rate - INR",
+      "Total - INR",
+      "0.56 MUR",
+      "Other import Cost (MUR)",
+      "Marketing (MUR)",
+      "Total Landing Cost",
+      "Landing Cost/Pc",
+      "Markup - 75%",
+      "Price",
+      "Tag Price"
+    ],
+    "firstRow": [
+      104,
+      "Azysh",
+      "AZ-1125-01",
+      null,
+      null,
+      null,
+      4,
+      895,
+      3580,
+      2004.8000000000002,
+      297.7256392693307,
+      198.48375951288713,
+      2501.009398782218,
+      625.2523496955545,
+      468.9392622716658,
+      1094.1916119672203,
+      1100,
+      4400
+    ],
+    "sheetFound": true,
+    "sheetEmpty": false,
+    "availableSheets": [
+      "Consolidated Purchasing",
+      "Fashion",
+      "Barbeesaa",
+      "Azysh",
+      "Riddhi Siddhi",
+      "Sawariya",
+      "LAAM",
+      "Price List",
+      "Sticker",
+      "Sheet2"
+    ],
+    "error": null
+  },
+  "images": {
+    "found": true,
+    "topLevelCount": 0,
+    "subDirs": [
+      "1. DELHI 1125",
+      "2. LAAM 2025"
+    ],
+    "sample": null,
+    "error": null,
+    "matchTest": {
+      "sku": "AZ-1125-01",
+      "found": true,
+      "files": [
+        "D:/Delhi and Laam/1. DELHI 1125/AZYSHI/AZ-1125-01.1.jpg",
+        "D:/Delhi and Laam/1. DELHI 1125/AZYSHI/AZ-1125-01.jpg"
+      ],
+      "count": 2
+    }
+  }
+}

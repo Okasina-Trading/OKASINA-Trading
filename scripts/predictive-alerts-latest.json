@@ -1,0 +1,16 @@
+{
+  "timestamp": "2025-12-13T20:16:25.586Z",
+  "checks": {
+    "errorTrend": {
+      "status": "unknown",
+      "reason": "No data"
+    },
+    "resourceTrends": {
+      "status": "healthy"
+    },
+    "anomalies": {
+      "status": "healthy"
+    }
+  },
+  "alerts": []
+}

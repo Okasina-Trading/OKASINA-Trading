@@ -119,23 +119,33 @@ export default function AdminProductsPage() {
 
         try {
             setLoading(true);
-            const results = await Promise.all(
+            const results = await Promise.allSettled(
                 selectedProducts.map(id =>
                     fetch(`${API_URL}/api/delete-product`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ productId: id })
-                    }).then(res => res.json())
+                    }).then(res => res.json().then(data => ({ id, status: res.status, data })))
                 )
             );
 
-            console.log('Bulk delete results:', results);
-            alert('Products deleted successfully');
+            const failures = results.filter(r => r.status === 'rejected' || r.value?.status !== 200);
+            const successes = results.filter(r => r.status === 'fulfilled' && r.value?.status === 200);
+
+            console.log('Bulk delete results:', { successes: successes.length, failures: failures.length });
+
+            if (failures.length > 0) {
+                console.error('Failed deletions:', failures);
+                alert(`Deleted ${successes.length} products. Failed to delete ${failures.length} products. Check console for details.`);
+            } else {
+                alert(`Successfully deleted ${successes.length} products`);
+            }
+
             setSelectedProducts([]);
             fetchProducts();
         } catch (error) {
             console.error('Bulk delete error:', error);
-            alert('Failed to delete some products');
+            alert('Failed to delete some products: ' + error.message);
         } finally {
             setLoading(false);
         }

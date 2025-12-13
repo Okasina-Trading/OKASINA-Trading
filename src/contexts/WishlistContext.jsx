@@ -29,10 +29,21 @@ export const WishlistProvider = ({ children }) => {
                 .select('*')
                 .eq('user_id', user.id);
 
-            if (error) throw error;
+            if (error) {
+                // Silently handle if table doesn't exist yet
+                if (error.message?.includes('relation') || error.message?.includes('does not exist')) {
+                    console.warn('Wishlists table not created yet. Run: node scripts/apply-wishlists-migration.js');
+                    setWishlist([]);
+                    return;
+                }
+                throw error;
+            }
             setWishlist(data || []);
         } catch (error) {
-            console.error('Error fetching wishlist:', error);
+            // Only log non-schema errors
+            if (!error.message?.includes('relation')) {
+                console.error('Error fetching wishlist:', error);
+            }
         } finally {
             setLoading(false);
         }

@@ -87,12 +87,13 @@ app.post("/api/upload-image", upload.single('file'), async (req, res) => {
 });
 
 // --- Supabase Admin Endpoints ---
-const supabaseUrl = process.env.VITE_SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
+const supabaseUrl = process.env.VITE_SUPABASE_URL?.trim();
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
 
 let supabaseAdmin;
 
 if (supabaseUrl && supabaseKey) {
+  console.log('✅ Supabase Admin initialized with service role key');
   supabaseAdmin = createClient(supabaseUrl, supabaseKey, {
     auth: {
       autoRefreshToken: false,

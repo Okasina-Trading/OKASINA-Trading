@@ -1,0 +1,44 @@
+{
+  "timestamp": "2025-12-13T19:04:17.547Z",
+  "checks": {
+    "database": {
+      "status": "healthy",
+      "details": "Supabase accessible"
+    },
+    "products": {
+      "status": "healthy",
+      "active": 62,
+      "draft": 0
+    },
+    "deleteFunction": {
+      "status": "healthy",
+      "tested": "L-1125-01"
+    },
+    "wishlistTable": {
+      "status": "unhealthy",
+      "error": "Could not find the table 'public.wishlists' in the schema cache"
+    },
+    "environmentVars": {
+      "status": "healthy",
+      "missing": [],
+      "hasWhitespace": []
+    }
+  },
+  "summary": {
+    "total": 5,
+    "healthy": 4,
+    "degraded": 0,
+    "unhealthy": 1,
+    "skipped": 0
+  },
+  "overallHealth": "CRITICAL",
+  "errors": [
+    {
+      "timestamp": "2025-12-13T19:04:21.573Z",
+      "level": "error",
+      "message": "❌ Wishlist check failed: Could not find the table 'public.wishlists' in the schema cache"
+    }
+  ],
+  "warnings": [],
+  "duration": 4031
+}

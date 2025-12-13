@@ -1,0 +1,80 @@
+{
+    "errors": {
+        "env_var_whitespace": {
+            "pattern": "Invalid API key",
+            "cause": "Environment variable has whitespace or newline characters",
+            "auto_fix": "trim_env_vars",
+            "severity": "high",
+            "max_retries_per_day": 3,
+            "fix_script": "okasina-auto-fix.js",
+            "fix_function": "fixEnvVarWhitespace"
+        },
+        "wishlist_table_missing": {
+            "pattern": "relation.*wishlists.*does not exist",
+            "cause": "Wishlist table not created in Supabase",
+            "auto_fix": "manual_sql_required",
+            "severity": "medium",
+            "max_retries_per_day": 0,
+            "manual_action": "Run supabase/migrations/002_create_wishlists_MANUAL.sql in Supabase SQL Editor"
+        },
+        "delete_function_fails": {
+            "pattern": "Failed to delete|permission denied.*delete",
+            "cause": "Using anon key instead of service role, or RLS blocking delete",
+            "auto_fix": "restart_server",
+            "severity": "critical",
+            "max_retries_per_day": 3,
+            "fix_script": "okasina-auto-fix.js",
+            "fix_function": "fixDeletePermissions"
+        },
+        "products_all_draft": {
+            "pattern": "0 active products.*draft products",
+            "cause": "All products in draft status, shop appears empty",
+            "auto_fix": "publish_draft_products",
+            "severity": "high",
+            "max_retries_per_day": 1,
+            "fix_script": "okasina-auto-fix.js",
+            "fix_function": "fixDraftProducts"
+        },
+        "server_crash": {
+            "pattern": "ECONNREFUSED|Cannot connect to server",
+            "cause": "Express server not running or crashed",
+            "auto_fix": "restart_server",
+            "severity": "critical",
+            "max_retries_per_day": 5,
+            "fix_script": "okasina-auto-fix.js",
+            "fix_function": "restartServer"
+        },
+        "build_failure": {
+            "pattern": "Build failed|npm run build.*error",
+            "cause": "Code syntax error or dependency issue",
+            "auto_fix": "manual_required",
+            "severity": "critical",
+            "max_retries_per_day": 0,
+            "manual_action": "Check build logs and fix code errors"
+        },
+        "database_connection_lost": {
+            "pattern": "Could not connect to Supabase|ETIMEDOUT.*supabase",
+            "cause": "Network issue or Supabase down",
+            "auto_fix": "retry_connection",
+            "severity": "high",
+            "max_retries_per_day": 10,
+            "fix_script": "okasina-auto-fix.js",
+            "fix_function": "retryDatabaseConnection"
+        },
+        "high_error_rate": {
+            "pattern": "error_rate_threshold_exceeded",
+            "cause": "More than 5 errors per hour detected",
+            "auto_fix": "alert_only",
+            "severity": "warning",
+            "max_retries_per_day": 0,
+            "manual_action": "Investigate root cause of error spike"
+        }
+    },
+    "metadata": {
+        "version": "1.0.0",
+        "last_updated": "2025-12-13T23:18:00Z",
+        "total_patterns": 8,
+        "auto_fixable": 5,
+        "manual_required": 3
+    }
+}

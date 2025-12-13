@@ -1,0 +1,57 @@
+{
+    "auto_fix_enabled": true,
+    "max_retries_per_error_per_day": 3,
+    "health_check_interval_minutes": 5,
+    "deep_health_interval_hours": 4,
+    "allowed_auto_fixes": [
+        "trim_env_vars",
+        "publish_draft_products",
+        "restart_server",
+        "clear_cache"
+    ],
+    "forbidden_auto_fixes": [
+        "delete_node_modules",
+        "run_migrations",
+        "modify_database_schema",
+        "delete_products",
+        "update_production_data"
+    ],
+    "alert_thresholds": {
+        "consecutive_failures_before_alert": 3,
+        "error_rate_per_hour": 5,
+        "api_response_time_ms": 2000,
+        "memory_usage_percent": 80,
+        "disk_space_gb": 10
+    },
+    "titan_integration": {
+        "logs_directory": "F:\\AION-ZERO\\logs\\okasina",
+        "inbox_directory": "F:\\AION-ZERO\\inbox\\okasina",
+        "command_table": "az_agent_runs",
+        "webhook_url": null,
+        "citadel_enabled": false,
+        "fallback_to_local": true
+    },
+    "tier2_health": {
+        "schedule_hours": 1,
+        "non_destructive_only": true,
+        "test_product_prefix": "TEST-",
+        "sandbox_tenant": null
+    },
+    "predictive_alerts": {
+        "schedule_minutes": 15,
+        "thresholds": {
+            "error_rate_per_hour": 3,
+            "error_rate_consecutive_hours": 2,
+            "response_time_ms": 1500,
+            "response_time_window_minutes": 30,
+            "memory_usage_percent": 70,
+            "memory_usage_duration_hours": 1,
+            "disk_space_warning_gb": 20,
+            "disk_space_critical_gb": 10
+        },
+        "prediction_window_minutes": {
+            "min": 30,
+            "max": 120
+        }
+    }
+}

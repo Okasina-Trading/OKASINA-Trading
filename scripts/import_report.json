@@ -1,0 +1,264 @@
+{
+  "total": 64,
+  "success": 0,
+  "skipped": 2,
+  "failed": 64,
+  "errors": [
+    {
+      "sku": "AZ-1125-01",
+      "error": "Invalid API key"
+    },
+    {
+      "sku": "AZ-1125-02",
+      "error": "Invalid API key"
+    },
+    {
+      "sku": "AZ-1125-03",
+      "error": "Invalid API key"
+    },
+    {
+      "sku": "RiSi-1125-01",
+      "error": "Invalid API key"
+    },
+    {
+      "sku": "RiSi-1125-02",
+      "error": "Invalid API key"
+    },
+    {
+      "sku": "RiSi-1125-03",
+      "error": "Invalid API key"
+    },
+    {
+      "sku": "RiSi-1125-04",
+      "error": "Invalid API key"
+    },
+    {
+      "sku": "RiSi-1125-05",
+      "error": "Invalid API key"
+    },
+    {
+      "sku": "RiSi-1125-06",
+      "error": "Invalid API key"
+    },
+    {
+      "sku": "RiSi-1125-07",
+      "error": "Invalid API key"
+    },
+    {
+      "sku": "RiSi-1125-08",
+      "error": "Invalid API key"
+    },
+    {
+      "sku": "RiSi-1125-09",
+      "error": "Invalid API key"
+    },
+    {
+      "sku": "RiSi-1125-10",
+      "error": "Invalid API key"
+    },
+    {
+      "sku": "RiSi-1125-11",
+      "error": "Invalid API key"
+    },
+    {
+      "sku": "RiSi-1125-12",
+      "error": "Invalid API key"
+    },
+    {
+      "sku": "RiSi-1125-13",
+      "error": "Invalid API key"
+    },
+    {
+      "sku": "RiSi-1125-14",
+      "error": "Invalid API key"
+    },
+    {
+      "sku": "SAW-1125-51",
+      "error": "Invalid API key"
+    },
+    {
+      "sku": "SAW-1125-52",
+      "error": "Invalid API key"
+    },
+    {
+      "sku": "SAW-1125-53",
+      "error": "Invalid API key"
+    },
+    {
+      "sku": "SAW-1125-54",
+      "error": "Invalid API key"
+    },
+    {
+      "sku": "SAW-1125-55",
+      "error": "Invalid API key"
+    },
+    {
+      "sku": "SAW-1125-56",
+      "error": "Invalid API key"
+    },
+    {
+      "sku": "SAW-1125-57",
+      "error": "Invalid API key"
+    },
+    {
+      "sku": "SAW-1125-58",
+      "error": "Invalid API key"
+    },
+    {
+      "sku": "SAW-1125-59",
+      "error": "Invalid API key"
+    },
+    {
+      "sku": "SAW-1125-60",
+      "error": "Invalid API key"
+    },
+    {
+      "sku": "L-1125-01",
+      "error": "Invalid API key"
+    },
+    {
+      "sku": "L-1125-02",
+      "error": "Invalid API key"
+    },
+    {
+      "sku": "L-1125-03",
+      "error": "Invalid API key"
+    },
+    {
+      "sku": "L-1125-04",
+      "error": "Invalid API key"
+    },
+    {
+      "sku": "L-1125-05",
+      "error": "Invalid API key"
+    },
+    {
+      "sku": "L-1125-06",
+      "error": "Invalid API key"
+    },
+    {
+      "sku": "L-1125-07",
+      "error": "Invalid API key"
+    },
+    {
+      "sku": "L-1125-08",
+      "error": "Invalid API key"
+    },
+    {
+      "sku": "L-1125-09",
+      "error": "Invalid API key"
+    },
+    {
+      "sku": "L-1125-10",
+      "error": "Invalid API key"
+    },
+    {
+      "sku": "L-1125-11",
+      "error": "Invalid API key"
+    },
+    {
+      "sku": "L-1125-12",
+      "error": "Invalid API key"
+    },
+    {
+      "sku": "L-1125-13",
+      "error": "Invalid API key"
+    },
+    {
+      "sku": "L-1125-14",
+      "error": "Invalid API key"
+    },
+    {
+      "sku": "L-1125-15",
+      "error": "Invalid API key"
+    },
+    {
+      "sku": "L-1125-16",
+      "error": "Invalid API key"
+    },
+    {
+      "sku": "L-1125-17",
+      "error": "Invalid API key"
+    },
+    {
+      "sku": "L-1125-18",
+      "error": "Invalid API key"
+    },
+    {
+      "sku": "L-1125-19",
+      "error": "Invalid API key"
+    },
+    {
+      "sku": "L-1125-20",
+      "error": "Invalid API key"
+    },
+    {
+      "sku": "L-1125-21",
+      "error": "Invalid API key"
+    },
+    {
+      "sku": "L-1125-22",
+      "error": "Invalid API key"
+    },
+    {
+      "sku": "L-1125-23",
+      "error": "Invalid API key"
+    },
+    {
+      "sku": "L-1125-24",
+      "error": "Invalid API key"
+    },
+    {
+      "sku": 22500,
+      "error": "Invalid API key"
+    },
+    {
+      "sku": 15000,
+      "error": "Invalid API key"
+    },
+    {
+      "sku": "Sum of Total - INR",
+      "error": "Invalid API key"
+    },
+    {
+      "sku": 14445,
+      "error": "Invalid API key"
+    },
+    {
+      "sku": 119410,
+      "error": "Invalid API key"
+    },
+    {
+      "sku": 76805,
+      "error": "Invalid API key"
+    },
+    {
+      "sku": 210660,
+      "error": "Invalid API key"
+    },
+    {
+      "sku": "Sum of Qty",
+      "error": "Invalid API key"
+    },
+    {
+      "sku": 11,
+      "error": "Invalid API key"
+    },
+    {
+      "sku": 78,
+      "error": "Invalid API key"
+    },
+    {
+      "sku": 59,
+      "error": "Invalid API key"
+    },
+    {
+      "sku": 43,
+      "error": "Invalid API key"
+    },
+    {
+      "sku": 191,
+      "error": "Invalid API key"
+    }
+  ]
+}
