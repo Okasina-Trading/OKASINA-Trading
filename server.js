@@ -6,6 +6,7 @@ import axios from "axios";
 import { createClient } from '@supabase/supabase-js';
 import { v2 as cloudinary } from 'cloudinary';
 import multer from 'multer';
+import nodemailer from 'nodemailer';
 
 dotenv.config();
 
@@ -240,29 +241,87 @@ app.post('/api/stylist-chat', async (req, res) => {
   }
 });
 
-// Vision Agent - Stubbed for now (Requires Google Vision or similar in cloud)
+// Vision Agent - Powered by Gemini 1.5 Flash
 app.post('/api/ai-agent/jarvis/vision', async (req, res) => {
   try {
     const { rawDetails, imageUrl } = req.body;
-    // Fallback logic immediately since we removed local python
-    const productData = {
-      name: "New Fashion Item",
-      description: `<p><strong>Automated Description:</strong><br>${rawDetails}</p><p><em>(AI generation pending cloud integration)</em></p>`,
-      price: 0,
-      category: "Clothing",
-      tags: ["Draft", "Needs-Review"],
+    const apiKey = process.env.GOOGLE_AI_KEY || process.env.VITE_GEMINI_API_KEY;
+
+    if (!apiKey) {
+      return res.status(503).json({ success: false, error: "AI Service Unavailable (Missing Key)" });
+    }
+
+    console.log(`[Vision] Analyzing image: ${imageUrl}`);
+
+    // Fetch the image and convert to base64
+    const imageResp = await fetch(imageUrl);
+    const arrayBuffer = await imageResp.arrayBuffer();
+    const base64Image = Buffer.from(arrayBuffer).toString('base64');
+
+    const prompt = `You are an expert fashion merchandiser. Analyze this product image and output a JSON object with these fields:
+    - name: A catchy, SEO-friendly product name.
+    - description: A compelling description (paragraph format).
+    - category: One of [Clothing, Shoes, Accessories, Bags].
+    - subcategory: Specific type (e.g., 'Maxi Dress', 'Sneakers').
+    - color: Primary color.
+    - tags: Array of 3 key hashtags (e.g., #Summer, #Cotton).
+    - estimated_price_mur: Estimate price in Mauritian Rupees (Number only).
+    
+    Return ONLY raw JSON, no markdown formatting.`;
+
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{
+          parts: [
+            { text: prompt },
+            { inline_data: { mime_type: "image/jpeg", data: base64Image } }
+          ]
+        }]
+      })
+    });
+
+    const data = await response.json();
+
+    let aiText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+    // Clean markdown code blocks if present
+    if (aiText && aiText.includes('```json')) {
+      aiText = aiText.replace(/```json/g, '').replace(/```/g, '');
+    }
+
+    let productData = {};
+    try {
+      productData = JSON.parse(aiText);
+    } catch (e) {
+      console.error("Failed to parse AI JSON", aiText);
+      // Fallback partial data
+      productData = { name: "New Arrival", description: aiText };
+    }
+
+    // Merge with defaults
+    const finalProduct = {
+      name: productData.name || "New Fashion Item",
+      description: productData.description || "Fresh arrival at Okasina.",
+      price: productData.estimated_price_mur || 1500,
+      price_mur: productData.estimated_price_mur || 1500,
+      category: productData.category || "Clothing",
+      subcategory: productData.subcategory || "General",
       stock_qty: 10,
       status: "draft",
-      image_url: imageUrl
+      image_url: imageUrl,
+      sizes: ["S", "M", "L"] // Default sizes
     };
 
     res.json({
       success: true,
-      product: productData,
-      message: 'Vision Agent: Cloud fallback active'
+      product: finalProduct
     });
+
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Vision Error:', error);
+    res.status(500).json({ success: false, error: error.message });
   }
 });
 
@@ -297,6 +356,61 @@ app.post('/api/ai-agent/jarvis/inventory', async (req, res) => {
   res.json({ success: true, predictions: "Inventory levels are stable.", message: "Cloud Inventory Active" });
 });
 
+// --- JARVIS Feedback Endpoint ("The Mouth") ---
+app.post('/api/jarvis/feedback', async (req, res) => {
+  try {
+    const { message, type, url, path, userAgent, timestamp } = req.body;
+
+    console.log(`[JARVIS MOUTH] New Report: [${type}] ${message.substring(0, 50)}...`);
+
+    // 1. Log to Supabase "jarvis_feedback" table
+    const { data, error } = await supabaseAdmin
+      .from('jarvis_feedback')
+      .insert([{
+        message,
+        type,
+        url,
+        path,
+        user_agent: userAgent,
+        created_at: timestamp || new Date().toISOString()
+      }])
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Supabase Feedback Insert Error:', error);
+      // Fallback: Just log it to console if DB fails
+    }
+
+    // 2. Email Admin if it's a BUG
+    if (type === 'bug' && process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+      // Async email (don't await)
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
+      });
+
+      transporter.sendMail({
+        from: `"JARVIS System" <${process.env.EMAIL_USER}>`,
+        to: process.env.EMAIL_USER, // Send to self/admin
+        subject: `[JARVIS ISSUE] ${type.toUpperCase()}: ${message.substring(0, 30)}...`,
+        html: `<h3>New Feedback Report</h3>
+               <p><strong>Type:</strong> ${type}</p>
+               <p><strong>Message:</strong> ${message}</p>
+               <p><strong>Path:</strong> ${path}</p>
+               <p><strong>URL:</strong> ${url}</p>
+               <p><strong>User Agent:</strong> ${userAgent}</p>`
+      }).catch(err => console.error('Feedback Email Failed:', err));
+    }
+
+    res.json({ success: true, id: data?.id || 'backup-log-id' });
+
+  } catch (error) {
+    console.error('Feedback Endpoint Error:', error);
+    res.status(500).json({ error: 'Failed to process feedback' });
+  }
+});
+
 // --- System Log Endpoint ---
 app.post('/api/log', async (req, res) => {
   const { level, message, context, url, user_agent } = req.body;
@@ -307,12 +421,103 @@ app.post('/api/log', async (req, res) => {
   res.json({ success: true });
 });
 
-// --- Facebook Album Import Stubs ---
-app.post('/api/facebook/list-albums', async (req, res) => {
+// --- Admin Agent Action Engine ---
+app.post('/api/admin-agent', async (req, res) => {
   try {
-    const { accessToken, pageId } = req.body;
+    const { command, context } = req.body;
+    console.log(`[AdminAgent] Received command: ${command}`);
+
+    // Simple Regex Intent Classifier (v1)
+    const lowerCmd = command.toLowerCase();
+    let action = null;
+    let responseText = "I didn't understand that command.";
+    let confirmationNeeded = false;
+    let data = {};
+
+    if (lowerCmd.includes('publish') && lowerCmd.includes('draft')) {
+      // Intent: Publish Drafts
+      const { count } = await supabaseAdmin
+        .from('products')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'draft');
+
+      action = 'confirm_publish_drafts';
+      responseText = `I found ${count} draft products. Do you want me to publish them all to the store?`;
+      confirmationNeeded = true;
+      data = { count };
+
+    } else if (lowerCmd.includes('confirm') && context?.lastAction === 'confirm_publish_drafts') {
+      // Intent: Execute Publish
+      const { data: updated, error } = await supabaseAdmin
+        .from('products')
+        .update({ status: 'active' })
+        .eq('status', 'draft')
+        .select();
+
+      if (error) throw error;
+      responseText = `Success! I have published ${updated.length} products.`;
+      action = 'completed';
+
+    } else if (lowerCmd.includes('delete') && lowerCmd.includes('draft')) {
+      // Intent: Delete Drafts
+      const { count } = await supabaseAdmin
+        .from('products')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'draft');
+
+      action = 'confirm_delete_drafts';
+      responseText = `I found ${count} draft products. Are you sure you want to DELETE them permanently?`;
+      confirmationNeeded = true;
+      data = { count };
+
+    } else if (lowerCmd.includes('confirm') && context?.lastAction === 'confirm_delete_drafts') {
+      // Intent: Execute Delete
+      const { count, error } = await supabaseAdmin
+        .from('products')
+        .delete({ count: 'exact' })
+        .eq('status', 'draft');
+
+      if (error) throw error;
+      responseText = `Done. I have deleted ${count} draft products.`;
+      action = 'completed';
+
+    } else if (lowerCmd.includes('stock') || lowerCmd.includes('inventory')) {
+      // Intent: Check Stock
+      const { data: lowStock } = await supabaseAdmin
+        .from('products')
+        .select('name, stock_qty')
+        .lt('stock_qty', 5)
+        .limit(5);
+
+      if (lowStock && lowStock.length > 0) {
+        const items = lowStock.map(i => `- ${i.name} (${i.stock_qty})`).join('\n');
+        responseText = `Here are some items running low on stock:\n${items}`;
+      } else {
+        responseText = "Stock levels look good! No items are critically low.";
+      }
+    }
+
+    res.json({
+      responseText,
+      action,
+      confirmationNeeded,
+      data
+    });
+
+  } catch (error) {
+    console.error('Admin Agent Error:', error);
+    res.status(500).json({ error: error.message, responseText: "I encountered an error executing that command." });
+  }
+});
+
+// --- Facebook Album Import Stubs ---
+app.get('/api/facebook/list-albums', async (req, res) => {
+  try {
+    const accessToken = req.query.accessToken || process.env.FACEBOOK_ACCESS_TOKEN || process.env.FB_ACCESS_TOKEN || process.env.VITE_FB_ACCESS_TOKEN;
+    const pageId = req.query.pageId || process.env.FACEBOOK_PAGE_ID;
+
     if (!accessToken || !pageId) {
-      return res.status(400).json({ error: 'AccessToken and PageId required' });
+      return res.status(500).json({ error: 'Server configuration missing: FACEBOOK_ACCESS_TOKEN or FACEBOOK_PAGE_ID not set.' });
     }
 
     const response = await axios.get(`https://graph.facebook.com/v18.0/${pageId}/albums`, {
@@ -328,50 +533,105 @@ app.post('/api/facebook/list-albums', async (req, res) => {
 
 app.post('/api/facebook/import-album', async (req, res) => {
   try {
-    const { accessToken, albumId, useAI, createProducts } = req.body;
+    // Merge body params with env defaults
+    const accessToken = req.body.accessToken || process.env.FACEBOOK_ACCESS_TOKEN || process.env.FB_ACCESS_TOKEN || process.env.VITE_FB_ACCESS_TOKEN;
+    const { albumId, useAI, createProducts } = req.body;
+
+    if (!accessToken) {
+      return res.status(500).json({ error: 'Missing FACEBOOK_ACCESS_TOKEN configuration.' });
+    }
 
     // 1. Fetch Photos
     const photosResp = await axios.get(`https://graph.facebook.com/v18.0/${albumId}/photos`, {
-      params: { access_token: accessToken, fields: 'id,source,name,created_time', limit: 50 }
+      params: { access_token: accessToken, fields: 'id,source,name,created_time', limit: 20 } // Reduced limit to prevent timeouts with AI
     });
 
     const photos = photosResp.data.data;
     const createdProducts = [];
     let failureCount = 0;
+    let aiUsedCount = 0;
 
     // 2. Process Photos
     for (const photo of photos) {
       try {
-        // Upload to Cloudinary (Optional, but good for persistence)
-        // For speed, let's use the FB source URL directly for now, or upload if needed.
-        // Using FB source URL is liable to expire, so ideally we upload.
-        // But to minimize complexity today, let's rely on the FB URL or assume user will fix images later.
-        // BETTER: Upload to Cloudinary here if keys exist.
-
         let imageUrl = photo.source;
+        let productData = {
+          name: photo.name ? (photo.name.length > 50 ? photo.name.substring(0, 47) + '...' : photo.name) : 'Imported Item',
+          description: photo.name || 'Imported from Facebook',
+          category: 'New Arrivals',
+          price_mur: 0,
+          tags: []
+        };
 
-        // Simple AI Name Generation (Stubbed if no AI key, real if key exists)
-        // ... (We can skip complex AI for this hotfix and just use the FB caption)
+        // AI ENHANCEMENT
+        if (useAI && (process.env.GOOGLE_AI_KEY || process.env.VITE_GEMINI_API_KEY)) {
+          try {
+            const apiKey = process.env.GOOGLE_AI_KEY || process.env.VITE_GEMINI_API_KEY;
+            const imageResp = await fetch(imageUrl);
+            const arrayBuffer = await imageResp.arrayBuffer();
+            const base64Image = Buffer.from(arrayBuffer).toString('base64');
+
+            const prompt = `Analyze this fashion product. Return JSON:
+                {
+                    "name": "Short catchy title (max 50 chars)",
+                    "description": "Engaging sales description",
+                    "category": "Clothing/Shoes/Accessories",
+                    "price_mur": estimated_price_in_mauritian_rupees_number
+                }`;
+
+            const aiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                contents: [{
+                  parts: [
+                    { text: prompt },
+                    { inline_data: { mime_type: "image/jpeg", data: base64Image } }
+                  ]
+                }]
+              })
+            });
+
+            const aiData = await aiResponse.json();
+            let aiText = aiData.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (aiText) {
+              aiText = aiText.replace(/```json/g, '').replace(/```/g, '');
+              const parsed = JSON.parse(aiText);
+              productData = { ...productData, ...parsed };
+              aiUsedCount++;
+            }
+          } catch (aiErr) {
+            console.error("AI Analysis Failed for photo:", photo.id, aiErr.message);
+          }
+        }
 
         if (createProducts) {
           const { data, error } = await supabaseAdmin.from('products').insert([{
-            name: photo.name ? (photo.name.length > 50 ? photo.name.substring(0, 47) + '...' : photo.name) : 'Imported Item',
-            description: photo.name || 'Imported from Facebook',
+            name: productData.name,
+            description: productData.description,
             image_url: imageUrl,
-            price: 0, // Default
+            price: 0, // Legacy field
+            price_mur: productData.price_mur || 0,
             stock_qty: 1,
-            category: 'New Arrivals',
+            category: productData.category || 'New Arrivals',
             status: 'draft'
           }]).select().single();
 
           if (data) createdProducts.push(data);
         }
       } catch (e) {
+        console.error("Product creation failed:", e);
         failureCount++;
       }
     }
 
-    res.json({ success: true, productsCreated: createdProducts.length, failures: failureCount });
+    res.json({
+      success: true,
+      productsCreated: createdProducts.length,
+      failures: failureCount,
+      aiUsed: aiUsedCount > 0,
+      products: createdProducts // Return full list for preview
+    });
 
   } catch (error) {
     console.error('FB Import Error:', error.response?.data || error.message);
@@ -441,9 +701,75 @@ app.post('/api/extract-image-text', async (req, res) => {
 });
 
 // --- Email Service ---
+// --- Email Service ---
 app.post('/api/send-email', async (req, res) => {
-  // ... (Keep existing email logic or stub)
-  res.json({ success: true, message: 'Email logged' });
+  try {
+    const { to, subject, html } = req.body;
+
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+      console.warn('Email credentials missing. Logging email instead.');
+      console.log(`[EMAIL STUB] To: ${to}, Subject: ${subject}`);
+      return res.json({ success: true, message: 'Email logged (Credentials missing)' });
+    }
+
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+      }
+    });
+
+    const info = await transporter.sendMail({
+      from: `"Okasina Fashion" <${process.env.EMAIL_USER}>`,
+      to,
+      subject,
+      html
+    });
+
+    console.log('Email sent:', info.messageId);
+    res.json({ success: true, messageId: info.messageId });
+  } catch (error) {
+    console.error('Email Error:', error);
+    // Don't fail the client completely, just log it
+    res.status(200).json({ success: false, error: error.message, message: 'Failed to send email' });
+  }
+});
+
+// --- CITADEL SYSTEM VITALS ---
+app.get('/api/citadel/vitals', async (req, res) => {
+  const start = Date.now();
+  let dbStatus = 'disconnected';
+  let dbLatency = 0;
+
+  try {
+    // Check Supabase connection
+    const { data, error } = await supabaseAdmin.from('products').select('id').limit(1);
+    if (!error) {
+      dbStatus = 'connected';
+      dbLatency = Date.now() - start;
+    }
+  } catch (e) {
+    console.error('Citadel DB Check Failed', e);
+  }
+
+  const memUsage = process.memoryUsage();
+
+  res.json({
+    status: 'operational',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    system: {
+      memory_rss: Math.round(memUsage.rss / 1024 / 1024) + ' MB',
+      memory_heap: Math.round(memUsage.heapUsed / 1024 / 1024) + ' MB',
+      node_version: process.version
+    },
+    services: {
+      database: { status: dbStatus, latency_ms: dbLatency },
+      ai_vision: { status: (process.env.GOOGLE_AI_KEY || process.env.VITE_GEMINI_API_KEY) ? 'ready' : 'offline' },
+      cloudinary: { status: (process.env.CLOUDINARY_CLOUD_NAME) ? 'configured' : 'missing_config' }
+    }
+  });
 });
 
 const PORT = process.env.PORT || 3001;

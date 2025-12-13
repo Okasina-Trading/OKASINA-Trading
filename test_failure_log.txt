@@ -1,0 +1,103 @@
+
+Running 3 tests using 1 worker
+
+[1A[2K[1/3] tests\okasina.smoke.spec.js:6:1 ΓÇ║ Home loads and has Shop/Collection CTA
+[1A[2Ktests\okasina.smoke.spec.js:6:1 ΓÇ║ Home loads and has Shop/Collection CTA
+Testing against: http://localhost:4173
+
+[1A[2K  1) tests\okasina.smoke.spec.js:6:1 ΓÇ║ Home loads and has Shop/Collection CTA ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveTitle[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/OKASINA|Trading|Fashion/i[39m
+    Received string:  [31m"Vite + React"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveTitle" with timeout 5000ms[22m
+    [2m    8 ├ù unexpected value "Vite + React"[22m
+
+
+       8 |     await page.goto(BASE, { waitUntil: "domcontentloaded" });
+       9 |     // Allow loose matching for title to catch "Okasina" or "Trading"
+    > 10 |     await expect(page).toHaveTitle(/OKASINA|Trading|Fashion/i);
+         |                        ^
+      11 |     await expect(page.getByText(/shop|collection|explore/i).first()).toBeVisible();
+      12 | });
+      13 |
+        at C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\tests\okasina.smoke.spec.js:10:24
+
+    Error Context: test-results\tests-okasina.smoke-Home-loads-and-has-Shop-Collection-CTA\error-context.md
+
+
+[1A[2K[2/3] tests\okasina.smoke.spec.js:14:1 ΓÇ║ Cart/Checkout basic navigation does not 404
+[1A[2Ktests\okasina.smoke.spec.js:14:1 ΓÇ║ Cart/Checkout basic navigation does not 404
+Navigating to /cart...
+
+[1A[2KNavigating to /checkout...
+
+[1A[2KNavigating to /shop...
+
+[1A[2K[3/3] tests\okasina.smoke.spec.js:38:1 ΓÇ║ No console errors on first load
+
+[1A[2Ktests\okasina.smoke.spec.js:38:1 ΓÇ║ No console errors on first load
+Critical Console Errors Found: [
+  "Access to fetch at 'https://ipapi.co/json/' from origin 'http://localhost:4173' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.",
+  'Error detecting location: TypeError: Failed to fetch\n' +
+    '    at http://localhost:4173/assets/index-XAevJksR.js:27:7047\n' +
+    '    at http://localhost:4173/assets/index-XAevJksR.js:27:7303\n' +
+    '    at Pi (http://localhost:4173/assets/index-XAevJksR.js:25:84073)\n' +
+    '    at _x (http://localhost:4173/assets/index-XAevJksR.js:25:98836)\n' +
+    '    at un (http://localhost:4173/assets/index-XAevJksR.js:25:98720)\n' +
+    '    at _x (http://localhost:4173/assets/index-XAevJksR.js:25:99572)\n' +
+    '    at un (http://localhost:4173/assets/index-XAevJksR.js:25:98720)\n' +
+    '    at _x (http://localhost:4173/assets/index-XAevJksR.js:25:98816)\n' +
+    '    at un (http://localhost:4173/assets/index-XAevJksR.js:25:98720)\n' +
+    '    at _x (http://localhost:4173/assets/index-XAevJksR.js:25:99572)',
+  'Error fetching products: {message: TypeError: Failed to fetch, details: TypeError: Failed to fetch\n' +
+    '    at http://localhostΓÇªlocalhost:4173/assets/index-XAevJksR.js:27:16517), hint: , code: }',
+  'Failed to send log to Supabase: {message: TypeError: Failed to fetch, details: TypeError: Failed to fetch\n' +
+    '    at http://localhostΓÇªlocalhost:4173/assets/index-XAevJksR.js:27:13933), hint: , code: }'
+]
+[1A[2K  2) tests\okasina.smoke.spec.js:38:1 ΓÇ║ No console errors on first load ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Error: Found critical console errors: Access to fetch at 'https://ipapi.co/json/' from origin 'http://localhost:4173' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.
+    Error detecting location: TypeError: Failed to fetch
+        at http://localhost:4173/assets/index-XAevJksR.js:27:7047
+        at http://localhost:4173/assets/index-XAevJksR.js:27:7303
+        at Pi (http://localhost:4173/assets/index-XAevJksR.js:25:84073)
+        at _x (http://localhost:4173/assets/index-XAevJksR.js:25:98836)
+        at un (http://localhost:4173/assets/index-XAevJksR.js:25:98720)
+        at _x (http://localhost:4173/assets/index-XAevJksR.js:25:99572)
+        at un (http://localhost:4173/assets/index-XAevJksR.js:25:98720)
+        at _x (http://localhost:4173/assets/index-XAevJksR.js:25:98816)
+        at un (http://localhost:4173/assets/index-XAevJksR.js:25:98720)
+        at _x (http://localhost:4173/assets/index-XAevJksR.js:25:99572)
+    Error fetching products: {message: TypeError: Failed to fetch, details: TypeError: Failed to fetch
+        at http://localhostΓÇªlocalhost:4173/assets/index-XAevJksR.js:27:16517), hint: , code: }
+    Failed to send log to Supabase: {message: TypeError: Failed to fetch, details: TypeError: Failed to fetch
+        at http://localhostΓÇªlocalhost:4173/assets/index-XAevJksR.js:27:13933), hint: , code: }
+
+    [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m0[39m
+    Received: [31m4[39m
+        at http://localhost:4173/assets/index-XAevJksR.js:27:7047
+        at http://localhost:4173/assets/index-XAevJksR.js:27:7303
+        at Pi (http://localhost:4173/assets/index-XAevJksR.js:25:84073)
+        at _x (http://localhost:4173/assets/index-XAevJksR.js:25:98836)
+        at un (http://localhost:4173/assets/index-XAevJksR.js:25:98720)
+        at _x (http://localhost:4173/assets/index-XAevJksR.js:25:99572)
+        at un (http://localhost:4173/assets/index-XAevJksR.js:25:98720)
+        at _x (http://localhost:4173/assets/index-XAevJksR.js:25:98816)
+        at un (http://localhost:4173/assets/index-XAevJksR.js:25:98720)
+        at _x (http://localhost:4173/assets/index-XAevJksR.js:25:99572)
+        at C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\tests\okasina.smoke.spec.js:61:98
+
+    Error Context: test-results\tests-okasina.smoke-No-console-errors-on-first-load\error-context.md
+
+
+[1A[2K  2 failed
+    tests\okasina.smoke.spec.js:6:1 ΓÇ║ Home loads and has Shop/Collection CTA ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    tests\okasina.smoke.spec.js:38:1 ΓÇ║ No console errors on first load ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+  1 passed (11.8s)

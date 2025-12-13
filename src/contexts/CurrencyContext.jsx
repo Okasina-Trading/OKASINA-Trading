@@ -26,23 +26,29 @@ export const CurrencyProvider = ({ children }) => {
     useEffect(() => {
         const detectLocation = async () => {
             try {
-                // Use a free IP geolocation API
-                const response = await fetch('https://ipapi.co/json/');
-                const data = await response.json();
+                // Safe, non-blocking fetch with timeout
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 2000); // 2s timeout
 
-                if (data.country_code === 'MU') {
-                    setIsMauritius(true);
-                    setCurrency('MUR');
-                } else {
-                    // Check local storage for saved preference
-                    const saved = localStorage.getItem('currency');
-                    if (saved && rates[saved]) {
-                        setCurrency(saved);
+                const response = await fetch('https://ipapi.co/json/', { signal: controller.signal });
+                clearTimeout(timeoutId);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.country_code === 'MU') {
+                        setIsMauritius(true);
+                        setCurrency('MUR');
+                    } else {
+                        // Check local storage for saved preference
+                        const saved = localStorage.getItem('currency');
+                        if (saved && rates[saved]) {
+                            setCurrency(saved);
+                        }
                     }
                 }
             } catch (error) {
-                console.error('Error detecting location:', error);
-                // Fallback: check local storage or default to USD
+                // Silently fail for CORS/Network/Timeout (Safe Mode)
+                console.warn('Location detection skipped (safe mode):', error.message);
                 const saved = localStorage.getItem('currency');
                 if (saved) setCurrency(saved);
             } finally {

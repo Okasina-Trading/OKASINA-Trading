@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import {
     ReactFlow,
     addEdge,
@@ -81,7 +81,30 @@ const AutomationBuilderContent = () => {
         [reactFlowInstance, setNodes],
     );
 
+    // Load from LocalStorage on mount
+    useEffect(() => {
+        const saved = localStorage.getItem('okasina_automation_workflow');
+        if (saved) {
+            try {
+                const { nodes: savedNodes, edges: savedEdges } = JSON.parse(saved);
+                setNodes(savedNodes);
+                setEdges(savedEdges);
+                addToast('Restored your saved workflow', 'info');
+            } catch (e) {
+                console.error('Failed to load workflow', e);
+            }
+        }
+    }, [setNodes, setEdges, addToast]);
+
+    const handleSave = () => {
+        const workflow = { nodes, edges };
+        localStorage.setItem('okasina_automation_workflow', JSON.stringify(workflow));
+        addToast('Workflow saved successfully!', 'success');
+    };
+
     const handleRun = async () => {
+        // Auto-save before running
+        handleSave();
         addToast('Starting workflow execution...', 'info');
 
         try {
@@ -146,9 +169,15 @@ const AutomationBuilderContent = () => {
                             // User wants it to WORK.
                             // RPC 'decrease_price' likely doesn't exist.
                             // We will loop.
+                            // Execute Update via Backend API to bypass RLS
                             for (const p of currentProducts) {
                                 const newPrice = Math.floor(p.price * (1 - percent / 100));
-                                await supabase.from('products').update({ price: newPrice }).eq('id', p.id);
+                                // Call Backend API
+                                await fetch(`${process.env.NODE_ENV === 'production' ? '' : 'http://localhost:3001'}/api/update-product`, {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ id: p.id, price: newPrice })
+                                });
                             }
                         }
                     }
@@ -240,6 +269,7 @@ const AutomationBuilderContent = () => {
                         Run Workflow
                     </button>
                     <button
+                        onClick={handleSave}
                         className="bg-white text-gray-700 px-4 py-2 rounded-lg shadow-lg hover:bg-gray-50 flex items-center gap-2 font-medium border border-gray-200"
                     >
                         <Save size={18} />

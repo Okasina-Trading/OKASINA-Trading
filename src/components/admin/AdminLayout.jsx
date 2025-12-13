@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import AdminAssistantWidget from './AdminAssistantWidget';
 import {
     LayoutDashboard,
     Package,
@@ -16,6 +17,7 @@ import {
     Workflow,
     Bot,
     Share2,
+    Activity,
 } from 'lucide-react';
 
 export default function AdminLayout({ children }) {
@@ -43,6 +45,7 @@ export default function AdminLayout({ children }) {
         { name: 'Album Import', href: '/admin/album-import', icon: UploadCloud },
         { name: 'Stock Manager', href: '/admin/stock-manager', icon: Package },
         { name: 'AI Team', href: '/admin/ai-employees', icon: Bot },
+        { name: 'Citadel (Health)', href: '/admin/citadel', icon: Activity },
     ];
 
     const isActive = href => {
@@ -195,6 +198,7 @@ export default function AdminLayout({ children }) {
                 {/* Page Content */}
                 <main className="flex-1 overflow-auto p-4 lg:p-8">{children}</main>
             </div>
+            <AdminAssistantWidget />
         </div>
     );
 }

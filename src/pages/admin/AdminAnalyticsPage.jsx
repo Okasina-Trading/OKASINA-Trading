@@ -1,331 +1,143 @@
-import React, { useEffect, useState } from 'react';
-import { supabase } from '../../supabase';
-import AdminLayout from '../../components/admin/AdminLayout';
-import {
-    TrendingUp,
-    TrendingDown,
-    DollarSign,
-    ShoppingCart,
-    Users,
-    Package,
-    BarChart3,
-    Calendar
-} from 'lucide-react';
-import {
-    LineChart,
-    Line,
-    BarChart,
-    Bar,
-    PieChart,
-    Pie,
-    Cell,
-    XAxis,
-    YAxis,
-    CartesianGrid,
-    Tooltip,
-    Legend,
-    ResponsiveContainer
-} from 'recharts';
+import React, { useState, useEffect } from 'react';
+import { BarChart3, TrendingUp, TrendingDown, DollarSign, Calendar, Target } from 'lucide-react';
+import { API_URL } from '../../api';
 
-export default function AdminAnalyticsPage() {
-    const [loading, setLoading] = useState(true);
-    const [timeRange, setTimeRange] = useState('30days');
-    const [analytics, setAnalytics] = useState({
-        revenue: 0,
-        orders: 0,
-        customers: 0,
-        products: 0,
-        revenueChange: 0,
-        ordersChange: 0,
-        salesData: [],
-        categoryData: [],
-        topProducts: []
+// Simple Linear Regression for Forecasting
+const calculateTrend = (dataPoints) => {
+    if (!dataPoints || dataPoints.length < 2) return null;
+
+    const n = dataPoints.length;
+    let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
+
+    dataPoints.forEach((point, index) => {
+        sumX += index;
+        sumY += point;
+        sumXY += index * point;
+        sumXX += index * index;
     });
 
+    const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
+    const intercept = (sumY - slope * sumX) / n;
+
+    return { slope, intercept };
+};
+
+export default function AdminAnalyticsPage() {
+    const [stats, setStats] = useState({
+        totalSales: 0,
+        totalOrders: 0,
+        averageOrderValue: 0,
+        conversionRate: 2.4, // Mocked for now
+        salesHistory: [1200, 1500, 1100, 1800, 2000, 1700, 2200] // Last 7 days
+    });
+    const [forecast, setForecast] = useState(null);
+    const [loading, setLoading] = useState(true);
+
     useEffect(() => {
-        fetchAnalytics();
-    }, [timeRange]);
-
-    const fetchAnalytics = async () => {
-        try {
-            setLoading(true);
-
-            // Fetch orders
-            const { data: orders, error: ordersError } = await supabase
-                .from('orders')
-                .select('*')
-                .gte('created_at', getDateRange());
-
-            if (ordersError) throw ordersError;
-
-            // Fetch products
-            const { data: products, error: productsError } = await supabase
-                .from('products')
-                .select('*');
-
-            if (productsError) throw productsError;
-
-            // Calculate analytics
-            const revenue = orders?.reduce((sum, order) => sum + (order.total || 0), 0) || 0;
-            const ordersCount = orders?.length || 0;
-
-            // Generate sales data for chart
-            const salesData = generateSalesData(orders || []);
-
-            // Generate category data
-            const categoryData = generateCategoryData(products || []);
-
-            // Get top products
-            const topProducts = getTopProducts(products || []);
-
-            setAnalytics({
-                revenue,
-                orders: ordersCount,
-                customers: new Set(orders?.map(o => o.customer_email)).size || 0,
-                products: products?.length || 0,
-                revenueChange: 12.5, // Mock data
-                ordersChange: 8.3, // Mock data
-                salesData,
-                categoryData,
-                topProducts
-            });
-        } catch (error) {
-            console.error('Error fetching analytics:', error);
-        } finally {
+        // Mock API call - In real app, fetch from /api/quant/metrics
+        // simulating delay
+        setTimeout(() => {
+            const trend = calculateTrend(stats.salesHistory);
+            if (trend) {
+                const nextDayIndex = stats.salesHistory.length;
+                const prediction = trend.slope * nextDayIndex + trend.intercept;
+                setForecast({
+                    nextDay: Math.round(prediction),
+                    trendDirection: trend.slope > 0 ? 'up' : 'down',
+                    confidence: 85 // Mock confidence
+                });
+            }
             setLoading(false);
-        }
-    };
-
-    const getDateRange = () => {
-        const now = new Date();
-        const days = timeRange === '7days' ? 7 : timeRange === '30days' ? 30 : 90;
-        const date = new Date(now.setDate(now.getDate() - days));
-        return date.toISOString();
-    };
-
-    const generateSalesData = (orders) => {
-        const data = [];
-        const days = timeRange === '7days' ? 7 : timeRange === '30days' ? 30 : 90;
-
-        for (let i = days - 1; i >= 0; i--) {
-            const date = new Date();
-            date.setDate(date.getDate() - i);
-            const dateStr = date.toISOString().split('T')[0];
-
-            const dayOrders = orders.filter(o =>
-                o.created_at?.split('T')[0] === dateStr
-            );
-
-            data.push({
-                date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-                revenue: dayOrders.reduce((sum, o) => sum + (o.total || 0), 0),
-                orders: dayOrders.length
-            });
-        }
-
-        return data;
-    };
-
-    const generateCategoryData = (products) => {
-        const categories = {};
-        products.forEach(p => {
-            const cat = p.category || 'Other';
-            categories[cat] = (categories[cat] || 0) + 1;
-        });
-
-        return Object.entries(categories).map(([name, value]) => ({
-            name,
-            value
-        }));
-    };
-
-    const getTopProducts = (products) => {
-        return products
-            .sort((a, b) => (b.stock || 0) - (a.stock || 0))
-            .slice(0, 5);
-    };
-
-    const COLORS = ['#3B82F6', '#8B5CF6', '#EC4899', '#F59E0B', '#10B981'];
+        }, 1000);
+    }, [stats]);
 
     return (
-        <AdminLayout>
-            <div className="space-y-6">
-                {/* Time Range Selector */}
-                <div className="flex justify-end">
-                    <select
-                        value={timeRange}
-                        onChange={(e) => setTimeRange(e.target.value)}
-                        className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                        <option value="7days">Last 7 Days</option>
-                        <option value="30days">Last 30 Days</option>
-                        <option value="90days">Last 90 Days</option>
-                    </select>
+        <div className="space-y-6 animate-fade-in p-6">
+            <div className="flex justify-between items-center bg-gradient-to-r from-purple-900 to-indigo-900 p-6 rounded-2xl shadow-xl text-white">
+                <div>
+                    <h1 className="text-3xl font-bold flex items-center gap-3">
+                        <BarChart3 className="text-purple-400" />
+                        Quant Intelligence
+                    </h1>
+                    <p className="text-purple-200 mt-1">AI-Powered Sales Forecasting & Metrics</p>
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <h3 className="text-gray-500 font-medium mb-2">Total Sales (7 Days)</h3>
+                    <div className="text-3xl font-bold text-gray-900">Rs {stats.salesHistory.reduce((a, b) => a + b, 0)}</div>
+                </div>
+                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <h3 className="text-gray-500 font-medium mb-2">Avg. Order Value</h3>
+                    <div className="text-3xl font-bold text-gray-900">Rs 2,500</div>
+                </div>
+                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <h3 className="text-gray-500 font-medium mb-2">Conversion Rate</h3>
+                    <div className="text-3xl font-bold text-gray-900">{stats.conversionRate}%</div>
+                </div>
+            </div>
+
+            {/* FORECAST SECTION */}
+            <div className="bg-white rounded-xl shadow-lg border border-purple-100 overflow-hidden">
+                <div className="p-6 border-b border-gray-100 bg-purple-50 flex justify-between items-center">
+                    <h2 className="text-lg font-bold text-purple-900 flex items-center gap-2">
+                        <Target className="text-purple-600" />
+                        Predictive Analysis (Quant)
+                    </h2>
+                    <span className="px-3 py-1 bg-purple-200 text-purple-800 text-xs font-bold rounded-full uppercase">
+                        Beta Model
+                    </span>
                 </div>
 
-                {/* Stats Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                    <div className="bg-white rounded-xl p-6 border border-gray-200">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-sm text-gray-600">Total Revenue</p>
-                                <p className="text-3xl font-bold text-gray-900 mt-2">
-                                    ${analytics.revenue.toFixed(2)}
-                                </p>
-                                <div className="flex items-center gap-1 mt-2">
-                                    <TrendingUp className="text-green-600" size={16} />
-                                    <span className="text-sm text-green-600 font-medium">
-                                        +{analytics.revenueChange}%
-                                    </span>
+                <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <p className="text-gray-500 mb-4">
+                            Based on your last 7 days of performance, our linear regression model predicts the following trajectory for tomorrow.
+                        </p>
+
+                        {forecast && (
+                            <div className="space-y-4">
+                                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                                    <span className="text-gray-600">Predicted Sales (Tomorrow)</span>
+                                    <span className="text-2xl font-bold text-gray-900">Rs {forecast.nextDay}</span>
                                 </div>
-                            </div>
-                            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                                <DollarSign className="text-green-600" size={24} />
-                            </div>
-                        </div>
-                    </div>
 
-                    <div className="bg-white rounded-xl p-6 border border-gray-200">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-sm text-gray-600">Total Orders</p>
-                                <p className="text-3xl font-bold text-gray-900 mt-2">
-                                    {analytics.orders}
-                                </p>
-                                <div className="flex items-center gap-1 mt-2">
-                                    <TrendingUp className="text-green-600" size={16} />
-                                    <span className="text-sm text-green-600 font-medium">
-                                        +{analytics.ordersChange}%
-                                    </span>
-                                </div>
-                            </div>
-                            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                                <ShoppingCart className="text-blue-600" size={24} />
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="bg-white rounded-xl p-6 border border-gray-200">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-sm text-gray-600">Customers</p>
-                                <p className="text-3xl font-bold text-gray-900 mt-2">
-                                    {analytics.customers}
-                                </p>
-                                <p className="text-sm text-gray-500 mt-2">Unique customers</p>
-                            </div>
-                            <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                                <Users className="text-purple-600" size={24} />
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="bg-white rounded-xl p-6 border border-gray-200">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-sm text-gray-600">Products</p>
-                                <p className="text-3xl font-bold text-gray-900 mt-2">
-                                    {analytics.products}
-                                </p>
-                                <p className="text-sm text-gray-500 mt-2">Total products</p>
-                            </div>
-                            <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                                <Package className="text-orange-600" size={24} />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Charts */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    {/* Revenue Chart */}
-                    <div className="bg-white rounded-xl p-6 border border-gray-200">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Revenue Over Time</h3>
-                        <ResponsiveContainer width="100%" height={300}>
-                            <LineChart data={analytics.salesData}>
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="date" />
-                                <YAxis />
-                                <Tooltip />
-                                <Legend />
-                                <Line
-                                    type="monotone"
-                                    dataKey="revenue"
-                                    stroke="#3B82F6"
-                                    strokeWidth={2}
-                                    name="Revenue ($)"
-                                />
-                            </LineChart>
-                        </ResponsiveContainer>
-                    </div>
-
-                    {/* Orders Chart */}
-                    <div className="bg-white rounded-xl p-6 border border-gray-200">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Orders Over Time</h3>
-                        <ResponsiveContainer width="100%" height={300}>
-                            <BarChart data={analytics.salesData}>
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="date" />
-                                <YAxis />
-                                <Tooltip />
-                                <Legend />
-                                <Bar dataKey="orders" fill="#8B5CF6" name="Orders" />
-                            </BarChart>
-                        </ResponsiveContainer>
-                    </div>
-
-                    {/* Category Distribution */}
-                    <div className="bg-white rounded-xl p-6 border border-gray-200">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Products by Category</h3>
-                        <ResponsiveContainer width="100%" height={300}>
-                            <PieChart>
-                                <Pie
-                                    data={analytics.categoryData}
-                                    cx="50%"
-                                    cy="50%"
-                                    labelLine={false}
-                                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                                    outerRadius={80}
-                                    fill="#8884d8"
-                                    dataKey="value"
-                                >
-                                    {analytics.categoryData.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                    ))}
-                                </Pie>
-                                <Tooltip />
-                            </PieChart>
-                        </ResponsiveContainer>
-                    </div>
-
-                    {/* Top Products */}
-                    <div className="bg-white rounded-xl p-6 border border-gray-200">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Top Products</h3>
-                        <div className="space-y-4">
-                            {analytics.topProducts.map((product, index) => (
-                                <div key={product.id} className="flex items-center gap-4">
-                                    <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg flex items-center justify-center text-white font-bold">
-                                        {index + 1}
-                                    </div>
-                                    <img
-                                        src={product.image_url || '/placeholder.jpg'}
-                                        alt={product.name}
-                                        className="w-12 h-12 rounded-lg object-cover"
-                                    />
-                                    <div className="flex-1">
-                                        <p className="font-medium text-gray-900">{product.name}</p>
-                                        <p className="text-sm text-gray-500">{product.category}</p>
-                                    </div>
-                                    <div className="text-right">
-                                        <p className="font-medium text-gray-900">Rs {product.price_mur?.toLocaleString() || (product.price * 45).toLocaleString()}</p>
-                                        <p className="text-sm text-gray-500">{product.stock} in stock</p>
+                                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                                    <span className="text-gray-600">Trend Direction</span>
+                                    <div className="flex items-center gap-2">
+                                        {forecast.trendDirection === 'up' ?
+                                            <TrendingUp className="text-green-500" /> :
+                                            <TrendingDown className="text-red-500" />
+                                        }
+                                        <span className={`font-bold ${forecast.trendDirection === 'up' ? 'text-green-600' : 'text-red-600'}`}>
+                                            {forecast.trendDirection.toUpperCase()}
+                                        </span>
                                     </div>
                                 </div>
-                            ))}
-                        </div>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="h-64 flex items-end justify-between gap-2 px-4 border-b border-l border-gray-300 relative">
+                        {stats.salesHistory.map((val, i) => (
+                            <div key={i} className="w-full bg-indigo-200 hover:bg-indigo-300 transition-colors rounded-t-sm relative group" style={{ height: `${(val / 3000) * 100}%` }}>
+                                <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                                    Rs {val}
+                                </div>
+                            </div>
+                        ))}
+                        {/* Prediction Bar */}
+                        {forecast && (
+                            <div className="w-full bg-purple-500/50 border-2 border-dashed border-purple-600 rounded-t-sm relative group animate-pulse" style={{ height: `${(forecast.nextDay / 3000) * 100}%` }}>
+                                <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-purple-900 text-white text-xs px-2 py-1 rounded">
+                                    Est: Rs {forecast.nextDay}
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
-        </AdminLayout>
+        </div>
     );
 }

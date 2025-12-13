@@ -175,9 +175,7 @@ export default function AdminDashboardPage() {
                                         <div className={`w-12 h-12 rounded-xl ${stat.bgColor} flex items-center justify-center`}>
                                             <Icon size={24} className="text-white" />
                                         </div>
-                                        <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            +23.5%
-                                        </span>
+                                        {/* Removed hardcoded percentage */}
                                     </div>
                                     <h3 className="text-3xl font-bold text-gray-900 mb-1">
                                         {loading ? '...' : stat.value}
@@ -281,23 +279,6 @@ export default function AdminDashboardPage() {
                             </div>
                         </div>
                     </div>
-                </div>
-
-                {/* Market Insights */}
-                <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl shadow-sm border border-blue-100 p-6">
-                    <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                        <Sparkles size={20} className="text-yellow-500" />
-                        Market Insights
-                    </h3>
-                    <ul className="space-y-2">
-                        {marketInsights.map((insight, index) => (
-                            <li key={index} className="flex items-center gap-2 text-gray-700">
-                                <span className="w-2 h-2 bg-yellow-400 rounded-full" />
-                                <span className="font-medium">{insight.label}:</span>
-                                <span className="text-gray-600">{insight.value}</span>
-                            </li>
-                        ))}
-                    </ul>
                 </div>
             </div>
         </AdminLayout>

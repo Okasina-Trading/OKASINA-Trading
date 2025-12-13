@@ -26,7 +26,7 @@ export default function ProductList({ filters, viewMode = 'grid' }) {
             const normalized = (data || []).map(p => ({
                 ...p,
                 category: p.category ?? "Accessories",
-                price_mur: p.price_mur || (p.price ? p.price * 45 : 0)
+                price_mur: p.price_mur || p.price // Assume price is already in MUR if price_mur is missing, or legacy logic handled by context
             }));
             setProducts(normalized);
         }

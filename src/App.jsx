@@ -27,6 +27,7 @@ import AdminAiEmployeesPage from './pages/admin/AdminAiEmployeesPage';
 import StockManagerPage from './pages/StockManagerPage';
 import ComparePage from './pages/ComparePage';
 import AdminSocialMediaPage from './pages/admin/AdminSocialMediaPage';
+import AdminCitadelPage from './pages/admin/AdminCitadelPage';
 import HeaderNew from './components/HeaderNew';
 import Footer from './components/Footer';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -42,6 +43,7 @@ import ProductComparisonBar from './components/product/ProductComparisonBar';
 import { HelmetProvider } from 'react-helmet-async';
 
 const StylistChatWidget = React.lazy(() => import('./components/ai/StylistChatWidget'));
+import JarvisFeedbackWidget from './components/JarvisFeedbackWidget';
 
 export default function App() {
     return (
@@ -91,12 +93,14 @@ export default function App() {
                                                         <Route path="/admin/ai-employees" element={<ProtectedRoute><AdminAiEmployeesPage /></ProtectedRoute>} />
                                                         <Route path="/admin/album-import" element={<ProtectedRoute><AlbumImportPage /></ProtectedRoute>} />
                                                         <Route path="/admin/social-media" element={<ProtectedRoute><AdminSocialMediaPage /></ProtectedRoute>} />
+                                                        <Route path="/admin/citadel" element={<ProtectedRoute><AdminCitadelPage /></ProtectedRoute>} />
                                                     </Routes>
                                                 </main>
                                                 <ProductComparisonBar />
                                                 <React.Suspense fallback={null}>
                                                     <StylistChatWidget />
                                                 </React.Suspense>
+                                                <JarvisFeedbackWidget />
                                                 <Footer />
                                             </div>
                                         </BrowserRouter>

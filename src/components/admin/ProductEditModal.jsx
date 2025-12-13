@@ -4,6 +4,10 @@ import { supabase } from '../../supabase';
 import { API_URL } from '../../api';
 
 export default function ProductEditModal({ product, isOpen, onClose, onUpdate }) {
+    const [imageFile, setImageFile] = useState(null);
+    const [imagePreview, setImagePreview] = useState(null);
+    const [analyzing, setAnalyzing] = useState(false);
+
     const [formData, setFormData] = useState({
         name: '',
         description: '',
@@ -14,7 +18,8 @@ export default function ProductEditModal({ product, isOpen, onClose, onUpdate })
         stock_qty: '',
         sku: '',
         status: 'active',
-        sizes: ''
+        sizes: '',
+        image_url: ''
     });
     const [saving, setSaving] = useState(false);
 
@@ -30,10 +35,21 @@ export default function ProductEditModal({ product, isOpen, onClose, onUpdate })
                 stock_qty: product.stock_qty || 0,
                 sku: product.sku || '',
                 status: product.status || 'active',
-                sizes: Array.isArray(product.sizes) ? product.sizes.join(', ') : (product.sizes || '')
+                sizes: Array.isArray(product.sizes) ? product.sizes.join(', ') : (product.sizes || ''),
+                image_url: product.image_url || ''
             });
+            setImagePreview(product.image_url || null);
+        } else {
+            // Reset for new product
+            setFormData({
+                name: '', description: '', category: '', subcategory: '',
+                price: '', price_mur: '', stock_qty: '', sku: '',
+                status: 'active', sizes: '', image_url: ''
+            });
+            setImagePreview(null);
+            setImageFile(null);
         }
-    }, [product]);
+    }, [product, isOpen]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -43,31 +59,106 @@ export default function ProductEditModal({ product, isOpen, onClose, onUpdate })
         }));
     };
 
+    const handleImageChange = async (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setImageFile(file);
+            const previewUrl = URL.createObjectURL(file);
+            setImagePreview(previewUrl);
+
+            // Auto-trigger analysis
+            if (confirm("✨ Image Detected! Shall I ask the AI to auto-fill the product details for you?")) {
+                await analyzeImage(file);
+            }
+        }
+    };
+
+    const analyzeImage = async (file) => {
+        setAnalyzing(true);
+        try {
+            // 1. Upload tmp image
+            const uploadFormData = new FormData();
+            uploadFormData.append('file', file);
+            const uploadRes = await fetch(`${API_URL}/api/upload-image`, { method: 'POST', body: uploadFormData });
+            const uploadData = await uploadRes.json();
+
+            if (!uploadData.url) throw new Error("Upload failed");
+
+            // 2. Call Vision Agent
+            const visionRes = await fetch(`${API_URL}/api/ai-agent/jarvis/vision`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ imageUrl: uploadData.url })
+            });
+            const visionData = await visionRes.json();
+
+            if (visionData.success && visionData.product) {
+                const p = visionData.product;
+                setFormData(prev => ({
+                    ...prev,
+                    name: p.name,
+                    description: p.description,
+                    category: p.category,
+                    subcategory: p.subcategory || '',
+                    price: p.price,
+                    price_mur: p.price,
+                    sizes: 'S, M, L' // Default
+                }));
+                // Persist the uploaded URL so we don't upload again on save
+                setFormData(prev => ({ ...prev, image_url: uploadData.url }));
+                setImageFile(null); // Clear file so we use the URL
+                alert("✨ Magic! Product details filled by AI.");
+            }
+        } catch (error) {
+            console.error("Vision Error:", error);
+            alert("AI couldn't analyze the image. Please fill details manually.");
+        } finally {
+            setAnalyzing(false);
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setSaving(true);
 
         try {
+            let finalImageUrl = formData.image_url;
+
+            // 1. Upload Image logic (only if new file and NOT already analyzed/uploaded)
+            if (imageFile) {
+                const uploadFormData = new FormData();
+                uploadFormData.append('file', imageFile);
+
+                const uploadRes = await fetch(`${API_URL}/api/upload-image`, {
+                    method: 'POST',
+                    body: uploadFormData
+                });
+                const uploadData = await uploadRes.json();
+
+                if (!uploadRes.ok) throw new Error(uploadData.error || 'Image upload failed');
+                finalImageUrl = uploadData.url;
+            }
+
+            // 2. Prepare Data (Sync Price)
+            const priceValue = parseFloat(formData.price);
             const updateData = {
                 ...formData,
-                price: parseFloat(formData.price),
-                price_mur: parseFloat(formData.price_mur) || 0, // Handle hidden field
+                price: priceValue,
+                price_mur: priceValue, // Auto-sync MUR price to the same value
                 stock_qty: parseInt(formData.stock_qty),
-                // Fix for Unique Constraint: Send NULL if SKU is empty string
                 sku: formData.sku && formData.sku.trim() !== '' ? formData.sku.trim() : null,
-                sizes: formData.sizes.split(',').map(s => s.trim()).filter(s => s)
+                sizes: formData.sizes.split(',').map(s => s.trim()).filter(s => s),
+                image_url: finalImageUrl
             };
 
             let response;
             if (product?.id) {
-                // Update existing product
                 response = await fetch(`${API_URL}/api/update-product`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ id: product.id, ...updateData })
                 });
             } else {
-                // Create new product
                 response = await fetch(`${API_URL}/api/create-product`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -83,7 +174,6 @@ export default function ProductEditModal({ product, isOpen, onClose, onUpdate })
 
             onUpdate();
             onClose();
-            alert(product?.id ? 'Product updated successfully' : 'Product created successfully');
         } catch (error) {
             console.error('Error saving product:', error);
             alert('Failed to save product: ' + error.message);
@@ -95,57 +185,90 @@ export default function ProductEditModal({ product, isOpen, onClose, onUpdate })
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-                <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+            <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full my-8">
+                <div className="bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center rounded-t-xl sticky top-0 z-10">
                     <h2 className="text-xl font-bold text-gray-900">{product ? 'Edit Product' : 'Add New Product'}</h2>
-                    <button
-                        onClick={onClose}
-                        className="text-gray-400 hover:text-gray-600 transition-colors"
-                    >
+                    <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
                         <X size={24} />
                     </button>
                 </div>
 
-                <form onSubmit={handleSubmit} className="p-6 space-y-4">
+                <form onSubmit={handleSubmit} className="p-6 space-y-6">
+                    {/* Image Upload Section */}
+                    <div className="flex justify-center">
+                        <div className="w-full max-w-xs">
+                            <label className="block text-sm font-medium text-gray-700 mb-2 text-center">
+                                Product Image
+                            </label>
+                            <div className="relative border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-blue-500 transition-colors bg-gray-50 flex flex-col items-center justify-center min-h-[200px]">
+                                {imagePreview ? (
+                                    <>
+                                        <img src={imagePreview} alt="Preview" className="w-full h-48 object-contain rounded-md mb-2" />
+                                        <button
+                                            type="button"
+                                            onClick={() => { setImageFile(null); setImagePreview(null); }}
+                                            className="text-red-500 text-sm hover:underline"
+                                        >
+                                            Remove
+                                        </button>
+                                    </>
+                                ) : (
+                                    <div className="text-center">
+                                        <div className="mx-auto h-12 w-12 text-gray-400 mb-2">
+                                            <svg className="w-full h-full" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                        </div>
+                                        <p className="text-sm text-gray-500">Tap to upload image</p>
+                                    </div>
+                                )}
+                                {analyzing && (
+                                    <div className="absolute inset-0 bg-white/80 flex flex-col items-center justify-center z-10">
+                                        <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-2"></div>
+                                        <p className="text-sm font-bold text-blue-600 animate-pulse">AI Analyzing...</p>
+                                    </div>
+                                )}
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleImageChange}
+                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                />
+                            </div>
+                        </div>
+                    </div>
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="md:col-span-2">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Product Name *
-                            </label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Product Name *</label>
                             <input
                                 type="text"
                                 name="name"
                                 value={formData.name}
                                 onChange={handleChange}
                                 required
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                             />
                         </div>
 
                         <div className="md:col-span-2">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Description
-                            </label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
                             <textarea
                                 name="description"
                                 value={formData.description}
                                 onChange={handleChange}
                                 rows="3"
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                             />
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Category *
-                            </label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Category *</label>
                             <select
                                 name="category"
                                 value={formData.category}
                                 onChange={handleChange}
                                 required
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                             >
                                 <option value="">Select Category</option>
                                 <option value="Clothing">Clothing</option>
@@ -156,22 +279,18 @@ export default function ProductEditModal({ product, isOpen, onClose, onUpdate })
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Subcategory
-                            </label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Subcategory</label>
                             <input
                                 type="text"
                                 name="subcategory"
                                 value={formData.subcategory}
                                 onChange={handleChange}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                             />
                         </div>
 
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Price (MUR) *
-                            </label>
+                        <div className="md:col-span-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Price (MUR) *</label>
                             <input
                                 type="number"
                                 name="price"
@@ -179,62 +298,42 @@ export default function ProductEditModal({ product, isOpen, onClose, onUpdate })
                                 onChange={handleChange}
                                 step="0.01"
                                 required
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                             />
+                            <p className="text-xs text-gray-500 mt-1">This will be used as the main selling price.</p>
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Auto-Calced (Hidden)
-                            </label>
-                            <input
-                                type="number"
-                                name="price_mur"
-                                value={formData.price_mur}
-                                onChange={handleChange}
-                                step="0.01"
-                                required
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Stock Quantity *
-                            </label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Stock Quantity *</label>
                             <input
                                 type="number"
                                 name="stock_qty"
                                 value={formData.stock_qty}
                                 onChange={handleChange}
                                 required
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                             />
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                SKU
-                            </label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">SKU</label>
                             <input
                                 type="text"
                                 name="sku"
                                 value={formData.sku}
                                 onChange={handleChange}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                             />
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Status *
-                            </label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Status *</label>
                             <select
                                 name="status"
                                 value={formData.status}
                                 onChange={handleChange}
                                 required
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                             >
                                 <option value="active">Active</option>
                                 <option value="draft">Draft</option>
@@ -242,17 +341,15 @@ export default function ProductEditModal({ product, isOpen, onClose, onUpdate })
                             </select>
                         </div>
 
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Sizes (comma-separated)
-                            </label>
+                        <div className="md:col-span-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Sizes (comma-separated)</label>
                             <input
                                 type="text"
                                 name="sizes"
                                 value={formData.sizes}
                                 onChange={handleChange}
                                 placeholder="XS, S, M, L, XL"
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                             />
                         </div>
                     </div>
@@ -261,16 +358,16 @@ export default function ProductEditModal({ product, isOpen, onClose, onUpdate })
                         <button
                             type="button"
                             onClick={onClose}
-                            className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                            className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
                             disabled={saving}
-                            className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+                            className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 font-medium"
                         >
-                            {saving ? 'Saving...' : 'Save Changes'}
+                            {saving ? 'Saving...' : 'Save Product'}
                         </button>
                     </div>
                 </form>

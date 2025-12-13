@@ -29,7 +29,7 @@ export default function CheckoutPage() {
 
     // Calculate subtotal using correct price
     const subtotal = cart.reduce((sum, item) => {
-        const price = item.price_mur || (Number(item.price) * 45);
+        const price = item.price_mur || item.price;
         return sum + (price * item.quantity);
     }, 0);
 
@@ -46,7 +46,7 @@ export default function CheckoutPage() {
                 <tr>
                     <td style="padding: 10px; border-bottom: 1px solid #eee;">${item.name}</td>
                     <td style="padding: 10px; border-bottom: 1px solid #eee;">x${item.quantity}</td>
-                    <td style="padding: 10px; border-bottom: 1px solid #eee;">Rs ${((item.price_mur || item.price * 45) * item.quantity).toLocaleString()}</td>
+                    <td style="padding: 10px; border-bottom: 1px solid #eee;">Rs ${((item.price_mur || item.price) * item.quantity).toLocaleString()}</td>
                 </tr>
             `).join('');
 
@@ -284,7 +284,7 @@ export default function CheckoutPage() {
                                         <h3 className="font-serif font-medium text-gray-900">{item.name}</h3>
                                         <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
                                         <p className="text-sm font-medium text-gray-900">
-                                            Rs {((item.price_mur || (Number(item.price) * 45)) * item.quantity).toLocaleString()}
+                                            Rs {((item.price_mur || Number(item.price)) * item.quantity).toLocaleString()}
                                         </p>
                                     </div>
                                 </div>

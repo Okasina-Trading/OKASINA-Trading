@@ -1,0 +1,117 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - link "Skip to content" [ref=e4] [cursor=pointer]:
+    - /url: "#main-content"
+  - banner [ref=e5]:
+    - generic [ref=e6]:
+      - link "OKASINA" [ref=e7] [cursor=pointer]:
+        - /url: /
+      - generic [ref=e10]:
+        - textbox "Search products..." [ref=e11]
+        - img [ref=e12]
+      - navigation [ref=e15]:
+        - link "Home" [ref=e16] [cursor=pointer]:
+          - /url: /
+        - link "Clothing" [ref=e17] [cursor=pointer]:
+          - /url: /shop?category=clothing
+        - link "Accessories" [ref=e18] [cursor=pointer]:
+          - /url: /shop?category=accessories
+      - generic [ref=e19]:
+        - generic [ref=e20]:
+          - img [ref=e21]
+          - combobox "Select Currency" [ref=e24] [cursor=pointer]:
+            - option "USD ($)"
+            - option "EUR (€)"
+            - option "MUR (Rs)" [selected]
+            - option "GBP (£)"
+        - link "Wishlist" [ref=e25] [cursor=pointer]:
+          - /url: /wishlist
+          - img [ref=e26]
+        - link "Account" [ref=e28] [cursor=pointer]:
+          - /url: /account
+          - img [ref=e29]
+        - link "Shopping Cart" [ref=e33] [cursor=pointer]:
+          - /url: /cart
+          - img [ref=e34]
+  - main [ref=e38]:
+    - generic [ref=e39]:
+      - generic [ref=e40]:
+        - img "Elegant Fashion" [ref=e42]
+        - generic [ref=e44]:
+          - paragraph [ref=e45]: New Collection 2025
+          - heading "Elegance Redefined" [level=1] [ref=e46]
+          - paragraph [ref=e47]: Discover the finest collection of modern Indian wear and accessories, curated for the sophisticated individual who values tradition and style.
+          - link "Shop Collection" [ref=e48] [cursor=pointer]:
+            - /url: /shop
+          - generic [ref=e50]: Scroll
+      - generic [ref=e52]:
+        - heading "Featured Collection" [level=2] [ref=e54]
+        - paragraph [ref=e57]: No products found. Check back soon!
+        - link "View All Products" [ref=e59] [cursor=pointer]:
+          - /url: /shop
+          - text: View All Products
+          - img [ref=e60]
+      - generic [ref=e63]:
+        - generic [ref=e64]:
+          - textbox "Enter your email" [ref=e65]
+          - img [ref=e66]
+        - button "Subscribe" [ref=e69] [cursor=pointer]
+  - button "Chat with AI Stylist" [ref=e71] [cursor=pointer]:
+    - img [ref=e72]
+    - generic: Chat with AI Stylist
+  - contentinfo [ref=e74]:
+    - generic [ref=e75]:
+      - generic [ref=e76]:
+        - generic [ref=e77]:
+          - heading "OKASINA" [level=3] [ref=e78]
+          - paragraph [ref=e79]: Redefining elegance with a curated collection of modern Indian wear. Tradition meets contemporary style.
+        - generic [ref=e80]:
+          - heading "Shop" [level=4] [ref=e81]
+          - list [ref=e82]:
+            - listitem [ref=e83]:
+              - link "New Arrivals" [ref=e84] [cursor=pointer]:
+                - /url: /new-arrivals
+            - listitem [ref=e85]:
+              - link "Best Sellers" [ref=e86] [cursor=pointer]:
+                - /url: /shop?category=clothing
+            - listitem [ref=e87]:
+              - link "Accessories" [ref=e88] [cursor=pointer]:
+                - /url: /shop?category=Accessories
+            - listitem [ref=e89]:
+              - link "Sale" [ref=e90] [cursor=pointer]:
+                - /url: /shop?sale=true
+        - generic [ref=e91]:
+          - heading "Support" [level=4] [ref=e92]
+          - list [ref=e93]:
+            - listitem [ref=e94]:
+              - link "Track Order" [ref=e95] [cursor=pointer]:
+                - /url: /orders
+            - listitem [ref=e96]:
+              - link "Feedback" [ref=e97] [cursor=pointer]:
+                - /url: /feedback
+            - listitem [ref=e98]:
+              - link "Wishlist" [ref=e99] [cursor=pointer]:
+                - /url: /wishlist
+            - listitem [ref=e100]:
+              - link "My Account" [ref=e101] [cursor=pointer]:
+                - /url: /account
+        - generic [ref=e102]:
+          - heading "Stay Updated" [level=4] [ref=e103]
+          - paragraph [ref=e104]: Subscribe to receive updates, access to exclusive deals, and more.
+          - generic [ref=e106]:
+            - generic [ref=e107]:
+              - textbox "Enter your email" [ref=e108]
+              - img [ref=e109]
+            - button "Subscribe" [ref=e112] [cursor=pointer]
+      - generic [ref=e113]:
+        - paragraph [ref=e114]: © 2025 OKASINA FASHION. ALL RIGHTS RESERVED.
+        - generic [ref=e115]:
+          - link "Privacy Policy" [ref=e116] [cursor=pointer]:
+            - /url: /privacy-policy
+          - link "Terms of Service" [ref=e117] [cursor=pointer]:
+            - /url: /terms-of-service
+          - link "Admin Dashboard" [ref=e118] [cursor=pointer]:
+            - /url: /admin
+```

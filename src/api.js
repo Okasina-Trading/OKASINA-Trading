@@ -83,5 +83,6 @@ api.interceptors.response.use(response => {
     return Promise.reject(error);
 });
 
+export const API_URL = API_BASE_URL;
 export { api };
 export default api;

@@ -106,7 +106,31 @@ export default function AdminMarketingPage() {
 
     const handleCreateCampaign = (e) => {
         e.preventDefault();
-        alert('Marketing campaign feature coming soon!');
+
+        const newCampaign = {
+            id: Date.now(),
+            name: campaignName,
+            type: campaignType,
+            audience: targetAudience,
+            message,
+            discount,
+            status: 'Scheduled',
+            sent: 0,
+            opened: 0,
+            clicked: 0,
+            date: new Date().toLocaleDateString()
+        };
+
+        // Save to LocalStorage
+        const existing = JSON.parse(localStorage.getItem('okasina_campaigns') || '[]');
+        localStorage.setItem('okasina_campaigns', JSON.stringify([newCampaign, ...existing]));
+
+        alert('Campaign Created Successfully! (Saved to local storage)');
+
+        // Reset Form
+        setCampaignName('');
+        setMessage('');
+        setDiscount('');
     };
 
     const handlePost = async (e) => {
@@ -183,8 +207,8 @@ export default function AdminMarketingPage() {
                         <button
                             onClick={() => setActiveTab('overview')}
                             className={`flex-1 px-4 py-3 rounded-lg font-medium transition-colors ${activeTab === 'overview'
-                                    ? 'bg-blue-600 text-white'
-                                    : 'text-gray-600 hover:bg-gray-100'
+                                ? 'bg-blue-600 text-white'
+                                : 'text-gray-600 hover:bg-gray-100'
                                 }`}
                         >
                             Overview
@@ -192,8 +216,8 @@ export default function AdminMarketingPage() {
                         <button
                             onClick={() => setActiveTab('social')}
                             className={`flex-1 px-4 py-3 rounded-lg font-medium transition-colors ${activeTab === 'social'
-                                    ? 'bg-blue-600 text-white'
-                                    : 'text-gray-600 hover:bg-gray-100'
+                                ? 'bg-blue-600 text-white'
+                                : 'text-gray-600 hover:bg-gray-100'
                                 }`}
                         >
                             Social Media
@@ -201,8 +225,8 @@ export default function AdminMarketingPage() {
                         <button
                             onClick={() => setActiveTab('email')}
                             className={`flex-1 px-4 py-3 rounded-lg font-medium transition-colors ${activeTab === 'email'
-                                    ? 'bg-blue-600 text-white'
-                                    : 'text-gray-600 hover:bg-gray-100'
+                                ? 'bg-blue-600 text-white'
+                                : 'text-gray-600 hover:bg-gray-100'
                                 }`}
                         >
                             Email & SMS
@@ -210,8 +234,8 @@ export default function AdminMarketingPage() {
                         <button
                             onClick={() => setActiveTab('promotions')}
                             className={`flex-1 px-4 py-3 rounded-lg font-medium transition-colors ${activeTab === 'promotions'
-                                    ? 'bg-blue-600 text-white'
-                                    : 'text-gray-600 hover:bg-gray-100'
+                                ? 'bg-blue-600 text-white'
+                                : 'text-gray-600 hover:bg-gray-100'
                                 }`}
                         >
                             Promotions
@@ -551,8 +575,8 @@ export default function AdminMarketingPage() {
                                         type="submit"
                                         disabled={isPosting || !isConnected}
                                         className={`px-6 py-3 text-white rounded-lg transition-colors flex items-center gap-2 font-medium ${isPosting || !isConnected
-                                                ? 'bg-gray-400 cursor-not-allowed'
-                                                : 'bg-green-600 hover:bg-green-700'
+                                            ? 'bg-gray-400 cursor-not-allowed'
+                                            : 'bg-green-600 hover:bg-green-700'
                                             }`}
                                     >
                                         {isPosting ? <Loader2 className="animate-spin" size={20} /> : <Send size={20} />}
@@ -742,7 +766,7 @@ export default function AdminMarketingPage() {
                         <div className="bg-white rounded-xl p-6 border border-gray-200">
                             <h2 className="text-xl font-semibold text-gray-900 mb-6">Recent Email Campaigns</h2>
                             <div className="space-y-4">
-                                {[
+                                {(JSON.parse(localStorage.getItem('okasina_campaigns') || '[]').length > 0 ? JSON.parse(localStorage.getItem('okasina_campaigns')) : [
                                     {
                                         name: 'New Arrivals - Spring Collection',
                                         type: 'Email',
@@ -759,7 +783,7 @@ export default function AdminMarketingPage() {
                                         clicked: '892',
                                         status: 'Active'
                                     }
-                                ].map((campaign, index) => (
+                                ]).map((campaign, index) => (
                                     <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                                         <div className="flex items-center gap-4">
                                             <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg flex items-center justify-center">
@@ -784,8 +808,8 @@ export default function AdminMarketingPage() {
                                                 <p className="font-medium text-gray-900">{campaign.clicked}</p>
                                             </div>
                                             <span className={`px-3 py-1 text-sm font-medium rounded-full ${campaign.status === 'Active'
-                                                    ? 'bg-green-100 text-green-800'
-                                                    : 'bg-gray-100 text-gray-800'
+                                                ? 'bg-green-100 text-green-800'
+                                                : 'bg-gray-100 text-gray-800'
                                                 }`}>
                                                 {campaign.status}
                                             </span>
