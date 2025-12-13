@@ -10,6 +10,8 @@ import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import TermsOfServicePage from './pages/TermsOfServicePage';
 import LoginPage from './pages/LoginPage';
 import AdminDashboardPage from './pages/admin/AdminDashboardPage';
+import AdminFeedbackPage from './pages/admin/AdminFeedbackPage';
+import AdminLayout from './components/admin/AdminLayout'; // Ensure this is imported if not already, or check context
 import AdminProductsPage from './pages/admin/AdminProductsPage';
 import AdminOrdersPage from './pages/admin/AdminOrdersPage';
 import AdminAnalyticsPage from './pages/admin/AdminAnalyticsPage';
@@ -66,6 +68,9 @@ export default function App() {
                                                     <Routes>
                                                         <Route path="/" element={<HomePage />} />
                                                         <Route path="/shop" element={<ShopPage />} />
+                                                        <Route path="/admin" element={<AdminDashboardPage />} />
+                                                        <Route path="/admin/feedback" element={<AdminFeedbackPage />} />
+                                                        <Route path="/admin/products" element={<AdminProductsPage />} />
                                                         <Route path="/product/:id" element={<ProductPage />} />
                                                         <Route path="/cart" element={<CartPage />} />
                                                         <Route path="/checkout" element={<CheckoutPage />} />

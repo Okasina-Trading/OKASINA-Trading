@@ -45,6 +45,7 @@ export default function AdminLayout({ children }) {
         { name: 'Album Import', href: '/admin/album-import', icon: UploadCloud },
         { name: 'Stock Manager', href: '/admin/stock-manager', icon: Package },
         { name: 'AI Team', href: '/admin/ai-employees', icon: Bot },
+        { name: 'Feedback Tracker', href: '/admin/feedback', icon: MessageSquare }, // New tracker
         { name: 'Citadel (Health)', href: '/admin/citadel', icon: Activity },
     ];
 
