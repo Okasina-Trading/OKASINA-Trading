@@ -10,7 +10,8 @@ export default function AdminCitadelPage() {
 
     const fetchVitals = async () => {
         try {
-            const res = await fetch(`${API_URL}/api/citadel/vitals`);
+            const baseUrl = API_URL || '';
+            const res = await fetch(`${baseUrl}/api/citadel/vitals`);
             if (!res.ok) throw new Error('Citadel unresponsive');
             const data = await res.json();
             setVitals(data);
