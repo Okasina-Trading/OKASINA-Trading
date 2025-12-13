@@ -1,18 +1,18 @@
 {
-  "run_id": "228d4820-d5ac-4229-9f47-cb1d23b27b17",
-  "timestamp": "2025-12-13T20:44:38.942Z",
+  "run_id": "c8a0f246-78f1-4efe-ad8b-27cfd642970d",
+  "timestamp": "2025-12-13T23:25:50.392Z",
   "tier": "fast",
-  "overall_health": "DEGRADED",
+  "overall_health": "HEALTHY",
   "checks": {
     "frontend": {
-      "status": "unhealthy",
-      "error": "request to http://localhost:5173/ failed, reason: "
+      "status": "healthy",
+      "code": 200
     },
     "apiEndpoints": {
-      "status": "degraded",
+      "status": "healthy",
       "endpoints": {
-        "/api/citadel/vitals": "unhealthy",
-        "/api/products": "unhealthy"
+        "/api/citadel/vitals": "healthy",
+        "/api/products": "healthy"
       }
     },
     "supabase": {
@@ -27,6 +27,6 @@
       }
     }
   },
-  "duration_ms": 1115,
-  "failure_count": 1
+  "duration_ms": 611,
+  "failure_count": 0
 }

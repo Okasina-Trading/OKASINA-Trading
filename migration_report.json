@@ -1,0 +1,46 @@
+[
+  {
+    "table": "products",
+    "status": "failed",
+    "error": "Could not find the 'ai_confidence' column of 'products' in the schema cache",
+    "rows": 61
+  },
+  {
+    "table": "orders",
+    "status": "failed",
+    "error": "Could not find the 'currency' column of 'orders' in the schema cache",
+    "rows": 2
+  },
+  {
+    "table": "wishlists",
+    "status": "failed",
+    "error": "Could not find the table 'public.wishlists' in the schema cache"
+  },
+  {
+    "table": "reviews",
+    "status": "failed",
+    "error": "Could not find the table 'public.reviews' in the schema cache"
+  },
+  {
+    "table": "coupons",
+    "status": "failed",
+    "error": "Could not find the table 'public.coupons' in the schema cache"
+  },
+  {
+    "table": "feedback",
+    "status": "empty",
+    "rows": 0
+  },
+  {
+    "table": "clients",
+    "status": "failed",
+    "error": "duplicate key value violates unique constraint \"clients_pkey\"",
+    "rows": 2
+  },
+  {
+    "table": "settings",
+    "status": "failed",
+    "error": "duplicate key value violates unique constraint \"settings_pkey\"",
+    "rows": 2
+  }
+]
