@@ -90,12 +90,27 @@ app.post("/api/upload-image", upload.single('file'), async (req, res) => {
 const supabaseUrl = process.env.VITE_SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
 
-const supabaseAdmin = createClient(supabaseUrl, supabaseKey, {
-  auth: {
-    autoRefreshToken: false,
-    persistSession: false
-  }
-});
+let supabaseAdmin;
+
+if (supabaseUrl && supabaseKey) {
+  supabaseAdmin = createClient(supabaseUrl, supabaseKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
+    }
+  });
+} else {
+  console.warn('Supabase URL or Key missing. API endpoints requiring DB will fail.');
+  // Create a dummy object to prevent crash, but endpoints should check for real instance
+  supabaseAdmin = {
+    from: () => ({
+      select: () => ({ error: { message: 'Supabase not configured (Missing Envs)' } }),
+      insert: () => ({ error: { message: 'Supabase not configured' } }),
+      update: () => ({ error: { message: 'Supabase not configured' } }),
+      delete: () => ({ error: { message: 'Supabase not configured' } })
+    })
+  };
+}
 
 // Update product categories
 app.post('/api/update-category', async (req, res) => {
