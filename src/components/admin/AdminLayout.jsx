@@ -38,6 +38,7 @@ export default function AdminLayout({ children }) {
         { name: 'Orders', href: '/admin/orders', icon: ShoppingCart },
         { name: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
         { name: 'Marketing', href: '/admin/marketing', icon: Megaphone },
+        { name: 'SMS Marketing', href: '/admin/sms-marketing', icon: MessageSquare },
         { name: 'Reviews', href: '/admin/reviews', icon: MessageSquare },
         { name: 'Media Manager', href: '/admin/media', icon: UploadCloud },
         { name: 'Social Media', href: '/admin/social-media', icon: Share2 },

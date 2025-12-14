@@ -28,6 +28,7 @@ import AdminAutomationPage from './pages/admin/AdminAutomationPage';
 import AdminAiEmployeesPage from './pages/admin/AdminAiEmployeesPage';
 import StockManagerPage from './pages/StockManagerPage';
 import ComparePage from './pages/ComparePage';
+import SMSMarketingPage from './pages/admin/SMSMarketingPage';
 import AdminSocialMediaPage from './pages/admin/AdminSocialMediaPage';
 import AdminCitadelPage from './pages/admin/AdminCitadelPage';
 import HeaderNew from './components/HeaderNew';
@@ -98,6 +99,7 @@ export default function App() {
                                                         <Route path="/admin/ai-employees" element={<ProtectedRoute><AdminAiEmployeesPage /></ProtectedRoute>} />
                                                         <Route path="/admin/album-import" element={<ProtectedRoute><AlbumImportPage /></ProtectedRoute>} />
                                                         <Route path="/admin/social-media" element={<ProtectedRoute><AdminSocialMediaPage /></ProtectedRoute>} />
+                                                        <Route path="/admin/sms-marketing" element={<ProtectedRoute><SMSMarketingPage /></ProtectedRoute>} />
                                                         <Route path="/admin/citadel" element={<ProtectedRoute><AdminCitadelPage /></ProtectedRoute>} />
                                                     </Routes>
                                                 </main>
