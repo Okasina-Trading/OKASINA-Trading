@@ -19,6 +19,7 @@ import NewArrivalsPage from './pages/NewArrivalsPage';
 import FeedbackPage from './pages/FeedbackPage';
 import WishlistPage from './pages/WishlistPage';
 import MyAccountPage from './pages/MyAccountPage';
+import MyRewardsPage from './pages/MyRewardsPage';
 import AdminMarketingPage from './pages/admin/AdminMarketingPage';
 import AdminReviewsPage from './pages/admin/AdminReviewsPage';
 import AlbumImportPage from './pages/admin/AlbumImportPage';
@@ -84,6 +85,7 @@ export default function App() {
                                                         <Route path="/wishlist" element={<WishlistPage />} />
                                                         <Route path="/account" element={<MyAccountPage />} />
                                                         <Route path="/compare" element={<ComparePage />} />
+                                                        <Route path="/rewards" element={<MyRewardsPage />} />
 
                                                         {/* Protected Admin Routes */}
                                                         <Route path="/admin" element={<ProtectedRoute><AdminDashboardPage /></ProtectedRoute>} />

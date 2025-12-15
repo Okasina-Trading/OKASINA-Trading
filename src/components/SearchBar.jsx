@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search } from 'lucide-react';
+import { Search, Camera } from 'lucide-react';
 import { supabase } from '../supabase';
 import { sanitizeInput } from '../utils/sanitize';
+import VisualSearchModal from './VisualSearchModal';
 
 export default function SearchBar({ className = "" }) {
     const [query, setQuery] = useState('');
@@ -10,8 +11,11 @@ export default function SearchBar({ className = "" }) {
     const [isOpen, setIsOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [searchHistory, setSearchHistory] = useState([]);
+    const [isVisualSearchOpen, setIsVisualSearchOpen] = useState(false);
     const searchRef = useRef(null);
     const navigate = useNavigate();
+
+    // ... (keep existing effects)
 
     // Load search history from localStorage
     useEffect(() => {
@@ -116,18 +120,35 @@ export default function SearchBar({ className = "" }) {
                     onChange={handleInputChange}
                     onFocus={() => setIsOpen(true)}
                     placeholder="Search products..."
-                    className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-full text-sm focus:outline-none focus:ring-1 focus:ring-black focus:border-black transition-all"
+                    className="w-full pl-10 pr-12 py-2 bg-gray-50 border border-gray-200 rounded-full text-sm focus:outline-none focus:ring-1 focus:ring-black focus:border-black transition-all"
                 />
                 <Search
                     size={18}
                     className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
                 />
+
+                {/* Visual Search Trigger */}
+                <button
+                    type="button"
+                    onClick={() => setIsVisualSearchOpen(true)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-purple-600 transition-colors"
+                    title="Search by Image"
+                >
+                    <Camera size={18} />
+                </button>
+
                 {isLoading && (
-                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                    <div className="absolute right-10 top-1/2 transform -translate-y-1/2">
                         <div className="animate-spin h-4 w-4 border-2 border-[#d4af37] border-t-transparent rounded-full"></div>
                     </div>
                 )}
             </form>
+
+            {/* Visual Search Modal */}
+            <VisualSearchModal
+                isOpen={isVisualSearchOpen}
+                onClose={() => setIsVisualSearchOpen(false)}
+            />
 
             {/* Search Results Dropdown */}
             {isOpen && (

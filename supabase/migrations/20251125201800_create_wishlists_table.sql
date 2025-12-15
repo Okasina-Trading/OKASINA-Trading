@@ -24,3 +24,4 @@ create policy "Users can add to own wishlist"
 create policy "Users can remove from own wishlist"
   on public.wishlists for delete
   using ( auth.uid() = user_id );
+

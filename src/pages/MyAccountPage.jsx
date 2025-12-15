@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../supabase';
 import { useNavigate } from 'react-router-dom';
-import { Package, LogOut, User } from 'lucide-react';
+import { Package, LogOut, User, Crown } from 'lucide-react';
 
 export default function MyAccountPage() {
     const { user, signOut } = useAuth();
@@ -56,25 +56,45 @@ export default function MyAccountPage() {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Profile Card */}
-                <div className="bg-gray-50 p-6 rounded-lg h-fit">
-                    <div className="flex items-center mb-4">
-                        <div className="bg-black text-white p-3 rounded-full mr-4">
-                            <User size={24} />
+                <div className="bg-gray-50 p-6 rounded-lg h-fit space-y-6">
+                    <div>
+                        <div className="flex items-center mb-4">
+                            <div className="bg-black text-white p-3 rounded-full mr-4">
+                                <User size={24} />
+                            </div>
+                            <div>
+                                <h2 className="font-bold text-lg">Profile Details</h2>
+                                <p className="text-sm text-gray-500">Manage your account</p>
+                            </div>
                         </div>
-                        <div>
-                            <h2 className="font-bold text-lg">Profile Details</h2>
-                            <p className="text-sm text-gray-500">Manage your account</p>
+                        <div className="space-y-3">
+                            <div>
+                                <label className="text-xs text-gray-500 uppercase font-bold">Email</label>
+                                <p className="font-medium">{user.email}</p>
+                            </div>
+                            <div>
+                                <label className="text-xs text-gray-500 uppercase font-bold">Member Since</label>
+                                <p className="font-medium">{new Date(user.created_at).toLocaleDateString()}</p>
+                            </div>
                         </div>
                     </div>
-                    <div className="space-y-3">
-                        <div>
-                            <label className="text-xs text-gray-500 uppercase font-bold">Email</label>
-                            <p className="font-medium">{user.email}</p>
-                        </div>
-                        <div>
-                            <label className="text-xs text-gray-500 uppercase font-bold">Member Since</label>
-                            <p className="font-medium">{new Date(user.created_at).toLocaleDateString()}</p>
-                        </div>
+
+                    {/* Rewards Link */}
+                    <div className="pt-6 border-t border-gray-200">
+                        <button
+                            onClick={() => navigate('/rewards')}
+                            className="w-full flex items-center justify-between p-3 bg-gradient-to-r from-yellow-100 to-yellow-50 rounded-lg border border-yellow-200 hover:shadow-md transition-all group"
+                        >
+                            <div className="flex items-center gap-3">
+                                <div className="bg-yellow-500 text-white p-2 rounded-full">
+                                    <Crown size={16} />
+                                </div>
+                                <div className="text-left">
+                                    <p className="font-bold text-gray-900">My Rewards</p>
+                                    <p className="text-xs text-yellow-700">View Points & Tiers</p>
+                                </div>
+                            </div>
+                        </button>
                     </div>
                 </div>
 
@@ -107,8 +127,8 @@ export default function MyAccountPage() {
                                         </div>
                                         <div className="mt-2 md:mt-0">
                                             <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${order.status === 'completed' ? 'bg-green-100 text-green-800' :
-                                                    order.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                                                        'bg-gray-100 text-gray-800'
+                                                order.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                                                    'bg-gray-100 text-gray-800'
                                                 }`}>
                                                 {order.status}
                                             </span>

@@ -1,0 +1,15 @@
+
+> okasina-fashion-store-vite@0.0.0 build
+> vite build
+
+[36mvite v6.3.5 [32mbuilding for production...[36m[39m
+transforming...
+[32mΓ£ô[39m 65 modules transformed.
+Γ£ù Build failed in 4.03s
+error during build:
+Could not resolve "../../services/LoyaltyService" from "src/pages/MyRewardsPage.jsx"
+file: C:/Users/ICL  ZAMBIA/Desktop/okasina-fashion-store-vite/src/pages/MyRewardsPage.jsx
+    at getRollupError (file:///C:/Users/ICL%20%20ZAMBIA/Desktop/okasina-fashion-store-vite/node_modules/rollup/dist/es/shared/parseAst.js:401:41)
+    at error (file:///C:/Users/ICL%20%20ZAMBIA/Desktop/okasina-fashion-store-vite/node_modules/rollup/dist/es/shared/parseAst.js:397:42)
+    at ModuleLoader.handleInvalidResolvedId (file:///C:/Users/ICL%20%20ZAMBIA/Desktop/okasina-fashion-store-vite/node_modules/rollup/dist/es/shared/node-entry.js:21396:24)
+    at file:///C:/Users/ICL%20%20ZAMBIA/Desktop/okasina-fashion-store-vite/node_modules/rollup/dist/es/shared/node-entry.js:21356:26

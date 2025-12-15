@@ -49,12 +49,51 @@ export default async function handler(req, res) {
         let category = 'Uncategorized';
         let price = 0;
 
-        // AI Placeholder (Future expansion: Call local Ollama or OpenAI here)
+
+        // 3. AI Analysis (Gemini)
         if (useAI) {
-            // Logic to call AI service would go here
-            // For now, we use simple heuristics or defaults
-            if (caption && caption.toLowerCase().includes('dress')) category = 'Clothing';
-            if (caption && caption.toLowerCase().includes('bag')) category = 'Bags';
+            try {
+                const geminiKey = process.env.GOOGLE_AI_KEY || process.env.VITE_GEMINI_API_KEY;
+                if (geminiKey) {
+                    const aiRes = await fetch(
+                        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`,
+                        {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                contents: [{
+                                    parts: [
+                                        { text: `Analyze this image and the caption: "${caption}". Extract product details into JSON format: { "name": "Short catchy title", "description": "Detailed description", "category": "Category Name", "price": Number (if found, else 0), "tags": ["tag1", "tag2"] }. Rules: 1. If price is in caption (e.g. Rs 500), use it. 2. Category must be one of: 'Dresses', 'Tops', 'Bottoms', 'Bags', 'Accessories', 'Beauty'. 3. Description should be professional.` },
+                                        {
+                                            inline_data: {
+                                                mime_type: 'image/jpeg',
+                                                data: Buffer.from(buffer).toString('base64')
+                                            }
+                                        }
+                                    ]
+                                }]
+                            })
+                        }
+                    );
+
+                    const aiData = await aiRes.json();
+                    const textResponse = aiData.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                    if (textResponse) {
+                        const jsonStr = textResponse.replace(/```json/g, '').replace(/```/g, '').trim();
+                        const analysis = JSON.parse(jsonStr);
+
+                        if (analysis.name) productName = analysis.name;
+                        if (analysis.description) description = analysis.description;
+                        if (analysis.category) category = analysis.category;
+                        if (analysis.price) price = analysis.price;
+                        // Tags could be stored if we had a tags column, usually in description for now
+                    }
+                }
+            } catch (err) {
+                console.error('AI Analysis Failed:', err);
+                // Continue with defaults
+            }
         }
 
         const { data: product, error: dbError } = await supabase

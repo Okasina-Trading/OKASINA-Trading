@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Loader2, RefreshCw, UploadCloud, Sparkles, Check, X, Facebook, Play, CloudLightning } from 'lucide-react';
 import AdminLayout from '../../components/admin/AdminLayout';
-import { metaService } from '../../services/metaService';
+import { metaService } from '@/services/metaService';
 
 export default function AlbumImportPage() {
     const { isAdmin, loading: authLoading } = useAuth();
@@ -304,8 +304,8 @@ export default function AlbumImportPage() {
                                 )}
                                 {logs.map((log, i) => (
                                     <div key={i} className={`flex gap-2 ${log.type === 'error' ? 'text-red-400' :
-                                            log.type === 'success' ? 'text-green-400' :
-                                                log.type === 'warning' ? 'text-yellow-400' : 'text-blue-300'
+                                        log.type === 'success' ? 'text-green-400' :
+                                            log.type === 'warning' ? 'text-yellow-400' : 'text-blue-300'
                                         }`}>
                                         <span className="text-gray-500">[{log.time}]</span>
                                         <span>{log.type === 'success' ? '✔' : log.type === 'error' ? '✖' : 'ℹ'}</span>

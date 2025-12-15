@@ -1,84 +1,170 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useCart } from '../contexts/CartContext';
+import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../supabase';
 import { useNavigate } from 'react-router-dom';
-import { Truck, Home, CreditCard, Smartphone } from 'lucide-react';
+import { Truck, Home, CreditCard, Smartphone, Gift, Check } from 'lucide-react';
 import { useToast } from '../contexts/ToastContext';
+import { LoyaltyService } from '../services/LoyaltyService';
 
 export default function CheckoutPage() {
     const { cart, clearCart } = useCart();
+    const { user } = useAuth();
     const navigate = useNavigate();
     const { addToast } = useToast();
+
     const [loading, setLoading] = useState(false);
-    const [shippingMethod, setShippingMethod] = useState('postage'); // 'postage' or 'door'
-    const [paymentMethod, setPaymentMethod] = useState('juice'); // 'juice' or 'card'
+    const [shippingMethod, setShippingMethod] = useState('postage');
+    const [paymentMethod, setPaymentMethod] = useState('juice');
+
+    // Loyalty State
+    const [loyaltyProfile, setLoyaltyProfile] = useState(null);
+    const [redeemPoints, setRedeemPoints] = useState(false);
 
     const [formData, setFormData] = useState({
         fullName: '',
-        email: '',
+        email: user?.email || '',
         phone: '',
         address: '',
         city: '',
         notes: ''
     });
 
-    const SHIPPING_RATES = {
-        postage: 100,
-        door: 150
+    useEffect(() => {
+        if (user) {
+            loadLoyaltyProfile();
+        }
+    }, [user]);
+
+    const loadLoyaltyProfile = async () => {
+        const profile = await LoyaltyService.getProfile(user.id);
+        setLoyaltyProfile(profile);
     };
 
-    // Calculate subtotal using correct price
+    const SHIPPING_RATES = { postage: 100, door: 150 };
+
+    // Calculations
     const subtotal = cart.reduce((sum, item) => {
-        const price = item.price_mur || item.price;
+        const price = item.price_mur || item.price || 0;
         return sum + (price * item.quantity);
     }, 0);
 
     const shippingCost = SHIPPING_RATES[shippingMethod];
-    const total = subtotal + shippingCost;
+
+    // Loyalty Logic
+    const pointsAvailable = loyaltyProfile?.points_balance || 0;
+    const maxDiscount = LoyaltyService.calculateDiscount(pointsAvailable);
+    // Don't allow discount > subtotal
+    const appliedDiscount = redeemPoints ? Math.min(maxDiscount, subtotal) : 0;
+    const pointsToRedeem = redeemPoints ? Math.ceil(appliedDiscount / 1) : 0; // 1 Point = 1 Rs (as per service)
+
+    const total = subtotal + shippingCost - appliedDiscount;
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
+    const handlePlaceOrder = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+
+        try {
+            // 1. Create Order in Supabase
+            // Prepare items JSON
+            const orderItems = cart.map(item => ({
+                id: item.id,
+                name: item.name,
+                price: item.price_mur || item.price,
+                quantity: item.quantity,
+                image: item.image_url || item.image,
+                selectedSize: item.selectedSize,
+                color: item.selectedColor
+            }));
+
+            const orderData = {
+                user_id: user?.id || null, // Allow guest checkout if RLS allows (or user is null)
+                customer_name: formData.fullName,
+                customer_email: formData.email,
+                customer_phone: formData.phone,
+                shipping_address: `${formData.address}${formData.city ? ', ' + formData.city : ''}`,
+                shipping_method: shippingMethod,
+                payment_method: paymentMethod,
+                order_notes: formData.notes,
+                items: orderItems, // stored as JSONB
+                total_amount: total,
+                subtotal_amount: subtotal,
+                shipping_cost: shippingCost,
+                status: 'pending',
+                // Loyalty Fields
+                points_redeemed: pointsToRedeem,
+                discount_amount: appliedDiscount
+            };
+
+
+            // Helper to insert order with fallback for missing columns
+            const insertOrderSpy = async (data) => {
+                try {
+                    return await supabase.from('orders').insert([data]).select().single();
+                } catch (err) {
+                    // Ref: Postgres error 42703 = Undefined Column
+                    // Supabase JS often returns message "pgrst: ..." or error object
+                    // We check if error relates to "points_redeemed" or "discount_amount"
+                    if (err.message && (err.message.includes('points_redeemed') || err.message.includes('discount_amount'))) {
+                        console.warn('Loyalty columns missing in DB. Retrying without loyalty data...');
+                        // Strip loyalty fields
+                        const { points_redeemed, discount_amount, ...safeData } = data;
+                        return await supabase.from('orders').insert([safeData]).select().single();
+                    }
+                    throw err;
+                }
+            };
+
+            const { data: order, error } = await insertOrderSpy(orderData);
+
+            if (error) throw error;
+
+            console.log('Order created:', order.id);
+
+            // 2. Send Email (using existing API)
+            await sendConfirmationEmail(order.id);
+
+            // 3. Success
+            clearCart();
+            addToast('Order placed successfully! Check your email.', 'success');
+
+            // Redirect to Orders or Success page
+            if (user) {
+                navigate('/orders');
+            } else {
+                navigate('/');
+            }
+
+        } catch (error) {
+            console.error('Checkout Error:', error);
+            addToast(`Failed to place order: ${error.message}`, 'error');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const sendConfirmationEmail = async (orderId) => {
+        // ... (Keep existing email logic)
         try {
             const itemsHtml = cart.map(item => `
                 <tr>
-                    <td style="padding: 10px; border-bottom: 1px solid #eee;">${item.name}</td>
-                    <td style="padding: 10px; border-bottom: 1px solid #eee;">x${item.quantity}</td>
-                    <td style="padding: 10px; border-bottom: 1px solid #eee;">Rs ${((item.price_mur || item.price) * item.quantity).toLocaleString()}</td>
+                    <td style="padding: 10px;">${item.name}</td>
+                    <td style="padding: 10px;">x${item.quantity}</td>
+                    <td style="padding: 10px;">Rs ${((item.price_mur || item.price) * item.quantity).toLocaleString()}</td>
                 </tr>
             `).join('');
 
             const emailHtml = `
-                <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-                    <h1 style="color: #000;">Order Confirmed!</h1>
-                    <p>Hi ${formData.fullName},</p>
-                    <p>Thank you for your order. We have received it and will begin processing shortly.</p>
-                    
-                    <div style="background: #f9f9f9; padding: 20px; border-radius: 8px; margin: 20px 0;">
-                        <h3 style="margin-top: 0;">Order #${orderId.slice(0, 8).toUpperCase()}</h3>
-                        <table style="width: 100%; border-collapse: collapse;">
-                            ${itemsHtml}
-                        </table>
-                        <div style="margin-top: 20px; text-align: right; font-weight: bold;">
-                            Total: Rs ${total.toLocaleString()}
-                        </div>
-                    </div>
-
-                    ${paymentMethod === 'juice' ? `
-                    <div style="background: #fff3cd; padding: 15px; border-radius: 8px; border: 1px solid #ffeeba; color: #856404;">
-                        <strong>Payment Required (Juice):</strong><br/>
-                        Please transfer <strong>Rs ${total.toLocaleString()}</strong> to:<br/>
-                        <strong>A-ONE GLOBAL RESOUR LTD</strong><br/>
-                        MCB Account: <strong>000449347214</strong><br/>
-                        IBAN: <strong>MU39MCBL0901000449347214000MUR</strong><br/>
-                        Reference: Order #${orderId.slice(0, 8).toUpperCase()}
-                    </div>
-                    ` : ''}
-
-                    <p>We will notify you when your order ships!</p>
-                    <p>Best,<br/>Okasina Fashion Team</p>
+                <div style="font-family: sans-serif; max-width: 600px;">
+                    <h1>Order Received!</h1>
+                    <p>Hi ${formData.fullName}, thanks for your order #${orderId.slice(0, 8)}.</p>
+                    <table style="width: 100%;">${itemsHtml}</table>
+                    <p><strong>Total: Rs ${total.toLocaleString()}</strong></p>
+                    ${appliedDiscount > 0 ? `<p style="color: green;">(Includes Rs ${appliedDiscount} Loyalty Discount)</p>` : ''}
                 </div>
             `;
 
@@ -91,234 +177,124 @@ export default function CheckoutPage() {
                     html: emailHtml
                 })
             });
-        } catch (error) {
-            console.error('Failed to send email:', error);
-        }
+        } catch (e) { console.error('Email failed but order created'); }
     };
+
+    if (cart.length === 0) {
+        return (
+            <div className="min-h-screen pt-32 pb-12 text-center">
+                <h1 className="text-2xl font-bold mb-4">Your cart is empty</h1>
+                <button onClick={() => navigate('/shop')} className="text-blue-600 underline">Continue Shopping</button>
+            </div>
+        );
+    }
+
     return (
         <div className="min-h-screen bg-white pt-20 pb-12">
             <div className="container mx-auto px-4">
                 <h1 className="text-3xl md:text-4xl font-serif font-bold text-gray-900 mb-8 text-center">Checkout</h1>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
-                    {/* Left Column: Forms */}
+                    {/* Left: Form */}
                     <div>
-                        <form onSubmit={(e) => { e.preventDefault(); sendConfirmationEmail('ORD-' + Math.random().toString(36).substr(2, 9)); }} className="space-y-8">
-
-                            {/* 1. Contact Information */}
+                        <form onSubmit={handlePlaceOrder} className="space-y-8">
                             <section>
-                                <h2 className="text-lg font-bold uppercase tracking-widest mb-6 border-b pb-2">1. Contact Information</h2>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div className="md:col-span-2">
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                                        <input
-                                            type="text"
-                                            name="fullName"
-                                            required
-                                            className="w-full border-gray-300 border p-3 focus:ring-black focus:border-black transition-colors"
-                                            value={formData.fullName}
-                                            onChange={handleChange}
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                                        <input
-                                            type="email"
-                                            name="email"
-                                            required
-                                            className="w-full border-gray-300 border p-3 focus:ring-black focus:border-black transition-colors"
-                                            value={formData.email}
-                                            onChange={handleChange}
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                                        <input
-                                            type="tel"
-                                            name="phone"
-                                            required
-                                            className="w-full border-gray-300 border p-3 focus:ring-black focus:border-black transition-colors"
-                                            value={formData.phone}
-                                            onChange={handleChange}
-                                        />
-                                    </div>
-                                </div>
-                            </section>
-
-                            {/* 2. Shipping Method */}
-                            <section>
-                                <h2 className="text-lg font-bold uppercase tracking-widest mb-6 border-b pb-2">2. Shipping Method</h2>
+                                <h2 className="text-lg font-bold uppercase tracking-widest mb-6 border-b pb-2">1. Contact Info</h2>
                                 <div className="space-y-4">
-                                    <label className={`flex items-center justify-between p-4 border cursor-pointer transition-all ${shippingMethod === 'postage' ? 'border-black bg-gray-50' : 'border-gray-200'}`}>
-                                        <div className="flex items-center">
-                                            <input
-                                                type="radio"
-                                                name="shipping"
-                                                checked={shippingMethod === 'postage'}
-                                                onChange={() => setShippingMethod('postage')}
-                                                className="text-black focus:ring-black mr-3"
-                                            />
-                                            <div className="flex items-center">
-                                                <Truck size={18} className="mr-2 text-gray-500" />
-                                                <span className="font-medium">Standard Postage</span>
-                                            </div>
-                                        </div>
-                                        <span className="font-bold">Rs 100</span>
-                                    </label>
-
-                                    <label className={`flex items-center justify-between p-4 border cursor-pointer transition-all ${shippingMethod === 'door' ? 'border-black bg-gray-50' : 'border-gray-200'}`}>
-                                        <div className="flex items-center">
-                                            <input
-                                                type="radio"
-                                                name="shipping"
-                                                checked={shippingMethod === 'door'}
-                                                onChange={() => setShippingMethod('door')}
-                                                className="text-black focus:ring-black mr-3"
-                                            />
-                                            <div className="flex items-center">
-                                                <Home size={18} className="mr-2 text-gray-500" />
-                                                <span className="font-medium">Door Delivery</span>
-                                            </div>
-                                        </div>
-                                        <span className="font-bold">Rs 150</span>
-                                    </label>
+                                    <input type="text" name="fullName" placeholder="Full Name" required className="w-full border p-3" value={formData.fullName} onChange={handleChange} />
+                                    <input type="email" name="email" placeholder="Email" required className="w-full border p-3" value={formData.email} onChange={handleChange} />
+                                    <input type="tel" name="phone" placeholder="Phone Number" required className="w-full border p-3" value={formData.phone} onChange={handleChange} />
+                                    <input type="text" name="address" placeholder="Delivery Address" required={shippingMethod === 'door'} className="w-full border p-3" value={formData.address} onChange={handleChange} />
+                                    <input type="text" name="city" placeholder="City / Town" className="w-full border p-3" value={formData.city} onChange={handleChange} />
                                 </div>
                             </section>
 
-                            {/* 3. Payment Method */}
                             <section>
-                                <h2 className="text-lg font-bold uppercase tracking-widest mb-6 border-b pb-2">3. Payment Method</h2>
-                                <div className="space-y-4">
-                                    {/* Juice Payment */}
-                                    <label className={`block p-4 border cursor-pointer transition-all ${paymentMethod === 'juice' ? 'border-black bg-gray-50' : 'border-gray-200'}`}>
-                                        <div className="flex items-center mb-2">
-                                            <input
-                                                type="radio"
-                                                name="payment"
-                                                checked={paymentMethod === 'juice'}
-                                                onChange={() => setPaymentMethod('juice')}
-                                                className="text-black focus:ring-black mr-3"
-                                            />
-                                            <div className="flex items-center">
-                                                <Smartphone size={18} className="mr-2 text-gray-500" />
-                                                <span className="font-bold">Juice by MCB</span>
-                                            </div>
-                                        </div>
-                                        {paymentMethod === 'juice' && (
-                                            <div className="ml-7 mt-2 text-sm text-gray-600 bg-white p-3 border border-gray-200 rounded">
-                                                <p className="font-medium text-black mb-1">Instructions:</p>
-                                                <p>1. Open Juice App</p>
-                                                <p>2. Pay to: <strong>A-ONE GLOBAL RESOUR LTD</strong></p>
-                                                <p>   MCB Account: <strong>000449347214</strong></p>
-                                                <p>   IBAN: <strong>MU39MCBL0901000449347214000MUR</strong></p>
-                                                <p>3. Use your Name as reference</p>
-                                                <p className="mt-2 text-xs text-gray-500">* Order will be processed after payment confirmation.</p>
-                                            </div>
-                                        )}
+                                <h2 className="text-lg font-bold uppercase tracking-widest mb-6 border-b pb-2">2. Shipping</h2>
+                                <div className="space-y-3">
+                                    <label className={`flex p-4 border cursor-pointer ${shippingMethod === 'postage' ? 'bg-gray-50 border-black' : ''}`}>
+                                        <input type="radio" onChange={() => setShippingMethod('postage')} checked={shippingMethod === 'postage'} className="mr-3" />
+                                        <div className="flex-1"><span className="font-bold block">Standard Postage</span>Rs 100 via Mauritius Post</div>
                                     </label>
-
-                                    {/* Card Payment */}
-                                    <label className={`block p-4 border cursor-pointer transition-all ${paymentMethod === 'card' ? 'border-black bg-gray-50' : 'border-gray-200'}`}>
-                                        <div className="flex items-center">
-                                            <input
-                                                type="radio"
-                                                name="payment"
-                                                checked={paymentMethod === 'card'}
-                                                onChange={() => setPaymentMethod('card')}
-                                                className="text-black focus:ring-black mr-3"
-                                            />
-                                            <div className="flex items-center">
-                                                <CreditCard size={18} className="mr-2 text-gray-500" />
-                                                <span className="font-bold">Credit / Debit Card</span>
-                                            </div>
-                                        </div>
-                                        {paymentMethod === 'card' && (
-                                            <div className="ml-7 mt-2">
-                                                <div className="flex gap-2 mb-2">
-                                                    <div className="h-6 w-10 bg-gray-200 rounded"></div>
-                                                    <div className="h-6 w-10 bg-gray-200 rounded"></div>
-                                                    <div className="h-6 w-10 bg-gray-200 rounded"></div>
-                                                </div>
-                                                <p className="text-xs text-gray-500">Secure payment via Stripe (Demo Mode)</p>
-                                            </div>
-                                        )}
+                                    <label className={`flex p-4 border cursor-pointer ${shippingMethod === 'door' ? 'bg-gray-50 border-black' : ''}`}>
+                                        <input type="radio" onChange={() => setShippingMethod('door')} checked={shippingMethod === 'door'} className="mr-3" />
+                                        <div className="flex-1"><span className="font-bold block">Door Delivery</span>Rs 150 courier service</div>
                                     </label>
                                 </div>
                             </section>
 
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Order Notes (Optional)</label>
-                                <textarea
-                                    name="notes"
-                                    rows="4"
-                                    className="w-full border-gray-300 border p-3 focus:ring-black focus:border-black transition-colors"
-                                    value={formData.notes}
-                                    onChange={handleChange}
-                                ></textarea>
-                            </div>
+                            <section>
+                                <h2 className="text-lg font-bold uppercase tracking-widest mb-6 border-b pb-2">3. Payment</h2>
+                                <div className="space-y-3">
+                                    <label className={`flex p-4 border cursor-pointer ${paymentMethod === 'juice' ? 'bg-gray-50 border-black' : ''}`}>
+                                        <input type="radio" onChange={() => setPaymentMethod('juice')} checked={paymentMethod === 'juice'} className="mr-3" />
+                                        <div className="flex-1">
+                                            <span className="font-bold block">Juice by MCB</span>
+                                            {paymentMethod === 'juice' && <div className="text-sm text-gray-600 mt-2 bg-white p-2 border rounded">Pay to: <strong>000449347214</strong> (A-ONE GLOBAL)</div>}
+                                        </div>
+                                    </label>
+                                    <label className={`flex p-4 border cursor-pointer ${paymentMethod === 'card' ? 'bg-gray-50 border-black' : ''}`}>
+                                        <input type="radio" onChange={() => setPaymentMethod('card')} checked={paymentMethod === 'card'} className="mr-3" />
+                                        <div className="flex-1"><span className="font-bold block">Credit Card (Stripe)</span></div>
+                                    </label>
+                                </div>
+                            </section>
 
-                            <button
-                                type="submit"
-                                disabled={loading}
-                                className="w-full bg-black text-white py-4 text-sm font-bold uppercase tracking-widest hover:bg-gray-800 transition-colors disabled:opacity-50 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-                            >
+                            <button type="submit" disabled={loading} className="w-full bg-black text-white py-4 font-bold hover:bg-gray-800 disabled:opacity-50">
                                 {loading ? 'Processing...' : `Place Order (Rs ${total.toLocaleString()})`}
                             </button>
                         </form>
                     </div>
 
-                    {/* Order Summary */}
-                    <div className="bg-gray-50 p-8 h-fit sticky top-24">
-                        <h2 className="text-lg font-bold uppercase tracking-widest mb-8">Your Order</h2>
-                        <div className="space-y-6 mb-8">
+                    {/* Right: Summary */}
+                    <div className="bg-gray-50 p-8 h-fit sticky top-24 rounded-lg">
+                        <h2 className="text-lg font-bold uppercase tracking-widest mb-6">Order Summary</h2>
+                        <div className="max-h-60 overflow-y-auto mb-6 space-y-4 pr-2">
                             {cart.map((item) => (
                                 <div key={item.id} className="flex gap-4">
-                                    <div className="w-16 h-20 bg-white flex-shrink-0">
-                                        <img
-                                            src={item.image_url || item.image}
-                                            alt={item.name}
-                                            className="w-full h-full object-cover"
-                                        />
-                                    </div>
-                                    <div className="flex-1">
-                                        <h3 className="font-serif font-medium text-gray-900">{item.name}</h3>
-                                        <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
-                                        <p className="text-sm font-medium text-gray-900">
-                                            Rs {((item.price_mur || Number(item.price)) * item.quantity).toLocaleString()}
-                                        </p>
+                                    <img src={item.image_url || item.image} alt={item.name} className="w-16 h-20 object-cover bg-white" />
+                                    <div>
+                                        <h3 className="font-medium text-sm line-clamp-2">{item.name}</h3>
+                                        <p className="text-xs text-gray-500">Qty: {item.quantity}</p>
+                                        <p className="font-bold text-sm">Rs {((item.price_mur || item.price) * item.quantity).toLocaleString()}</p>
                                     </div>
                                 </div>
                             ))}
                         </div>
 
-                        {/* Promo Code Input */}
-                        <div className="mb-6">
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Promo Code</label>
-                            <div className="flex gap-2">
-                                <input
-                                    type="text"
-                                    placeholder="Enter code"
-                                    className="flex-1 border-gray-300 border p-2 text-sm focus:ring-black focus:border-black"
-                                />
-                                <button
-                                    type="button"
-                                    className="bg-gray-900 text-white px-4 py-2 text-sm font-medium hover:bg-black transition-colors"
-                                >
-                                    Apply
-                                </button>
+                        {/* Loyalty Redemption */}
+                        {user && loyaltyProfile && loyaltyProfile.points_balance > 0 && (
+                            <div className="mb-6 bg-yellow-50 border border-yellow-200 p-4 rounded-lg">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <Gift size={18} className="text-yellow-600" />
+                                    <h3 className="font-bold text-yellow-800">Use Loyalty Points</h3>
+                                </div>
+                                <div className="flex justify-between items-center text-sm mb-3">
+                                    <span>Available Balance:</span>
+                                    <span className="font-bold">{loyaltyProfile.points_balance} pts</span>
+                                </div>
+                                <label className="flex items-center gap-2 cursor-pointer select-none">
+                                    <input
+                                        type="checkbox"
+                                        checked={redeemPoints}
+                                        onChange={(e) => setRedeemPoints(e.target.checked)}
+                                        className="w-5 h-5 text-yellow-600 rounded focus:ring-yellow-500"
+                                    />
+                                    <span className="font-medium">Redeem for Rs {Math.min(maxDiscount, subtotal).toLocaleString()} off</span>
+                                </label>
                             </div>
-                        </div>
+                        )}
 
-                        <div className="border-t border-gray-200 pt-6 space-y-3">
-                            <div className="flex justify-between text-gray-600">
-                                <span>Subtotal</span>
-                                <span>Rs {subtotal.toLocaleString()}</span>
-                            </div>
-                            <div className="flex justify-between text-gray-600">
-                                <span>Shipping</span>
-                                <span>Rs {shippingCost}</span>
-                            </div>
-                            <div className="flex justify-between text-xl font-bold text-gray-900 pt-3 border-t border-gray-200">
+                        <div className="border-t pt-4 space-y-2">
+                            <div className="flex justify-between text-gray-600"><span>Subtotal</span><span>Rs {subtotal.toLocaleString()}</span></div>
+                            <div className="flex justify-between text-gray-600"><span>Shipping</span><span>Rs {shippingCost}</span></div>
+                            {redeemPoints && (
+                                <div className="flex justify-between text-green-600 font-medium">
+                                    <span>Loyalty Discount</span>
+                                    <span>- Rs {appliedDiscount.toLocaleString()}</span>
+                                </div>
+                            )}
+                            <div className="flex justify-between text-xl font-bold pt-4 border-t mt-4">
                                 <span>Total</span>
                                 <span>Rs {total.toLocaleString()}</span>
                             </div>
