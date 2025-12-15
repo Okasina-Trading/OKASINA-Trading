@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { supabase } from '../lib/supabase';
+import { supabase } from '../supabase';
 
 /**
  * SMS Gateway Service
