@@ -1,0 +1,58 @@
+
+> okasina-fashion-store-vite@0.0.0 jarvis:check
+> node scripts/jarvis-health-check.js
+
+≡ƒñû JARVIS System Health Check Starting...
+
+
+==================================================
+≡ƒôï Database Connectivity
+==================================================
+Γ£à Supabase connection successful
+
+==================================================
+≡ƒôï Product Data Integrity
+==================================================
+Γ¥î Product data check failed: column products.original_price does not exist
+
+==================================================
+≡ƒôï Settings & Configuration
+==================================================
+Γ£à Settings table exists with 2 entries
+ΓÜá∩╕Å  No social media links configured yet
+
+==================================================
+≡ƒôï Currency & Pricing
+==================================================
+ΓÜá∩╕Å  No MUR prices found - currency conversion will be used
+Γ£à Currency system operational (defaults to MUR)
+
+==================================================
+≡ƒôï Environment Configuration
+==================================================
+Γ£à VITE_SUPABASE_URL is set
+Γ£à VITE_SUPABASE_ANON_KEY is set
+Γ£à SUPABASE_SERVICE_ROLE_KEY is set
+ΓÜá∩╕Å  GOOGLE_AI_KEY not set (optional - some features may not work)
+ΓÜá∩╕Å  VITE_GEMINI_API_KEY not set (optional - some features may not work)
+ΓÜá∩╕Å  CLOUDINARY_CLOUD_NAME not set (optional - some features may not work)
+ΓÜá∩╕Å  CLOUDINARY_API_KEY not set (optional - some features may not work)
+ΓÜá∩╕Å  CLOUDINARY_API_SECRET not set (optional - some features may not work)
+
+==================================================
+≡ƒôï Row Level Security
+==================================================
+
+==================================================
+≡ƒôï Summary
+==================================================
+
+≡ƒôè Check Results:
+   Γ£à Passed: 6
+   Γ¥î Failed: 1
+   ΓÜá∩╕Å  Warnings: 7
+
+≡ƒÜ¿ 1 critical issue(s) found - please address
+
+≡ƒñû JARVIS Health Check Complete
+

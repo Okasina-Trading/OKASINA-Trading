@@ -19,7 +19,7 @@ DO $$
 DECLARE
     r RECORD;
     table_name TEXT;
-BEGIN
+                                                                                                                                                  BEGIN
     FOR r IN 
         SELECT t.table_name
         FROM information_schema.tables t

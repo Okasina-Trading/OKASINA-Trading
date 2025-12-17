@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { supabase } from '../../supabase';
-import { API_URL } from '../../api';
+import { API_BASE_URL as API_URL } from '../../config';
 
 export default function ProductEditModal({ product, isOpen, onClose, onUpdate }) {
     const [imageFile, setImageFile] = useState(null);
