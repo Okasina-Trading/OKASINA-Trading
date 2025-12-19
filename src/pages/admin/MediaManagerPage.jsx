@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
-import { Upload, Download, Image as ImageIcon, CheckCircle, AlertCircle, Loader, Folder } from 'lucide-react';
+import { Upload, Download, Image as ImageIcon, CheckCircle, AlertCircle, Loader, Folder, Link as LinkIcon, Sparkles } from 'lucide-react';
 import { supabase } from '../../supabase';
 import { downloadCSV } from '../../utils/csvTemplate';
 
@@ -8,7 +8,7 @@ export default function MediaManagerPage() {
     const [uploading, setUploading] = useState(false);
     const [uploadedImages, setUploadedImages] = useState([]);
     const [uploadProgress, setUploadProgress] = useState({ current: 0, total: 0 });
-    const [error, setError] = useState(null);
+    const [linkedCount, setLinkedCount] = useState(0);
 
     // Handle file selection
     const handleFileSelect = async (e) => {
@@ -16,317 +16,258 @@ export default function MediaManagerPage() {
         if (files.length === 0) return;
 
         setUploading(true);
-        setError(null);
         setUploadProgress({ current: 0, total: files.length });
+        setLinkedCount(0);
 
         const results = [];
+        let newLinked = 0;
 
         for (let i = 0; i < files.length; i++) {
             const file = files[i];
             setUploadProgress({ current: i + 1, total: files.length });
 
             try {
-                // Extract SKU from filename (e.g., "ANK-002-1.jpg" -> "ANK-002")
+                // 1. Extract SKU
                 const filename = file.name;
+                // Match "ANK-001" or "ANK001" from start of string
                 const skuMatch = filename.match(/^([A-Z0-9-]+)/i);
-                const sku = skuMatch ? skuMatch[1] : 'UNKNOWN';
+                const rawSku = skuMatch ? skuMatch[1] : null;
 
-                // Upload to Cloudinary via our backend (Auto-Enhanced!)
-                const formData = new FormData();
-                formData.append('file', file);
+                // Clean SKU (remove trailing hyphens or numbers if they are just indexes like -1, -2)
+                // Heuristic: If it ends with -1, -2, crop it? 
+                // Let's assume the user names files carefully OR we try to match "ANK-001" exactly against DB.
 
-                const response = await fetch('http://localhost:3001/api/upload-image', {
-                    method: 'POST',
-                    body: formData
-                });
+                let sku = rawSku;
+                let productId = null;
+                let productName = null;
+                let isLinked = false;
 
-                if (!response.ok) throw new Error('Upload failed');
+                if (sku) {
+                    // 2. Upload to Server (storage)
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    // Using the existing upload endpoint
+                    const uploadRes = await fetch('http://localhost:3001/api/upload-image', {
+                        method: 'POST', body: formData
+                    });
 
-                const data = await response.json();
+                    if (!uploadRes.ok) throw new Error('Upload failed');
+                    const uploadData = await uploadRes.json();
 
-                results.push({
-                    sku,
-                    filename,
-                    path: data.public_id,
-                    url: data.url, // This is the AI Enhanced URL
-                    size: file.size,
-                    type: file.type
-                });
+                    const imageUrl = uploadData.url;
+
+                    // 3. Find Product in DB (Try Exact Match First)
+                    // We might need to try variations if "ANK-001-1" is passed but SKU is "ANK-001"
+
+                    // a) Try exact match on extracted chunk
+                    let { data: products } = await supabase
+                        .from('products')
+                        .select('id, name, image_url')
+                        .ilike('sku', sku) // Case insensitive
+                        .limit(1);
+
+                    // b) If no match, try trimming last 2 chars (e.g. ANK-001-1 -> ANK-001) if length > 5
+                    if ((!products || products.length === 0) && sku.length > 5) {
+                        const trimmed = sku.replace(/[-_\s][0-9]+$/, '');
+                        if (trimmed !== sku) {
+                            const retry = await supabase
+                                .from('products')
+                                .select('id, name, image_url')
+                                .ilike('sku', trimmed)
+                                .limit(1);
+                            if (retry.data && retry.data.length > 0) {
+                                products = retry.data;
+                                sku = trimmed; // Update to real sku
+                            }
+                        }
+                    }
+
+                    if (products && products.length > 0) {
+                        const product = products[0];
+                        productId = product.id;
+                        productName = product.name;
+
+                        // 4. Update Product
+                        // Set image_url if empty (Primary Image)
+                        if (!product.image_url) {
+                            await supabase
+                                .from('products')
+                                .update({ image_url: imageUrl })
+                                .eq('id', productId);
+                        } else {
+                            // Add to Media Gallery (Secondary)
+                            await supabase
+                                .from('product_media')
+                                .insert({
+                                    product_id: productId,
+                                    type: 'image',
+                                    url: imageUrl,
+                                    storage_path: imageUrl
+                                });
+                        }
+
+                        isLinked = true;
+                        newLinked++;
+                    }
+
+                    results.push({
+                        sku,
+                        filename,
+                        url: imageUrl,
+                        productId,
+                        productName,
+                        isLinked
+                    });
+                } else {
+                    throw new Error('Unknown SKU format');
+                }
 
             } catch (err) {
                 console.error(`Error uploading ${file.name}:`, err);
                 results.push({
-                    sku: 'ERROR',
                     filename: file.name,
-                    error: err.message
+                    error: err.message,
+                    isLinked: false
                 });
             }
         }
 
         setUploadedImages(results);
+        setLinkedCount(newLinked);
         setUploading(false);
     };
 
-    // Generate CSV with image URLs
-    const handleDownloadCSV = () => {
-        // Group images by SKU
-        const groupedBySKU = {};
-        let maxImages = 0;
-
-        uploadedImages.forEach(img => {
-            if (img.error) return; // Skip errors
-
-            // Use filename as SKU if detection failed or returned UNKNOWN
-            const skuKey = (img.sku === 'UNKNOWN' || !img.sku) ? img.filename : img.sku;
-
-            if (!groupedBySKU[skuKey]) {
-                groupedBySKU[skuKey] = [];
-            }
-            groupedBySKU[skuKey].push(img.url);
-
-            // Track max images for dynamic headers
-            maxImages = Math.max(maxImages, groupedBySKU[skuKey].length);
-        });
-
-        // Generate dynamic headers based on max images found
-        const imageHeaders = Array.from({ length: maxImages }, (_, i) => `image_url_${i + 1}`);
-        const headers = ['sku', ...imageHeaders];
-        const rows = [headers.join(',')];
-
-        Object.entries(groupedBySKU).forEach(([sku, urls]) => {
-            const row = [sku, ...urls];
-            rows.push(row.join(','));
-        });
-
-        const csvContent = rows.join('\n');
-        downloadCSV(csvContent, 'product_images_urls.csv');
-    };
-
-    const successCount = uploadedImages.filter(img => !img.error).length;
-    const errorCount = uploadedImages.filter(img => img.error).length;
-
     return (
         <AdminLayout>
-            <div className="space-y-8">
+            <div className="space-y-8 max-w-6xl mx-auto">
                 <div>
-                    <h2 className="text-2xl font-serif font-bold text-gray-900 mb-2">Media Manager</h2>
-                    <p className="text-gray-600">Bulk upload product images and generate CSV with URLs</p>
+                    <h2 className="text-3xl font-serif font-bold text-gray-900 mb-2">Smart Media Linker</h2>
+                    <p className="text-gray-600">
+                        Upload images. We'll automatically attach them to your Draft products by matching the SKU in the filename.
+                    </p>
                 </div>
 
                 {/* Upload Section */}
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-                    <div className="text-center">
-                        <div className="mb-6">
-                            <div className="w-20 h-20 bg-gradient-to-br from-blue-50 to-purple-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <Upload size={32} className="text-blue-600" />
+                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 text-center">
+                    <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <ImageIcon size={32} />
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">Drag & Drop or Select Images</h3>
+                    <p className="text-gray-500 mb-6 max-w-lg mx-auto">
+                        Filenames must start with the SKU (e.g., <code>ANK-001-front.jpg</code> will attach to <code>ANK-001</code>).
+                    </p>
+
+                    <label className="inline-flex items-center gap-3 px-8 py-4 bg-black text-white rounded-xl hover:bg-gray-800 transition-all cursor-pointer shadow-lg font-medium text-lg">
+                        <Folder size={24} />
+                        Select Images
+                        <input
+                            type="file"
+                            multiple
+                            accept="image/*"
+                            onChange={handleFileSelect}
+                            className="hidden"
+                            disabled={uploading}
+                        />
+                    </label>
+
+                    {uploading && (
+                        <div className="mt-8 max-w-md mx-auto">
+                            <div className="flex items-center justify-between text-sm text-gray-600 mb-2">
+                                <span>Processing...</span>
+                                <span>{uploadProgress.current} / {uploadProgress.total}</span>
                             </div>
-                            <h3 className="text-lg font-bold text-gray-900 mb-2">Upload Product Images</h3>
-                            <p className="text-sm text-gray-600 mb-6">
-                                Name your files with SKU prefix (e.g., <code className="bg-gray-100 px-2 py-1 rounded">ANK-002-1.jpg</code>, <code className="bg-gray-100 px-2 py-1 rounded">ANK-002-2.jpg</code>)
+                            <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
+                                <div
+                                    className="bg-blue-600 h-full transition-all duration-300"
+                                    style={{ width: `${(uploadProgress.current / uploadProgress.total) * 100}%` }}
+                                />
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                {/* Results Summary */}
+                {!uploading && uploadedImages.length > 0 && (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="bg-green-50 border border-green-200 rounded-xl p-6 flex flex-col items-center">
+                            <h4 className="text-green-800 font-bold text-3xl mb-1">{linkedCount}</h4>
+                            <p className="text-green-600 text-sm font-medium flex items-center gap-2">
+                                <LinkIcon size={16} /> Products Linked
                             </p>
                         </div>
-
-                        <label className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all cursor-pointer shadow-lg hover:shadow-xl">
-                            <Folder size={24} />
-                            <span className="font-bold text-lg">Select Images</span>
-                            <input
-                                type="file"
-                                multiple
-                                accept="image/*"
-                                onChange={handleFileSelect}
-                                className="hidden"
-                                disabled={uploading}
-                            />
-                        </label>
-
-                        {uploading && (
-                            <div className="mt-6">
-                                <div className="flex items-center justify-center gap-3 text-blue-600 mb-2">
-                                    <Loader size={20} className="animate-spin" />
-                                    <span className="font-medium">
-                                        Uploading {uploadProgress.current} of {uploadProgress.total}...
-                                    </span>
-                                </div>
-                                <div className="w-full bg-gray-200 rounded-full h-2">
-                                    <div
-                                        className="bg-gradient-to-r from-blue-600 to-purple-600 h-2 rounded-full transition-all"
-                                        style={{ width: `${(uploadProgress.current / uploadProgress.total) * 100}%` }}
-                                    />
-                                </div>
-                            </div>
-                        )}
+                        <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 flex flex-col items-center">
+                            <h4 className="text-blue-800 font-bold text-3xl mb-1">{uploadedImages.length}</h4>
+                            <p className="text-blue-600 text-sm font-medium flex items-center gap-2">
+                                <Upload size={16} /> Total Uploads
+                            </p>
+                        </div>
+                        <div className="bg-white border border-gray-200 rounded-xl p-6 flex flex-col items-center justify-center">
+                            <button
+                                onClick={() => setUploadedImages([])}
+                                className="text-sm text-gray-500 hover:text-gray-900 underline"
+                            >
+                                Clear Results
+                            </button>
+                        </div>
                     </div>
-                </div>
-
-                {/* Results */}
-                {uploadedImages.length > 0 && (
-                    <>
-                        {/* Summary */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                                <div className="flex items-center gap-4">
-                                    <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                                        <CheckCircle size={24} className="text-green-600" />
-                                    </div>
-                                    <div>
-                                        <p className="text-sm text-gray-500 uppercase tracking-wider">Uploaded</p>
-                                        <p className="text-2xl font-bold text-gray-900">{successCount}</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                                <div className="flex items-center gap-4">
-                                    <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-                                        <AlertCircle size={24} className="text-red-600" />
-                                    </div>
-                                    <div>
-                                        <p className="text-sm text-gray-500 uppercase tracking-wider">Errors</p>
-                                        <p className="text-2xl font-bold text-gray-900">{errorCount}</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                                <div className="flex items-center gap-4">
-                                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                                        <ImageIcon size={24} className="text-blue-600" />
-                                    </div>
-                                    <div>
-                                        <p className="text-sm text-gray-500 uppercase tracking-wider">Total</p>
-                                        <p className="text-2xl font-bold text-gray-900">{uploadedImages.length}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Download CSV Button */}
-                        {successCount > 0 && (
-                            <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-xl border border-green-200 p-6">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <h3 className="text-lg font-bold text-gray-900 mb-1">Ready to Export</h3>
-                                        <p className="text-sm text-gray-600">
-                                            Download CSV with image URLs grouped by SKU
-                                        </p>
-                                    </div>
-                                    <button
-                                        onClick={handleDownloadCSV}
-                                        className="inline-flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
-                                    >
-                                        <Download size={20} />
-                                        Download CSV
-                                    </button>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Image Gallery */}
-                        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                            <div className="px-6 py-4 border-b border-gray-100">
-                                <h3 className="text-lg font-bold text-gray-900">Uploaded Images</h3>
-                            </div>
-                            <div className="p-6">
-                                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                                    {uploadedImages.map((img, index) => (
-                                        <div
-                                            key={index}
-                                            className={`relative group rounded-lg overflow-hidden border-2 ${img.error ? 'border-red-300 bg-red-50' : 'border-gray-200'
-                                                }`}
-                                        >
-                                            {img.error ? (
-                                                <div className="aspect-square flex items-center justify-center p-4">
-                                                    <div className="text-center">
-                                                        <AlertCircle size={24} className="text-red-600 mx-auto mb-2" />
-                                                        <p className="text-xs text-red-600 font-medium">{img.filename}</p>
-                                                        <p className="text-xs text-red-500 mt-1">{img.error}</p>
-                                                    </div>
-                                                </div>
-                                            ) : (
-                                                <>
-                                                    <img
-                                                        src={img.url}
-                                                        alt={img.filename}
-                                                        className="w-full aspect-square object-cover"
-                                                    />
-                                                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-70 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
-                                                        <div className="text-center text-white p-2">
-                                                            <p className="text-xs font-bold mb-1">{img.sku}</p>
-                                                            <p className="text-xs truncate">{img.filename}</p>
-                                                        </div>
-                                                    </div>
-                                                    <div className="absolute top-2 right-2 bg-green-500 text-white rounded-full p-1">
-                                                        <CheckCircle size={16} />
-                                                    </div>
-                                                </>
-                                            )}
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* URL List (for copying) */}
-                        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                            <div className="px-6 py-4 border-b border-gray-100">
-                                <h3 className="text-lg font-bold text-gray-900">Image URLs</h3>
-                            </div>
-                            <div className="p-6">
-                                <div className="space-y-2 max-h-96 overflow-y-auto">
-                                    {uploadedImages.filter(img => !img.error).map((img, index) => (
-                                        <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                                            <span className="text-xs font-mono text-gray-500 w-24">{img.sku}</span>
-                                            <input
-                                                type="text"
-                                                value={img.url}
-                                                readOnly
-                                                className="flex-1 text-xs font-mono bg-white border border-gray-200 rounded px-3 py-2"
-                                                onClick={(e) => e.target.select()}
-                                            />
-                                            <button
-                                                onClick={() => {
-                                                    navigator.clipboard.writeText(img.url);
-                                                    alert('URL copied!');
-                                                }}
-                                                className="px-3 py-2 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
-                                            >
-                                                Copy
-                                            </button>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    </>
                 )}
 
-                {/* Instructions */}
-                <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl border border-blue-100 p-6">
-                    <h3 className="text-lg font-bold text-gray-900 mb-4">📝 How to Use</h3>
-                    <ol className="space-y-2 text-sm text-gray-700">
-                        <li className="flex gap-2">
-                            <span className="font-bold text-blue-600">1.</span>
-                            <span>Name your image files with SKU prefix: <code className="bg-white px-2 py-1 rounded">ANK-002-1.jpg</code>, <code className="bg-white px-2 py-1 rounded">ANK-002-2.jpg</code></span>
-                        </li>
-                        <li className="flex gap-2">
-                            <span className="font-bold text-blue-600">2.</span>
-                            <span>Click "Select Images" and choose all your product images (can select multiple)</span>
-                        </li>
-                        <li className="flex gap-2">
-                            <span className="font-bold text-blue-600">3.</span>
-                            <span>Wait for upload to complete (images are organized by SKU in Supabase Storage)</span>
-                        </li>
-                        <li className="flex gap-2">
-                            <span className="font-bold text-blue-600">4.</span>
-                            <span>Click "Download CSV" to get a file with SKUs and image URLs</span>
-                        </li>
-                        <li className="flex gap-2">
-                            <span className="font-bold text-blue-600">5.</span>
-                            <span>Open the CSV and copy the image URLs to your product import CSV</span>
-                        </li>
-                    </ol>
-                </div>
+                {/* Detailed Results */}
+                {uploadedImages.length > 0 && (
+                    <div className="border border-gray-200 rounded-xl overflow-hidden bg-white">
+                        <div className="px-6 py-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
+                            <h3 className="font-bold text-gray-900">Upload Results</h3>
+                        </div>
+                        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 p-6">
+                            {uploadedImages.map((img, i) => (
+                                <div key={i} className={`relative group border rounded-lg overflow-hidden ${img.isLinked ? 'border-green-200 bg-green-50' : 'border-gray-200 bg-gray-50'}`}>
+                                    <div className="aspect-square bg-white relative">
+                                        {img.url ? (
+                                            <img src={img.url} alt={img.filename} className="w-full h-full object-cover" />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center text-red-400">
+                                                <AlertCircle />
+                                            </div>
+                                        )}
+
+                                        {/* Status Badge */}
+                                        <div className="absolute top-2 right-2">
+                                            {img.isLinked ? (
+                                                <span className="bg-green-500 text-white p-1 rounded-full shadow-sm block">
+                                                    <LinkIcon size={12} />
+                                                </span>
+                                            ) : (
+                                                <span className="bg-gray-400 text-white p-1 rounded-full shadow-sm block">
+                                                    <AlertCircle size={12} />
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div className="p-3">
+                                        <p className="text-xs font-mono font-bold text-gray-900 truncate mb-0.5">
+                                            {img.sku || 'NO SKU'}
+                                        </p>
+                                        <p className="text-[10px] text-gray-500 truncate mb-1" title={img.filename}>
+                                            {img.filename}
+                                        </p>
+                                        {img.isLinked ? (
+                                            <div className="flex items-center gap-1 text-[10px] text-green-700 font-medium">
+                                                <CheckCircle size={10} />
+                                                <span>Linked to {img.productName}</span>
+                                            </div>
+                                        ) : (
+                                            <div className="text-[10px] text-red-500 font-medium">
+                                                {img.error || 'Product not found'}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
             </div>
         </AdminLayout>
     );
 }
+

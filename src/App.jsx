@@ -27,6 +27,7 @@ import MediaManagerPage from './pages/admin/MediaManagerPage';
 import AdminCouponsPage from './pages/admin/AdminCouponsPage';
 import AdminAutomationPage from './pages/admin/AdminAutomationPage';
 import AdminAiEmployeesPage from './pages/admin/AdminAiEmployeesPage';
+import AiEnrichmentCenter from './pages/admin/AiEnrichmentCenter';
 import StockManagerPage from './pages/StockManagerPage';
 import ComparePage from './pages/ComparePage';
 import SMSMarketingPage from './pages/admin/SMSMarketingPage';
@@ -99,6 +100,7 @@ export default function App() {
                                                         <Route path="/admin/coupons" element={<ProtectedRoute><AdminCouponsPage /></ProtectedRoute>} />
                                                         <Route path="/admin/automation" element={<ProtectedRoute><AdminAutomationPage /></ProtectedRoute>} />
                                                         <Route path="/admin/ai-employees" element={<ProtectedRoute><AdminAiEmployeesPage /></ProtectedRoute>} />
+                                                        <Route path="/admin/ai-enrichment" element={<ProtectedRoute><AiEnrichmentCenter /></ProtectedRoute>} />
                                                         <Route path="/admin/album-import" element={<ProtectedRoute><AlbumImportPage /></ProtectedRoute>} />
                                                         <Route path="/admin/social-media" element={<ProtectedRoute><AdminSocialMediaPage /></ProtectedRoute>} />
                                                         <Route path="/admin/sms-marketing" element={<ProtectedRoute><SMSMarketingPage /></ProtectedRoute>} />

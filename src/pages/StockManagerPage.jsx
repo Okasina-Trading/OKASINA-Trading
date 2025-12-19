@@ -1,22 +1,40 @@
 import React, { useState } from 'react';
-import { Upload, Download, FileSpreadsheet, AlertCircle, CheckCircle, Loader, Sparkles } from 'lucide-react';
-import { generateCSVTemplate, downloadCSV } from '../utils/csvTemplate';
-import { enrichProduct, parseSizeStock, generateVariantSKU } from '../utils/aiEnrichment';
-import Papa from 'papaparse';
+import { Upload, Download, FileSpreadsheet, AlertCircle, CheckCircle, Loader, Sparkles, FileText, ArrowRight } from 'lucide-react';
+import { downloadCSV } from '../utils/csvTemplate'; // Keeping downloadCSV only, template generation handles internally now
+import { session } from '../supabase'; // Assuming session handling if needed, or removing if unused
 import { supabase } from '../supabase';
 import AdminLayout from '../components/admin/AdminLayout';
+import SmartColumnMapper from '../components/admin/SmartColumnMapper';
+import Papa from 'papaparse';
+
+// Helper to generate a simple template
+const generateSimpleTemplate = () => {
+    return `SKU,Name,Category,Price,Stock,Color,Fabric,Sizes
+ANK-001,Anarkali Red,Suits,2500,10,Red,Cotton,S;M;L
+ANK-002,Blue Kurti,Kurtis,1200,5,Blue,Silk,Free Size`;
+};
 
 export default function StockManagerPage() {
+    // Phase 1 States
     const [file, setFile] = useState(null);
-    const [preview, setPreview] = useState([]);
+    const [rawHeaders, setRawHeaders] = useState([]);
+    const [rawData, setRawData] = useState([]);
+    const [isMapping, setIsMapping] = useState(false);
+
+    // Phase 2 States (Preview & Import)
+    const [mappedData, setMappedData] = useState([]);
     const [validationErrors, setValidationErrors] = useState([]);
     const [importing, setImporting] = useState(false);
     const [importResult, setImportResult] = useState(null);
-    const [aiEnrichEnabled, setAiEnrichEnabled] = useState(true);
 
     const handleDownloadTemplate = () => {
-        const csvContent = generateCSVTemplate();
-        downloadCSV(csvContent);
+        const csvContent = "data:text/csv;charset=utf-8," + encodeURI(generateSimpleTemplate());
+        const link = document.createElement("a");
+        link.setAttribute("href", csvContent);
+        link.setAttribute("download", "okasina_simple_template.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     };
 
     const handleFileChange = (e) => {
@@ -26,42 +44,80 @@ export default function StockManagerPage() {
         setFile(uploadedFile);
         setImportResult(null);
         setValidationErrors([]);
+        setMappedData([]);
+        setIsMapping(false);
 
         Papa.parse(uploadedFile, {
             header: true,
             skipEmptyLines: true,
             complete: (results) => {
-                setPreview(results.data);
-                validateData(results.data);
+                const headers = results.meta.fields || [];
+                // Check if we need mapping (simple check: do we have 'sku' and 'name' exactly?)
+                const hasCritical = headers.includes('sku') && headers.includes('name');
+
+                setRawHeaders(headers);
+                setRawData(results.data);
+
+                if (!hasCritical) {
+                    setIsMapping(true); // Trigger Mapper UI
+                } else {
+                    // Auto-mapped exact match
+                    processMappedData(results.data, null);
+                }
             },
             error: (error) => {
                 alert('Error parsing CSV: ' + error.message);
+                setFile(null);
             }
         });
     };
 
+    const handleMappingConfirm = (mappingMap) => {
+        // Transform rawData using mappingMap
+        // map: { 'sku': 'Item Code', 'name': 'Title' ... }
+
+        const transformed = rawData.map(row => {
+            const newRow = {};
+            // Copy mapped fields
+            Object.entries(mappingMap).forEach(([systemKey, csvHeader]) => {
+                if (csvHeader) {
+                    newRow[systemKey] = row[csvHeader];
+                }
+            });
+            // Keep original unmapped fields just in case? No, keep it clean.
+            return newRow;
+        });
+
+        setIsMapping(false);
+        processMappedData(transformed, mappingMap);
+    };
+
+    const processMappedData = (data, mappingUsed) => {
+        setMappedData(data);
+        validateData(data);
+    };
+
     const validateData = (data) => {
         const errors = [];
+        const seenSkus = new Set();
 
         data.forEach((row, index) => {
             const rowErrors = [];
 
-            if (!row.sku) rowErrors.push('SKU is required');
-            if (!row.name) rowErrors.push('Name is required');
-            if (!row.category) rowErrors.push('Category is required');
-            if (!row.selling_price || isNaN(row.selling_price)) rowErrors.push('Valid selling price is required');
+            // Critical Fields for DRAFT creation
+            if (!row.sku) rowErrors.push('SKU is missing');
+            if (row.sku && seenSkus.has(row.sku)) rowErrors.push('Duplicate SKU in file');
+            if (row.sku) seenSkus.add(row.sku);
 
-            if (row.sizes && row.stock_by_size) {
-                try {
-                    const variants = parseSizeStock(row.sizes, row.stock_by_size);
-                    if (variants.length === 0) {
-                        rowErrors.push('Invalid size/stock format');
-                    }
-                } catch (e) {
-                    rowErrors.push('Invalid size/stock format: ' + e.message);
-                }
-            } else if (!row.stock_qty || isNaN(row.stock_qty)) {
-                rowErrors.push('Either stock_by_size or stock_qty is required');
+            if (!row.name) rowErrors.push('Name is missing');
+
+            // Relaxed validation for Phase 1 (Draft Mode)
+            // We create drafts even if price/stock checks fail, we just flag them as issues?
+            // User requested: "Ai checks for errors". So let's be strict enough to be useful.
+
+            if (!row.selling_price || isNaN(parseFloat(row.selling_price))) {
+                // Warning only? No, Price is usually critical for any listing.
+                rowErrors.push('Invalid Price');
             }
 
             if (rowErrors.length > 0) {
@@ -78,20 +134,22 @@ export default function StockManagerPage() {
 
     const handleImport = async () => {
         if (validationErrors.length > 0) {
-            alert('Please fix validation errors before importing');
-            return;
+            if (!confirm(`There are ${validationErrors.length} validation errors. These rows will be skipped. Continue?`)) {
+                return;
+            }
         }
 
         setImporting(true);
 
         try {
+            // Create Bulk Job
             const { data: jobData, error: jobError } = await supabase
                 .from('bulk_jobs')
                 .insert({
-                    type: 'import',
+                    type: 'smart_import',
                     status: 'running',
                     file_name: file.name,
-                    total_rows: preview.length
+                    total_rows: mappedData.length
                 })
                 .select()
                 .single();
@@ -101,155 +159,60 @@ export default function StockManagerPage() {
             let successCount = 0;
             let errorCount = 0;
             const errorDetails = [];
-            let variantsCreated = 0;
 
-            for (let i = 0; i < preview.length; i++) {
-                const row = preview[i];
+            // Process Rows
+            for (let i = 0; i < mappedData.length; i++) {
+                const row = mappedData[i];
+
+                // Skip invalid
+                if (validationErrors.some(e => e.row === i + 2)) {
+                    errorCount++;
+                    continue; // Skip this row
+                }
 
                 try {
-                    const enrichedRow = aiEnrichEnabled ? enrichProduct(row) : row;
-
-                    const sizeVariants = row.stock_by_size
-                        ? parseSizeStock(row.sizes, row.stock_by_size)
-                        : [{ size: 'Free Size', stock: parseInt(row.stock_qty) || 0 }];
-
-                    const totalStock = sizeVariants.reduce((sum, v) => sum + v.stock, 0);
+                    // Logic: Create DRAFT product
+                    const cleanPrice = parseFloat(row.selling_price) || 0;
 
                     const productData = {
                         sku: row.sku,
-                        design_no: row.design_no || null,
-                        name: enrichedRow.name,
-                        category: row.category,
-                        subcategory: row.subcategory || null,
+                        name: row.name,
+                        category: row.category || 'Uncategorized',
+                        description: row.description || '', // might be mapped
+                        price: cleanPrice,
+                        price_mur: cleanPrice, // Default assumption
+                        stock_qty: parseInt(row.stock_qty) || 0,
                         fabric: row.fabric || null,
                         color: row.color || null,
-                        sizes: sizeVariants.map(v => v.size),
-                        cost_price: parseFloat(row.cost_price) || null,
-                        selling_price: parseFloat(row.selling_price),
-                        price: parseFloat(row.selling_price),
-                        mrp: parseFloat(row.mrp) || null,
-                        stock_qty: totalStock,
-                        description: enrichedRow.description || null,
-                        care_instructions: enrichedRow.care_instructions || null,
-                        tags: enrichedRow.tags || [],
-                        seo_title: enrichedRow.seo_title || null,
-                        ai_generated: enrichedRow.ai_generated || false,
-                        ai_confidence: enrichedRow.ai_confidence || null,
-                        image_url: row.image_url_1 || null,
-                        status: 'active'
+                        status: 'draft', // FORCE DRAFT
+                        sizes: row.sizes ? row.sizes.split(/[;,]/).map(s => s.trim()) : [], // Handle CSV lists
+                        image_url: null // No image in Phase 1
                     };
 
-                    const { data: existing } = await supabase
+                    // Insert or Update (Upsert by SKU)
+                    // We need to check existence first to get ID for upsert?
+                    // Or use upsert with onConflict clause if SKU has unique constraint
+
+                    const { data: upsertData, error: upsertError } = await supabase
                         .from('products')
-                        .select('id')
-                        .eq('sku', row.sku)
+                        .upsert(productData, { onConflict: 'sku' })
+                        .select()
                         .single();
 
-                    let productId;
-
-                    if (existing) {
-                        const { error } = await supabase
-                            .from('products')
-                            .update(productData)
-                            .eq('id', existing.id);
-
-                        if (error) throw error;
-                        productId = existing.id;
-
-                        await supabase
-                            .from('product_variants')
-                            .delete()
-                            .eq('product_id', productId);
-
-                    } else {
-                        const { data: newProduct, error } = await supabase
-                            .from('products')
-                            .insert(productData)
-                            .select()
-                            .single();
-
-                        if (error) throw error;
-                        productId = newProduct.id;
-                    }
-
-                    const variantRecords = sizeVariants.map((variant, idx) => ({
-                        product_id: productId,
-                        sku_variant: generateVariantSKU(row.sku, variant.size),
-                        size: variant.size,
-                        stock_qty: variant.stock,
-                        is_available: variant.stock > 0,
-                        display_order: idx
-                    }));
-
-                    const { error: variantError } = await supabase
-                        .from('product_variants')
-                        .insert(variantRecords);
-
-                    if (variantError) throw variantError;
-                    variantsCreated += variantRecords.length;
-
-                    if (!existing && totalStock > 0) {
-                        const movementRecords = sizeVariants
-                            .filter(v => v.stock > 0)
-                            .map(variant => {
-                                const variantRecord = variantRecords.find(vr => vr.size === variant.size);
-                                return {
-                                    product_id: productId,
-                                    variant_id: variantRecord?.id || null,
-                                    change_qty: variant.stock,
-                                    reason: 'bulk_import',
-                                    reference: jobData.id,
-                                    notes: `Initial stock from bulk import: ${file.name} (Size: ${variant.size})`
-                                };
-                            });
-
-                        await supabase.from('stock_movements').insert(movementRecords);
-                    }
-
-                    if (row.image_url_2 || row.image_url_3) {
-                        const mediaRecords = [];
-
-                        if (row.image_url_2) {
-                            mediaRecords.push({
-                                product_id: productId,
-                                type: 'image',
-                                url: row.image_url_2,
-                                storage_path: row.image_url_2,
-                                display_order: 2
-                            });
-                        }
-
-                        if (row.image_url_3) {
-                            mediaRecords.push({
-                                product_id: productId,
-                                type: 'image',
-                                url: row.image_url_3,
-                                storage_path: row.image_url_3,
-                                display_order: 3
-                            });
-                        }
-
-                        if (mediaRecords.length > 0) {
-                            await supabase.from('product_media').insert(mediaRecords);
-                        }
-                    }
+                    if (upsertError) throw upsertError;
 
                     successCount++;
                 } catch (error) {
                     errorCount++;
-                    errorDetails.push({
-                        row: i + 2,
-                        sku: row.sku,
-                        error: error.message
-                    });
+                    errorDetails.push({ row: i + 2, sku: row.sku, error: error.message });
                 }
             }
 
+            // Finish Job
             await supabase
                 .from('bulk_jobs')
                 .update({
-                    status: errorCount === 0 ? 'done' : 'failed',
-                    processed_rows: preview.length,
+                    status: 'done',
                     success_count: successCount,
                     error_count: errorCount,
                     error_details: errorDetails,
@@ -259,18 +222,13 @@ export default function StockManagerPage() {
 
             setImportResult({
                 success: true,
-                total: preview.length,
+                total: mappedData.length,
                 successCount,
-                errorCount,
-                variantsCreated,
-                errors: errorDetails
+                errorCount
             });
 
         } catch (error) {
-            setImportResult({
-                success: false,
-                error: error.message
-            });
+            setImportResult({ success: false, error: error.message });
         } finally {
             setImporting(false);
         }
@@ -278,204 +236,167 @@ export default function StockManagerPage() {
 
     return (
         <AdminLayout>
-            <div className="space-y-8">
-                <div>
-                    <h2 className="text-2xl font-serif font-bold text-gray-900 mb-2">Stock & Bulk Manager</h2>
-                    <p className="text-gray-600">Import products with size variants and AI-powered enrichment</p>
-                </div>
-
-                <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
-                    <div className="flex flex-wrap gap-4 items-center">
-                        <button
-                            onClick={handleDownloadTemplate}
-                            className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-                        >
-                            <Download size={20} />
-                            Download CSV Template
-                        </button>
-
-                        <label className="inline-flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium cursor-pointer">
-                            <Upload size={20} />
-                            Upload CSV File
-                            <input
-                                type="file"
-                                accept=".csv"
-                                onChange={handleFileChange}
-                                className="hidden"
-                            />
-                        </label>
-
-                        {preview.length > 0 && validationErrors.length === 0 && (
-                            <button
-                                onClick={handleImport}
-                                disabled={importing}
-                                className="inline-flex items-center gap-2 px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors font-medium disabled:opacity-50"
-                            >
-                                {importing ? (
-                                    <>
-                                        <Loader size={20} className="animate-spin" />
-                                        Importing...
-                                    </>
-                                ) : (
-                                    <>
-                                        <FileSpreadsheet size={20} />
-                                        Import Products
-                                    </>
-                                )}
-                            </button>
-                        )}
-
-                        <label className="flex items-center gap-2 ml-auto cursor-pointer">
-                            <input
-                                type="checkbox"
-                                checked={aiEnrichEnabled}
-                                onChange={(e) => setAiEnrichEnabled(e.target.checked)}
-                                className="w-4 h-4 text-blue-600 rounded"
-                            />
-                            <Sparkles size={16} className={aiEnrichEnabled ? 'text-yellow-500' : 'text-gray-400'} />
-                            <span className="text-sm font-medium text-gray-700">AI Enrichment</span>
-                        </label>
-                    </div>
-                </div>
-
-                {aiEnrichEnabled && (
-                    <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-lg p-4">
-                        <div className="flex items-start gap-3">
-                            <Sparkles size={20} className="text-yellow-600 flex-shrink-0 mt-0.5" />
-                            <div className="text-sm">
-                                <p className="font-medium text-yellow-900 mb-1">AI Enrichment Enabled</p>
-                                <p className="text-yellow-700">
-                                    Missing descriptions, care instructions, and tags will be automatically generated.
-                                </p>
-                            </div>
+            <div className="space-y-8 max-w-6xl mx-auto">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <h2 className="text-3xl font-serif font-bold text-gray-900 mb-2">Smart Product Import</h2>
+                        <div className="flex items-center gap-2 text-sm text-gray-500">
+                            <span className="font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded">Step 1</span>
+                            <span>Import List</span>
+                            <ArrowRight size={14} />
+                            <span>Map Columns</span>
+                            <ArrowRight size={14} />
+                            <span>Create Drafts</span>
                         </div>
+                    </div>
+                    <button
+                        onClick={handleDownloadTemplate}
+                        className="text-sm text-blue-600 hover:underline flex items-center gap-1"
+                    >
+                        <Download size={16} />
+                        Download Sample Template
+                    </button>
+                </div>
+
+                {/* Step 1: Upload */}
+                {!file && (
+                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
+                        <div className="mx-auto h-20 w-20 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mb-6">
+                            <FileSpreadsheet size={40} />
+                        </div>
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">Upload your Product List</h3>
+                        <p className="text-gray-500 mb-8 max-w-md mx-auto">
+                            Upload any CSV file. We'll help you map your columns to our system so you don't have to reformat manually.
+                        </p>
+                        <label className="inline-flex items-center gap-3 px-8 py-4 bg-black text-white rounded-xl hover:bg-gray-800 transition-all transform hover:scale-105 cursor-pointer shadow-lg font-medium text-lg">
+                            <Upload size={24} />
+                            Select CSV File
+                            <input type="file" accept=".csv" onChange={handleFileChange} className="hidden" />
+                        </label>
                     </div>
                 )}
 
-                {validationErrors.length > 0 && (
-                    <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-                        <div className="flex items-start gap-3 mb-4">
-                            <AlertCircle size={24} className="text-red-600 flex-shrink-0 mt-0.5" />
-                            <div>
-                                <h3 className="text-lg font-bold text-red-900 mb-2">
-                                    Validation Errors ({validationErrors.length})
-                                </h3>
-                                <p className="text-red-700 text-sm mb-4">
-                                    Please fix the following errors before importing:
+                {/* Step 2: Mapping */}
+                {file && isMapping && (
+                    <SmartColumnMapper
+                        csvHeaders={rawHeaders}
+                        onConfirm={handleMappingConfirm}
+                        onCancel={() => setFile(null)}
+                    />
+                )}
+
+                {/* Step 3: Preview & Import */}
+                {file && !isMapping && (
+                    <div className="space-y-6">
+                        {/* Summary Card */}
+                        <div className="bg-white rounded-lg border border-gray-200 p-6 flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                                <div className="h-12 w-12 bg-green-50 text-green-600 rounded-full flex items-center justify-center">
+                                    <FileText size={24} />
+                                </div>
+                                <div>
+                                    <h4 className="font-bold text-gray-900">{file.name}</h4>
+                                    <p className="text-sm text-gray-500">{mappedData.length} rows found</p>
+                                </div>
+                            </div>
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={() => setFile(null)}
+                                    className="px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={handleImport}
+                                    disabled={importing}
+                                    className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2 font-medium"
+                                >
+                                    {importing ? <Loader size={18} className="animate-spin" /> : <CheckCircle size={18} />}
+                                    {importing ? 'Creating Drafts...' : 'Create Drafts'}
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Validation & Results */}
+                        {validationErrors.length > 0 && !importResult && (
+                            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+                                <h4 className="font-bold text-yellow-800 mb-2 flex items-center gap-2">
+                                    <AlertCircle size={20} />
+                                    Found {validationErrors.length} issues
+                                </h4>
+                                <p className="text-sm text-yellow-700 mb-4">
+                                    These rows will be skipped during import. You can fix the CSV and re-upload, or continue to import valid rows.
                                 </p>
-                                <div className="space-y-2 max-h-64 overflow-y-auto">
-                                    {validationErrors.map((error, index) => (
-                                        <div key={index} className="bg-white rounded p-3 text-sm">
-                                            <div className="font-medium text-red-900">Row {error.row} (SKU: {error.sku})</div>
-                                            <ul className="list-disc list-inside text-red-700 mt-1">
-                                                {error.errors.map((err, i) => (
-                                                    <li key={i}>{err}</li>
-                                                ))}
-                                            </ul>
+                                <div className="max-h-60 overflow-y-auto bg-white rounded border border-yellow-100 p-2">
+                                    {validationErrors.map((err, i) => (
+                                        <div key={i} className="text-xs text-red-600 py-1 border-b border-gray-50 last:border-0">
+                                            Row {err.row} (SKU: {err.sku}): {err.errors.join(', ')}
                                         </div>
                                     ))}
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                )}
+                        )}
 
-                {importResult && (
-                    <div className={`border rounded-lg p-6 ${importResult.success ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
-                        }`}>
-                        <div className="flex items-start gap-3">
-                            {importResult.success ? (
-                                <CheckCircle size={24} className="text-green-600 flex-shrink-0 mt-0.5" />
-                            ) : (
-                                <AlertCircle size={24} className="text-red-600 flex-shrink-0 mt-0.5" />
-                            )}
-                            <div className="flex-1">
-                                <h3 className={`text-lg font-bold mb-2 ${importResult.success ? 'text-green-900' : 'text-red-900'
-                                    }`}>
-                                    {importResult.success ? 'Import Completed' : 'Import Failed'}
-                                </h3>
-                                {importResult.success ? (
-                                    <div className="text-green-800">
-                                        <p className="mb-2">
-                                            Successfully imported {importResult.successCount} out of {importResult.total} products.
-                                        </p>
-                                        <p className="text-sm">
-                                            Created {importResult.variantsCreated} size variants.
-                                        </p>
-                                        {importResult.errorCount > 0 && (
-                                            <div className="mt-4">
-                                                <p className="font-medium mb-2">{importResult.errorCount} products failed:</p>
-                                                <div className="space-y-1 max-h-48 overflow-y-auto">
-                                                    {importResult.errors.map((err, i) => (
-                                                        <div key={i} className="text-sm bg-white rounded p-2">
-                                                            Row {err.row} (SKU: {err.sku}): {err.error}
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-                                ) : (
-                                    <p className="text-red-800">{importResult.error}</p>
+                        {importResult && (
+                            <div className={`p-6 rounded-lg border ${importResult.success ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
+                                <h4 className={`font-bold text-lg mb-2 ${importResult.success ? 'text-green-800' : 'text-red-800'}`}>
+                                    {importResult.success ? 'Drafts Created Successfully!' : 'Import Failed'}
+                                </h4>
+                                {importResult.success && (
+                                    <p className="text-green-700">
+                                        Imported {importResult.successCount} products as <strong>Drafts</strong>.
+                                        {importResult.errorCount > 0 && ` (${importResult.errorCount} skipped due to errors)`}
+                                    </p>
                                 )}
-                            </div>
-                        </div>
-                    </div>
-                )}
+                                {!importResult.success && <p className="text-red-700">{importResult.error}</p>}
 
-                {preview.length > 0 && (
-                    <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
-                        <div className="px-6 py-4 border-b border-gray-100">
-                            <h2 className="text-lg font-bold text-gray-900">
-                                Preview ({preview.length} products)
-                            </h2>
-                        </div>
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-sm">
-                                <thead className="bg-gray-50 text-gray-600 uppercase tracking-wider font-medium">
+                                <div className="mt-4">
+                                    <button
+                                        onClick={() => setFile(null)}
+                                        className="text-sm underline font-medium"
+                                    >
+                                        Import Another File
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Data Preview */}
+                        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                            <table className="w-full text-sm text-left">
+                                <thead className="bg-gray-50 text-gray-500 font-medium">
                                     <tr>
-                                        <th className="px-4 py-3 text-left">SKU</th>
-                                        <th className="px-4 py-3 text-left">Name</th>
-                                        <th className="px-4 py-3 text-left">Category</th>
-                                        <th className="px-4 py-3 text-left">Sizes</th>
-                                        <th className="px-4 py-3 text-left">Price</th>
-                                        <th className="px-4 py-3 text-left">Total Stock</th>
-                                        <th className="px-4 py-3 text-left">Status</th>
+                                        <th className="px-4 py-3">SKU</th>
+                                        <th className="px-4 py-3">Name</th>
+                                        <th className="px-4 py-3">Category</th>
+                                        <th className="px-4 py-3">Price</th>
+                                        <th className="px-4 py-3">Stock</th>
+                                        <th className="px-4 py-3">Status</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-100">
-                                    {preview.slice(0, 10).map((row, index) => {
-                                        const hasError = validationErrors.some(e => e.row === index + 2);
-                                        const variants = row.stock_by_size ? parseSizeStock(row.sizes, row.stock_by_size) : [];
-                                        const totalStock = variants.reduce((sum, v) => sum + v.stock, 0) || row.stock_qty || 0;
-
+                                    {mappedData.slice(0, 10).map((row, i) => {
+                                        const isInvalid = validationErrors.some(e => e.row === i + 2);
                                         return (
-                                            <tr key={index} className={hasError ? 'bg-red-50' : 'hover:bg-gray-50'}>
-                                                <td className="px-4 py-3 font-medium">{row.sku}</td>
+                                            <tr key={i} className={isInvalid ? 'bg-red-50 opacity-70' : ''}>
+                                                <td className="px-4 py-3 font-mono text-xs">{row.sku}</td>
                                                 <td className="px-4 py-3">{row.name}</td>
                                                 <td className="px-4 py-3">{row.category}</td>
+                                                <td className="px-4 py-3">{row.selling_price}</td>
+                                                <td className="px-4 py-3">{row.stock_qty}</td>
                                                 <td className="px-4 py-3">
-                                                    <span className="text-xs bg-gray-100 px-2 py-1 rounded">
-                                                        {variants.length > 0 ? `${variants.length} sizes` : row.sizes || 'N/A'}
+                                                    <span className="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs uppercase tracking-wide">
+                                                        Draft
                                                     </span>
-                                                </td>
-                                                <td className="px-4 py-3">Rs {row.selling_price}</td>
-                                                <td className="px-4 py-3">{totalStock}</td>
-                                                <td className="px-4 py-3">
-                                                    {hasError ? (
-                                                        <span className="text-red-600 font-medium">Error</span>
-                                                    ) : (
-                                                        <span className="text-green-600 font-medium">Valid</span>
-                                                    )}
                                                 </td>
                                             </tr>
                                         );
                                     })}
                                 </tbody>
                             </table>
-                            {preview.length > 10 && (
-                                <div className="px-6 py-3 bg-gray-50 text-sm text-gray-600 text-center">
-                                    Showing first 10 of {preview.length} products
+                            {mappedData.length > 10 && (
+                                <div className="px-4 py-2 bg-gray-50 text-xs text-center text-gray-500">
+                                    Showing 10 of {mappedData.length} records
                                 </div>
                             )}
                         </div>
@@ -485,3 +406,4 @@ export default function StockManagerPage() {
         </AdminLayout>
     );
 }
+
