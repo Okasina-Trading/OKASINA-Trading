@@ -185,7 +185,6 @@ export default function StockManagerPage() {
                         fabric: row.fabric || null,
                         color: row.color || null,
                         status: 'draft', // FORCE DRAFT
-                        status: 'draft', // FORCE DRAFT
                         image_url: null // No image in Phase 1
                     };
 
