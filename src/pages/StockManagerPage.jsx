@@ -287,13 +287,18 @@ export default function StockManagerPage() {
                             <span>Create Drafts</span>
                         </div>
                     </div>
-                    <button
-                        onClick={handleDownloadTemplate}
-                        className="text-sm text-blue-600 hover:underline flex items-center gap-1"
-                    >
-                        <Download size={16} />
-                        Download Sample Template
-                    </button>
+                    <div className="flex flex-col items-end">
+                        <button
+                            onClick={handleDownloadTemplate}
+                            className="text-sm text-blue-600 hover:underline flex items-center gap-1 font-medium"
+                        >
+                            <Download size={16} />
+                            Download Sample Template
+                        </button>
+                        <span className="text-[10px] text-gray-400 mt-1">
+                            Supports <code className="bg-gray-100 px-1 rounded">Size:Qty</code> (e.g. S:5; M:2)
+                        </span>
+                    </div>
                 </div>
 
                 {/* Step 1: Upload */}
