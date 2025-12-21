@@ -517,40 +517,38 @@ export default function StockManagerPage() {
                                                     matchedCount++;
                                                     // Upload
                                                     try {
-                                                        // Upload to Cloudinary (Directly)
-                                                        try {
-                                                            // 1. Get Signature
-                                                            const signRes = await fetch('/api/sign-upload');
-                                                            if (!signRes.ok) throw new Error('Failed to get upload signature');
-                                                            const signData = await signRes.json();
+                                                        // 1. Get Signature
+                                                        const signRes = await fetch('/api/sign-upload');
+                                                        if (!signRes.ok) throw new Error('Failed to get upload signature');
+                                                        const signData = await signRes.json();
 
-                                                            // 2. Upload to Cloudinary
-                                                            const formData = new FormData();
-                                                            formData.append('file', file);
-                                                            formData.append('api_key', signData.api_key);
-                                                            formData.append('timestamp', signData.timestamp);
-                                                            formData.append('signature', signData.signature);
-                                                            formData.append('upload_preset', 'okasina_products');
+                                                        // 2. Upload to Cloudinary
+                                                        const formData = new FormData();
+                                                        formData.append('file', file);
+                                                        formData.append('api_key', signData.api_key);
+                                                        formData.append('timestamp', signData.timestamp);
+                                                        formData.append('signature', signData.signature);
+                                                        formData.append('upload_preset', 'okasina_products');
 
-                                                            const response = await fetch(`https://api.cloudinary.com/v1_1/${signData.cloud_name}/image/upload`, {
-                                                                method: 'POST',
-                                                                body: formData
-                                                            });
+                                                        const response = await fetch(`https://api.cloudinary.com/v1_1/${signData.cloud_name}/image/upload`, {
+                                                            method: 'POST',
+                                                            body: formData
+                                                        });
 
-                                                            const data = await response.json();
-                                                            if (data.secure_url) {
-                                                                // Update Product
-                                                                await supabase
-                                                                    .from('products')
-                                                                    .update({ image_url: data.secure_url })
-                                                                    .eq('id', targetId);
+                                                        const data = await response.json();
+                                                        if (data.secure_url) {
+                                                            // Update Product
+                                                            await supabase
+                                                                .from('products')
+                                                                .update({ image_url: data.secure_url })
+                                                                .eq('id', targetId);
 
-                                                                uploadedCount++;
-                                                            }
-                                                        } catch (err) {
-                                                            errors.push(`${file.name}: Upload failed`);
+                                                            uploadedCount++;
                                                         }
-                                                    } else {
+                                                    } catch (err) {
+                                                        errors.push(`${file.name}: Upload failed`);
+                                                    }
+                                                } else {
                                                     errors.push(`${file.name}: No matching SKU found`);
                                                 }
                                             }
