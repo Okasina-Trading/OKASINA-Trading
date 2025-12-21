@@ -826,27 +826,15 @@ app.post('/api/facebook/import-photo', async (req, res) => {
 app.post('/api/extract-image-text', async (req, res) => {
   try {
     const { imageUrl } = req.body;
+    if (!imageUrl) return res.status(400).json({ error: 'imageUrl is required' });
 
-    if (!imageUrl) {
-      return res.status(400).json({ error: 'imageUrl is required' });
-    }
-
-    // Use Gemini Vision for OCR
     const geminiKey = process.env.GOOGLE_AI_KEY || process.env.VITE_GEMINI_API_KEY;
+    if (!geminiKey) return res.status(501).json({ error: 'Vision AI not configured' });
 
-    if (!geminiKey) {
-      return res.status(501).json({
-        error: 'Vision AI not configured',
-        message: 'Add GOOGLE_AI_KEY or VITE_GEMINI_API_KEY to enable image text extraction'
-      });
-    }
-
-    // Fetch image and convert to base64
     const imageResponse = await fetch(imageUrl);
     const imageBuffer = await imageResponse.buffer();
     const base64Image = imageBuffer.toString('base64');
 
-    // Call Gemini Vision API
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`,
       {
@@ -856,12 +844,7 @@ app.post('/api/extract-image-text', async (req, res) => {
           contents: [{
             parts: [
               { text: 'Extract ALL text from this image. Include product names, prices, sizes, colors, materials, and descriptions. Format as structured data.' },
-              {
-                inline_data: {
-                  mime_type: 'image/jpeg',
-                  data: base64Image
-                }
-              }
+              { inline_data: { mime_type: 'image/jpeg', data: base64Image } }
             ]
           }]
         })
@@ -870,16 +853,69 @@ app.post('/api/extract-image-text', async (req, res) => {
 
     const data = await response.json();
     const extractedText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-
-    res.json({
-      success: true,
-      extractedText,
-      imageUrl
-    });
+    res.json({ success: true, extractedText, imageUrl });
 
   } catch (error) {
     console.error('Vision AI error:', error);
     res.status(500).json({ error: 'Failed to extract text from image', details: error.message });
+  }
+});
+
+// --- NEW: AI Product Scanner (Structured) ---
+app.post('/api/analyze-product-image', async (req, res) => {
+  try {
+    const { imageUrl } = req.body;
+    if (!imageUrl) return res.status(400).json({ error: 'imageUrl is required' });
+
+    const geminiKey = process.env.GOOGLE_AI_KEY || process.env.VITE_GEMINI_API_KEY;
+    if (!geminiKey) return res.status(501).json({ error: 'Vision AI not configured' });
+
+    console.log(`[AI Scanner] Analyzing: ${imageUrl}`);
+    const imageResponse = await fetch(imageUrl);
+    const imageBuffer = await imageResponse.buffer();
+    const base64Image = imageBuffer.toString('base64');
+
+    const prompt = `
+      Analyze this product image and extract the following details into a valid JSON object:
+      - name: A short, descriptive product name (e.g. "Cotton Dress with Pockets").
+      - price: The price as a number (remove currency symbols).
+      - sizes: A string of available sizes (e.g. "S, M, L").
+      - fabric: The material/fabric if mentioned.
+      - color: The primary color.
+      - category: Suggested category (e.g. Kurtis, Suits, Dresses).
+      - sku_suggestion: A short SKU code based on the name (e.g. COT-DRS-001).
+      
+      Return ONLY the JSON. Do not include markdown formatting.
+    `;
+
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{
+            parts: [
+              { text: prompt },
+              { inline_data: { mime_type: 'image/jpeg', data: base64Image } }
+            ]
+          }]
+        })
+      }
+    );
+
+    const data = await response.json();
+    let text = data.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
+
+    // Clean markdown if present
+    text = text.replace(/```json/g, '').replace(/```/g, '').trim();
+
+    const productData = JSON.parse(text);
+    res.json({ success: true, product: productData });
+
+  } catch (error) {
+    console.error('AI Scanner Error:', error);
+    res.status(500).json({ error: 'AI Analysis Failed', details: error.message });
   }
 });
 
