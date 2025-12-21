@@ -9,8 +9,8 @@ import Papa from 'papaparse';
 // Helper to generate a simple template
 const generateSimpleTemplate = () => {
     return `SKU,Name,Category,Price,Stock,Color,Fabric,Sizes
-ANK-001,Anarkali Red,Suits,2500,10,Red,Cotton,S;M;L
-ANK-002,Blue Kurti,Kurtis,1200,5,Blue,Silk,Free Size`;
+ANK-001,Anarkali Red,Suits,2500,10,Red,Cotton,S:5;M:3;L:2
+ANK-002,Blue Kurti,Kurtis,1200,5,Blue,Silk,Free Size:5`;
 };
 
 export default function StockManagerPage() {
