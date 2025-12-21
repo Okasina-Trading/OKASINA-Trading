@@ -43,18 +43,27 @@ export default function MediaManagerPage() {
                 let isLinked = false;
 
                 if (sku) {
-                    // 2. Upload to Server (storage)
+                    // 2. Upload to Cloudinary (Directly)
+                    // Get signature first
+                    const signRes = await fetch('/api/sign-upload');
+                    if (!signRes.ok) throw new Error('Failed to get upload signature');
+                    const signData = await signRes.json();
+
                     const formData = new FormData();
                     formData.append('file', file);
-                    // Using the existing upload endpoint
-                    const uploadRes = await fetch('/api/upload-image', {
-                        method: 'POST', body: formData
+                    formData.append('api_key', signData.api_key);
+                    formData.append('timestamp', signData.timestamp);
+                    formData.append('signature', signData.signature);
+                    formData.append('upload_preset', 'okasina_products');
+
+                    const uploadRes = await fetch(`https://api.cloudinary.com/v1_1/${signData.cloud_name}/image/upload`, {
+                        method: 'POST',
+                        body: formData
                     });
 
-                    if (!uploadRes.ok) throw new Error('Upload failed');
+                    if (!uploadRes.ok) throw new Error('Cloudinary Upload failed');
                     const uploadData = await uploadRes.json();
-
-                    const imageUrl = uploadData.url;
+                    const imageUrl = uploadData.secure_url;
 
                     // 3. Find Product in DB (Try Exact Match First)
                     // We might need to try variations if "ANK-001-1" is passed but SKU is "ANK-001"

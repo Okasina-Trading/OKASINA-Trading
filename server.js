@@ -57,6 +57,22 @@ cloudinary.config({
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
+// --- Cloudinary Signature Endpoint (for client-side upload) ---
+app.get("/api/sign-upload", (req, res) => {
+  const timestamp = Math.round((new Date()).getTime() / 1000);
+  const signature = cloudinary.utils.api_sign_request({
+    timestamp: timestamp,
+    upload_preset: 'okasina_products' // Must match the preset in Cloudinary settings
+  }, process.env.CLOUDINARY_API_SECRET || 'uVWGCQ4jKjQWo5xZMCdRMs7rdLo');
+
+  res.json({
+    timestamp,
+    signature,
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME || 'dw86lrpv6',
+    api_key: process.env.CLOUDINARY_API_KEY || '121943449379972'
+  });
+});
+
 app.post("/api/upload-image", upload.single('file'), async (req, res) => {
   try {
     if (!req.file) {
