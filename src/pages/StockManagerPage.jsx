@@ -302,19 +302,111 @@ export default function StockManagerPage() {
 
                 {/* Step 1: Upload */}
                 {!file && (
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
-                        <div className="mx-auto h-20 w-20 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mb-6">
-                            <FileSpreadsheet size={40} />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Option 1: CSV Upload */}
+                        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center hover:border-blue-300 transition-colors">
+                            <div className="mx-auto h-16 w-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mb-4">
+                                <FileSpreadsheet size={32} />
+                            </div>
+                            <h3 className="text-xl font-bold text-gray-900 mb-2">Upload CSV</h3>
+                            <p className="text-gray-500 mb-6 text-sm">
+                                Standard bulk import using a CSV file.
+                            </p>
+                            <label className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-all cursor-pointer shadow-md font-medium">
+                                <Upload size={20} />
+                                Select CSV
+                                <input type="file" accept=".csv" onChange={handleFileChange} className="hidden" />
+                            </label>
                         </div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-2">Upload your Product List</h3>
-                        <p className="text-gray-500 mb-8 max-w-md mx-auto">
-                            Upload any CSV file. We'll help you map your columns to our system so you don't have to reformat manually.
-                        </p>
-                        <label className="inline-flex items-center gap-3 px-8 py-4 bg-black text-white rounded-xl hover:bg-gray-800 transition-all transform hover:scale-105 cursor-pointer shadow-lg font-medium text-lg">
-                            <Upload size={24} />
-                            Select CSV File
-                            <input type="file" accept=".csv" onChange={handleFileChange} className="hidden" />
-                        </label>
+
+                        {/* Option 2: AI Magic Scanner */}
+                        <div className="bg-gradient-to-br from-purple-50 to-white rounded-xl shadow-sm border border-purple-200 p-8 text-center relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 p-2 bg-purple-600 text-white text-xs font-bold rounded-bl-lg">
+                                NEW
+                            </div>
+                            <div className="mx-auto h-16 w-16 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                                <Sparkles size={32} />
+                            </div>
+                            <h3 className="text-xl font-bold text-purple-900 mb-2">AI Magic Scanner</h3>
+                            <p className="text-purple-700 mb-6 text-sm">
+                                Upload images and let AI auto-extract details.
+                            </p>
+                            <label className="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-all cursor-pointer shadow-md font-medium">
+                                <Sparkles size={20} />
+                                Scan Images
+                                <input
+                                    type="file"
+                                    multiple
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={async (e) => {
+                                        const files = Array.from(e.target.files);
+                                        if (files.length === 0) return;
+
+                                        if (!confirm(`Scan ${files.length} images? This will analyze them with AI.`)) return;
+
+                                        const newRows = [];
+
+                                        for (const file of files) {
+                                            try {
+                                                addToast(`Scanning ${file.name}...`, 'info');
+
+                                                // 1. Get Signature & Upload
+                                                const signRes = await fetch('/api/sign-upload');
+                                                if (!signRes.ok) throw new Error('Signature failed');
+                                                const signData = await signRes.json();
+
+                                                const formData = new FormData();
+                                                formData.append('file', file);
+                                                formData.append('api_key', signData.api_key);
+                                                formData.append('timestamp', signData.timestamp);
+                                                formData.append('signature', signData.signature);
+                                                formData.append('upload_preset', 'okasina_products');
+
+                                                const uploadRes = await fetch(`https://api.cloudinary.com/v1_1/${signData.cloud_name}/image/upload`, {
+                                                    method: 'POST', body: formData
+                                                });
+                                                const uploadData = await uploadRes.json();
+                                                const imageUrl = uploadData.secure_url;
+
+                                                // 2. Analyze
+                                                const aiRes = await fetch('/api/analyze-product-image', {
+                                                    method: 'POST',
+                                                    headers: { 'Content-Type': 'application/json' },
+                                                    body: JSON.stringify({ imageUrl })
+                                                });
+                                                const aiData = await aiRes.json();
+
+                                                if (aiData.success) {
+                                                    const p = aiData.product;
+                                                    newRows.push({
+                                                        sku: p.sku_suggestion || `AI-${Date.now()}-${Math.floor(Math.random() * 100)}`,
+                                                        name: p.name || 'Unknown Product',
+                                                        category: p.category || 'Uncategorized',
+                                                        selling_price: p.price || 0,
+                                                        stock_qty: 10, // Default stock
+                                                        sizes: p.sizes || 'Free Size',
+                                                        color: p.color || '',
+                                                        fabric: p.fabric || '',
+                                                        image_url: imageUrl
+                                                    });
+                                                    addToast(`scanned: ${p.name}`, 'success');
+                                                }
+                                            } catch (err) {
+                                                console.error(err);
+                                                addToast(`Error scanning ${file.name}`, 'error');
+                                            }
+                                        }
+
+                                        // Set data as if it came from CSV
+                                        setRawHeaders(['sku', 'name', 'category', 'selling_price', 'stock_qty', 'sizes', 'color', 'fabric', 'image_url']);
+                                        setMappedData(newRows);
+                                        setFile({ name: `AI Scan (${files.length} images)` }); // Fake file to trigger "Step 3"
+                                        setIsMapping(false); // Skip mapping
+                                    }}
+                                />
+                            </label>
+                        </div>
                     </div>
                 )}
 
