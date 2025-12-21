@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import { Upload, Download, FileSpreadsheet, AlertCircle, CheckCircle, Loader, Sparkles, FileText, ArrowRight } from 'lucide-react';
-import { downloadCSV } from '../utils/csvTemplate'; // Keeping downloadCSV only, template generation handles internally now
-import { session } from '../supabase'; // Assuming session handling if needed, or removing if unused
 import { supabase } from '../supabase';
 import { useToast } from '../contexts/ToastContext';
 import AdminLayout from '../components/admin/AdminLayout';
