@@ -3,6 +3,7 @@ import { Upload, Download, FileSpreadsheet, AlertCircle, CheckCircle, Loader, Sp
 import { downloadCSV } from '../utils/csvTemplate'; // Keeping downloadCSV only, template generation handles internally now
 import { session } from '../supabase'; // Assuming session handling if needed, or removing if unused
 import { supabase } from '../supabase';
+import { useToast } from '../contexts/ToastContext';
 import AdminLayout from '../components/admin/AdminLayout';
 import SmartColumnMapper from '../components/admin/SmartColumnMapper';
 import Papa from 'papaparse';
@@ -15,6 +16,7 @@ ANK-002,Blue Kurti,Kurtis,1200,5,Blue,Silk,Free Size`;
 };
 
 export default function StockManagerPage() {
+    const { addToast } = useToast();
     // Phase 1 States
     const [file, setFile] = useState(null);
     const [rawHeaders, setRawHeaders] = useState([]);
@@ -185,9 +187,47 @@ export default function StockManagerPage() {
                         fabric: row.fabric || null,
                         color: row.color || null,
                         status: 'draft', // FORCE DRAFT
-                        sizes: row.sizes ? row.sizes.split(/[;,]/).map(s => s.trim()) : [], // Handle CSV lists
+                        status: 'draft', // FORCE DRAFT
                         image_url: null // No image in Phase 1
                     };
+
+                    // Parse Variants (Size:Stock)
+                    if (row.sizes) {
+                        const rawSizes = row.sizes.split(/[;,]/).map(s => s.trim()).filter(s => s);
+                        const variants = [];
+                        let totalStock = 0;
+                        let simpleSizes = [];
+
+                        rawSizes.forEach(entry => {
+                            // Try to match "Size:Qty" format
+                            const match = entry.match(/^(.+?):(\d+)$/);
+                            if (match) {
+                                const size = match[1].trim();
+                                const qty = parseInt(match[2], 10);
+                                variants.push({ size, stock: qty });
+                                totalStock += qty;
+                                simpleSizes.push(size);
+                            } else {
+                                // Fallback: Simple size string, assume 0 stock or use global? 
+                                // For mixed mode, we'll just add the size with 0 stock
+                                simpleSizes.push(entry);
+                                variants.push({ size: entry, stock: 0 }); // Default to 0 for specific size if not specified
+                            }
+                        });
+
+                        productData.sizes = simpleSizes;
+                        productData.variants = variants;
+
+                        // If we found variants with stock, override the CSV stock column (optional?)
+                        // User might providing global stock AND variants. 
+                        // Let's trust variants sum if > 0, otherwise fallback to row.stock_qty
+                        if (totalStock > 0) {
+                            productData.stock_qty = totalStock;
+                        }
+                    } else {
+                        productData.sizes = [];
+                        productData.variants = [];
+                    }
 
                     // Insert or Update (Upsert by SKU)
                     // We need to check existence first to get ID for upsert?
@@ -399,7 +439,128 @@ export default function StockManagerPage() {
                                     Showing 10 of {mappedData.length} records
                                 </div>
                             )}
+                            {mappedData.length > 10 && (
+                                <div className="px-4 py-2 bg-gray-50 text-xs text-center text-gray-500">
+                                    Showing 10 of {mappedData.length} records
+                                </div>
+                            )}
                         </div>
+
+                        {/* Step 4: Bulk Image Upload (Post-Import) */}
+                        {importResult?.success && (
+                            <div className="mt-8 bg-white rounded-xl shadow-sm border border-blue-100 p-8">
+                                <h3 className="text-xl font-serif font-bold text-gray-900 mb-4 flex items-center gap-2">
+                                    <Sparkles className="text-blue-600" size={24} />
+                                    Bulk Image Import
+                                </h3>
+
+                                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                                    <h4 className="font-bold text-blue-900 mb-2">How to Bulk Upload Images</h4>
+                                    <ul className="text-sm text-blue-800 space-y-1 list-disc list-inside">
+                                        <li>Naming Convention: <strong>Name your image files exactly as the SKU.</strong></li>
+                                        <li>Example: If SKU is <code className="bg-blue-100 px-1 rounded">ANK-001</code>, name the file <code className="bg-blue-100 px-1 rounded">ANK-001.jpg</code> or <code className="bg-blue-100 px-1 rounded">ANK-001.png</code>.</li>
+                                        <li>We will automatically find the product and attach the image.</li>
+                                        <li>Supported formats: JPG, PNG, WEBP.</li>
+                                    </ul>
+                                </div>
+
+                                <div className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-xl p-8 hover:bg-gray-50 transition-colors">
+                                    <input
+                                        type="file"
+                                        multiple
+                                        accept="image/*"
+                                        onChange={async (e) => {
+                                            const files = Array.from(e.target.files);
+                                            if (files.length === 0) return;
+
+                                            const confirmUpload = confirm(`Found ${files.length} images. Ready to match and upload?`);
+                                            if (!confirmUpload) return;
+
+                                            let matchedCount = 0;
+                                            let uploadedCount = 0;
+                                            const errors = [];
+
+                                            // Determine targets (use mappedData SKUs)
+                                            // Create a map of SKU -> ProductID (if we have it? We might only have drafts with no IDs yet if we didn't fetch back)
+                                            // Actually, the import result didn't return IDs for all rows, only count.
+                                            // We should query the DB for these SKUs to get their IDs.
+
+                                            // 1. Get SKUs from current list
+                                            const skus = mappedData.map(r => r.sku);
+
+                                            addToast('Matching SKUs...', 'info'); // Assuming we have toast, if not console
+                                            console.log('Fetching IDs for SKUs:', skus.length);
+
+                                            const { data: productsInDb, error: fetchErr } = await supabase
+                                                .from('products')
+                                                .select('id, sku')
+                                                .in('sku', skus);
+
+                                            if (fetchErr) {
+                                                alert('Error fetching product IDs: ' + fetchErr.message);
+                                                return;
+                                            }
+
+                                            const skuMap = {};
+                                            productsInDb.forEach(p => skuMap[p.sku.toLowerCase()] = p.id);
+
+                                            // 2. Process Files
+                                            for (const file of files) {
+                                                // Extract SKU from filename (remove extension)
+                                                // e.g. "ANK-001.jpg" -> "ANK-001"
+                                                const fileNameNoExt = file.name.substring(0, file.name.lastIndexOf('.')).toLowerCase();
+                                                const targetId = skuMap[fileNameNoExt];
+
+                                                if (targetId) {
+                                                    matchedCount++;
+                                                    // Upload
+                                                    try {
+                                                        const formData = new FormData();
+                                                        formData.append('file', file);
+                                                        formData.append('upload_preset', 'okasina_products'); // If using direct or via server
+
+                                                        // Use server endpoint
+                                                        const response = await fetch('/api/upload-image', {
+                                                            method: 'POST',
+                                                            body: formData
+                                                        });
+
+                                                        const data = await response.json();
+                                                        if (data.url) {
+                                                            // Update Product
+                                                            await supabase
+                                                                .from('products')
+                                                                .update({ image_url: data.url })
+                                                                .eq('id', targetId);
+
+                                                            uploadedCount++;
+                                                        }
+                                                    } catch (err) {
+                                                        errors.push(`${file.name}: Upload failed`);
+                                                    }
+                                                } else {
+                                                    errors.push(`${file.name}: No matching SKU found`);
+                                                }
+                                            }
+
+                                            alert(`Process Complete!\nMatched Files: ${matchedCount}\nUploaded: ${uploadedCount}\nErrors: ${errors.length}`);
+                                            if (errors.length > 0) {
+                                                console.warn("Image Upload Errors:", errors);
+                                            }
+                                        }}
+                                        className="hidden"
+                                        id="bulk-image-input"
+                                    />
+                                    <label htmlFor="bulk-image-input" className="cursor-pointer flex flex-col items-center">
+                                        <div className="bg-black text-white p-4 rounded-full mb-4 shadow-lg hover:scale-110 transition-transform">
+                                            <Upload size={24} />
+                                        </div>
+                                        <span className="text-lg font-bold text-gray-900">Select Images</span>
+                                        <span className="text-sm text-gray-500">Select all your product images at once</span>
+                                    </label>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 )}
             </div>

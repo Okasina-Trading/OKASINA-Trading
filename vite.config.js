@@ -36,6 +36,6 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: './src/tests/setup.js',
     css: true,
-    exclude: ['**/node_modules/**', '**/dist/**', '**/.{idea,git,cache,output,temp}/**', '**/okasina-backup/**'],
+    exclude: ['**/node_modules/**', '**/dist/**', '**/.{idea,git,cache,output,temp}/**', '**/okasina-backup/**', 'tests/**', 'okasina-fashion-store-Antigravity/**'],
   }
 })

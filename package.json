@@ -8,6 +8,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
+    "test": "vitest run",
     "jarvis:check": "node scripts/jarvis-health-check.js",
     "jarvis:repair": "node scripts/jarvis-auto-repair.js",
     "jarvis:full": "node scripts/jarvis-auto-repair.js && node scripts/jarvis-health-check.js",

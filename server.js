@@ -708,6 +708,104 @@ app.post('/api/facebook/import-album', async (req, res) => {
   }
 });
 
+app.post('/api/facebook/import-photo', async (req, res) => {
+  try {
+    const { id, url, caption, useAI, createProducts } = req.body;
+
+    // Validate inputs
+    if (!id || !url) {
+      return res.status(400).json({ error: 'Missing required fields (id, url)' });
+    }
+
+    console.log(`[Import-Photo] Processing photo ${id.substring(0, 8)}...`);
+
+    let finalProduct = {
+      name: caption ? (caption.length > 50 ? caption.substring(0, 47) + '...' : caption) : 'Imported Item',
+      description: caption || 'Imported from Facebook',
+      category: 'New Arrivals',
+      price_mur: 0,
+      tags: [],
+      image_url: url,
+      facebook_photo_id: id,
+      status: 'draft',
+      stock_qty: 1
+    };
+
+    // 1. AI Analysis (if enabled)
+    if (useAI && (process.env.GOOGLE_AI_KEY || process.env.VITE_GEMINI_API_KEY)) {
+      try {
+        const apiKey = process.env.GOOGLE_AI_KEY || process.env.VITE_GEMINI_API_KEY;
+
+        // Fetch image for AI
+        const imageResp = await fetch(url);
+        const arrayBuffer = await imageResp.arrayBuffer();
+        const base64Image = Buffer.from(arrayBuffer).toString('base64');
+
+        const prompt = `Analyze this fashion product. Return JSON:
+              {
+                  "name": "Short catchy title (max 50 chars)",
+                  "description": "Engaging sales description",
+                  "category": "Clothing/Shoes/Accessories",
+                  "price_mur": <estimated_price_number>
+              }`;
+
+        const aiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{
+              parts: [
+                { text: prompt },
+                { inline_data: { mime_type: "image/jpeg", data: base64Image } }
+              ]
+            }]
+          })
+        });
+
+        const aiData = await aiResponse.json();
+        let aiText = aiData.candidates?.[0]?.content?.parts?.[0]?.text;
+
+        if (aiText) {
+          aiText = aiText.replace(/```json/g, '').replace(/```/g, '');
+          const parsed = JSON.parse(aiText);
+          // Merge AI data
+          finalProduct = { ...finalProduct, ...parsed };
+        }
+      } catch (aiErr) {
+        console.error("[Import-Photo] AI Analysis Failed:", aiErr.message);
+        // Continue without AI data
+      }
+    }
+
+    // 2. Create Product in DB (if enabled)
+    if (createProducts) {
+      const { data, error } = await supabaseAdmin.from('products').insert([finalProduct]).select().single();
+
+      if (error) {
+        throw error;
+      }
+
+      return res.json({
+        success: true,
+        product: data,
+        message: 'Product imported successfully'
+      });
+    }
+
+    // Dry run
+    res.json({
+      success: true,
+      product: finalProduct,
+      message: 'Dry run complete (Product not saved)'
+    });
+
+  } catch (error) {
+    console.error('[Import-Photo] Error:', error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
 // --- Vision AI - Extract Text from Images ---
 app.post('/api/extract-image-text', async (req, res) => {
   try {

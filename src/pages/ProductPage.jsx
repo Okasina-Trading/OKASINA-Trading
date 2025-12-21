@@ -178,18 +178,43 @@ export default function ProductPage() {
                                 </div>
                             )}
                             <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto">
-                                {sizes.map((size) => (
-                                    <button
-                                        key={size}
-                                        onClick={() => setSelectedSize(size)}
-                                        className={`min-w-[60px] h-14 px-3 flex items-center justify-center border-2 text-sm font-bold ${selectedSize === size
-                                            ? 'border-black bg-black text-white'
-                                            : 'border-gray-300 text-gray-700 hover:border-black bg-white'
-                                            } transition-all duration-200 hover:scale-105`}
-                                    >
-                                        {size}
-                                    </button>
-                                ))}
+                                {sizes.map((size) => {
+                                    // Check Variant Stock
+                                    let isOutOfStock = false;
+                                    let stockCount = null;
+
+                                    if (product.variants && Array.isArray(product.variants) && product.variants.length > 0) {
+                                        const variant = product.variants.find(v => v.size === size);
+                                        if (variant) {
+                                            stockCount = variant.stock;
+                                            if (variant.stock <= 0) isOutOfStock = true;
+                                        }
+                                    } else {
+                                        // Legacy / Simple Product: Check global stock
+                                        if (product.stock_qty <= 0) isOutOfStock = true;
+                                    }
+
+                                    return (
+                                        <button
+                                            key={size}
+                                            onClick={() => !isOutOfStock && setSelectedSize(size)}
+                                            disabled={isOutOfStock}
+                                            className={`min-w-[60px] h-14 px-3 flex flex-col items-center justify-center border-2 text-sm font-bold transition-all duration-200 
+                                                ${isOutOfStock
+                                                    ? 'border-gray-100 bg-gray-50 text-gray-300 cursor-not-allowed line-through'
+                                                    : selectedSize === size
+                                                        ? 'border-black bg-black text-white hover:scale-105'
+                                                        : 'border-gray-300 text-gray-700 hover:border-black bg-white hover:scale-105'
+                                                }`}
+                                            title={isOutOfStock ? "Out of Stock" : `${stockCount !== null ? stockCount + ' left' : 'In Stock'}`}
+                                        >
+                                            <span>{size}</span>
+                                            {stockCount !== null && stockCount < 5 && stockCount > 0 && (
+                                                <span className="text-[10px] font-normal leading-none mt-0.5 opacity-80">{stockCount} left</span>
+                                            )}
+                                        </button>
+                                    );
+                                })}
                             </div>
                         </div>
 
@@ -199,6 +224,24 @@ export default function ProductPage() {
                                 onClick={(e) => {
                                     e.preventDefault();
                                     e.stopPropagation();
+
+                                    if (!selectedSize) {
+                                        addToast('Please select a size first');
+                                        return;
+                                    }
+
+                                    // Verify variant again
+                                    if (product.variants && Array.isArray(product.variants)) {
+                                        const variant = product.variants.find(v => v.size === selectedSize);
+                                        if (variant && variant.stock <= 0) {
+                                            addToast(`Sorry, size ${selectedSize} is out of stock`);
+                                            return;
+                                        }
+                                    } else if (product.stock_qty <= 0) {
+                                        addToast('Sorry, this product is out of stock');
+                                        return;
+                                    }
+
                                     try {
                                         addToCart({ ...product, selectedSize });
                                         addToast(`Added ${product.name} to cart`);
@@ -206,9 +249,13 @@ export default function ProductPage() {
                                         console.error('Add to Cart failed:', err);
                                     }
                                 }}
-                                className="w-full bg-black text-white py-4 text-sm font-bold uppercase tracking-widest hover:bg-gray-800 transition-colors"
+                                className={`w-full py-4 text-sm font-bold uppercase tracking-widest transition-colors ${(product.stock_qty <= 0 && (!product.variants || product.variants.length === 0)) // Global OOS
+                                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                        : 'bg-black text-white hover:bg-gray-800'
+                                    }`}
+                                disabled={(product.stock_qty <= 0 && (!product.variants || product.variants.length === 0))}
                             >
-                                Add to Cart
+                                {(product.stock_qty <= 0 && (!product.variants || product.variants.length === 0)) ? 'Out of Stock' : 'Add to Cart'}
                             </button>
 
                             <button
