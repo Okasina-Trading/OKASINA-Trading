@@ -52,9 +52,6 @@ export default function AdminCitadelPage() {
 
     const MetricCard = ({ title, value, subtext, icon: Icon, status, trend }) => (
         <div className="bg-white/80 backdrop-blur-md rounded-xl p-6 shadow-lg border border-white/20 relative overflow-hidden group hover:shadow-xl transition-all">
-            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                <Icon size={64} />
-            </div>
             <div className="flex justify-between items-start mb-4">
                 <div className="p-2 bg-blue-50 rounded-lg text-blue-600">
                     <Icon size={24} />
