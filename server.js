@@ -857,8 +857,11 @@ app.post('/api/extract-image-text', async (req, res) => {
     if (!geminiKey) return res.status(501).json({ error: 'Vision AI not configured' });
 
     const imageResponse = await fetch(imageUrl);
-    const imageBuffer = await imageResponse.buffer();
-    const base64Image = imageBuffer.toString('base64');
+    if (!imageResponse.ok) throw new Error(`Failed to fetch image: ${imageResponse.statusText}`);
+
+    // Use arrayBuffer() for compatibility
+    const imageBuffer = await imageResponse.arrayBuffer();
+    const base64Image = Buffer.from(imageBuffer).toString('base64');
 
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`,
@@ -897,8 +900,11 @@ app.post('/api/analyze-product-image', async (req, res) => {
 
     console.log(`[AI Scanner] Analyzing: ${imageUrl}`);
     const imageResponse = await fetch(imageUrl);
-    const imageBuffer = await imageResponse.buffer();
-    const base64Image = imageBuffer.toString('base64');
+    if (!imageResponse.ok) throw new Error(`Failed to fetch image: ${imageResponse.statusText}`);
+
+    // Use arrayBuffer() for compatibility with native fetch in Node 18+
+    const imageBuffer = await imageResponse.arrayBuffer();
+    const base64Image = Buffer.from(imageBuffer).toString('base64');
 
     const prompt = `
       Analyze this product image and extract the following details into a valid JSON object:
