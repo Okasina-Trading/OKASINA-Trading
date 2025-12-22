@@ -935,6 +935,12 @@ app.post('/api/analyze-product-image', async (req, res) => {
       }
     );
 
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`[AI Scanner] Google API Error (${response.status}):`, errorText);
+      throw new Error(`Google AI API Error: ${response.status} ${response.statusText} - ${errorText}`);
+    }
+
     const data = await response.json();
     let text = data.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
 
