@@ -717,7 +717,7 @@ app.post('/api/facebook/import-album', async (req, res) => {
         }
 
         if (createProducts) {
-          const { data, error } = await supabaseAdmin.from('products').insert([{
+          const { data, error } = await getSupabaseAdmin().from('products').insert([{
             name: productData.name,
             description: productData.description,
             image_url: imageUrl,
@@ -821,7 +821,7 @@ app.post('/api/facebook/import-photo', async (req, res) => {
 
     // 2. Create Product in DB (if enabled)
     if (createProducts) {
-      const { data, error } = await supabaseAdmin.from('products').insert([finalProduct]).select().single();
+      const { data, error } = await getSupabaseAdmin().from('products').insert([finalProduct]).select().single();
 
       if (error) {
         throw error;
@@ -991,7 +991,7 @@ app.get('/api/citadel/vitals', async (req, res) => {
 
   try {
     // Check Supabase connection
-    const { data, error } = await supabaseAdmin.from('products').select('id').limit(1);
+    const { data, error } = await getSupabaseAdmin().from('products').select('id').limit(1);
     if (!error) {
       dbStatus = 'connected';
       dbLatency = Date.now() - start;
