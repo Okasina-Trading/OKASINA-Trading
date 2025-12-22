@@ -118,33 +118,47 @@ app.post("/api/upload-image", upload.single('file'), async (req, res) => {
 
 // --- Supabase Admin Endpoints ---
 // --- Supabase Setup ---
-let supabase;
-let supabaseAdmin;
+// --- Supabase Setup (Lazy Init) ---
+let supabaseInstance = null;
+let supabaseAdminInstance = null;
 
-try {
-  const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
-  const supabaseKey = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY;
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (supabaseUrl && supabaseKey) {
-    supabase = createClient(supabaseUrl, supabaseKey);
-    console.log("✅ Supabase Public Client initialized");
-  } else {
-    console.warn("⚠️  Supabase Public Keys missing - DB features will fail");
+const getSupabase = () => {
+  if (supabaseInstance) return supabaseInstance;
+  try {
+    const url = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+    const key = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY;
+    if (url && key) {
+      supabaseInstance = createClient(url, key);
+      return supabaseInstance;
+    }
+  } catch (e) {
+    console.error("Supabase Init Err:", e);
   }
+  return null;
+};
 
-  if (supabaseUrl && supabaseServiceKey) {
-    supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
-    console.log("✅ Supabase Admin initialized with service role key");
-  } else {
-    console.warn("⚠️  Supabase Admin Keys missing - Admin features will fail");
+const getSupabaseAdmin = () => {
+  if (supabaseAdminInstance) return supabaseAdminInstance;
+  try {
+    const url = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (url && key) {
+      supabaseAdminInstance = createClient(url, key);
+      return supabaseAdminInstance;
+    }
+  } catch (e) {
+    console.error("Supabase Admin Init Err:", e);
   }
-} catch (err) {
-  console.error("❌ Critical Supabase Init Error:", err.message);
-}
+  // Return dummy if missing to prevent crash on property access
+  return {
+    from: () => ({ select: () => ({ limit: () => ({ data: null, error: { message: "DB Not Configured" } }) }), insert: () => ({ select: () => ({ single: () => ({ data: null, error: { message: "DB Not Configured" } }) }) }) }),
+    rpc: () => ({})
+  };
+};
 
 // Helper to check DB
 const getDbStatus = async () => {
+  const supabase = getSupabase();
   if (!supabase) return { status: 'offline', error: 'Missing Configuration' };
   const start = Date.now();
   try {
@@ -160,7 +174,7 @@ const getDbStatus = async () => {
 app.post('/api/update-category', async (req, res) => {
   try {
     const { productIds, category } = req.body;
-    const { data, error, count } = await supabaseAdmin
+    const { data, error, count } = await getSupabaseAdmin()
       .from('products')
       .update({ category }, { count: 'exact' })
       .in('id', productIds);
@@ -176,7 +190,7 @@ app.post('/api/update-category', async (req, res) => {
 app.post('/api/delete-product', async (req, res) => {
   try {
     const { productId } = req.body;
-    const { error, count } = await supabaseAdmin
+    const { error, count } = await getSupabaseAdmin()
       .from('products')
       .delete({ count: 'exact' })
       .eq('id', productId);
@@ -192,7 +206,7 @@ app.post('/api/delete-product', async (req, res) => {
 app.post('/api/create-product', async (req, res) => {
   try {
     const productData = req.body;
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await getSupabaseAdmin()
       .from('products')
       .insert([productData])
       .select()
@@ -212,7 +226,7 @@ app.post('/api/update-product', async (req, res) => {
 
     console.log('Update product request:', { id, fields: Object.keys(updateData) });
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await getSupabaseAdmin()
       .from('products')
       .update(updateData)
       .eq('id', id)
@@ -239,7 +253,7 @@ app.post('/api/update-order-status', async (req, res) => {
 
     console.log(`Updating order ${orderId} to ${status}`);
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await getSupabaseAdmin()
       .from('orders')
       .update({ status })
       .eq('id', orderId)
@@ -415,7 +429,7 @@ app.post('/api/ai-agent/jarvis/vision', async (req, res) => {
 // Sentinel - Health Check
 app.post('/api/ai-agent/az/sentinel', async (req, res) => {
   // In cloud, we just check Supabase connection
-  const { error } = await supabaseAdmin.from('products').select('id').limit(1);
+  const { error } = await getSupabaseAdmin().from('products').select('id').limit(1);
   if (error) {
     res.status(500).json({ success: false, status: 'critical', error: error.message });
   } else {
@@ -451,7 +465,7 @@ app.post('/api/jarvis/feedback', async (req, res) => {
     console.log(`[JARVIS MOUTH] New Report: [${type}] ${message.substring(0, 50)}...`);
 
     // 1. Log to Supabase "jarvis_feedback" table
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await getSupabaseAdmin()
       .from('jarvis_feedback')
       .insert([{
         message,
@@ -523,7 +537,7 @@ app.post('/api/admin-agent', async (req, res) => {
 
     if (lowerCmd.includes('publish') && lowerCmd.includes('draft')) {
       // Intent: Publish Drafts
-      const { count } = await supabaseAdmin
+      const { count } = await getSupabaseAdmin()
         .from('products')
         .select('*', { count: 'exact', head: true })
         .eq('status', 'draft');
@@ -535,7 +549,7 @@ app.post('/api/admin-agent', async (req, res) => {
 
     } else if (lowerCmd.includes('confirm') && context?.lastAction === 'confirm_publish_drafts') {
       // Intent: Execute Publish
-      const { data: updated, error } = await supabaseAdmin
+      const { data: updated, error } = await getSupabaseAdmin()
         .from('products')
         .update({ status: 'active' })
         .eq('status', 'draft')
@@ -547,7 +561,7 @@ app.post('/api/admin-agent', async (req, res) => {
 
     } else if (lowerCmd.includes('delete') && lowerCmd.includes('draft')) {
       // Intent: Delete Drafts
-      const { count } = await supabaseAdmin
+      const { count } = await getSupabaseAdmin()
         .from('products')
         .select('*', { count: 'exact', head: true })
         .eq('status', 'draft');
@@ -559,7 +573,7 @@ app.post('/api/admin-agent', async (req, res) => {
 
     } else if (lowerCmd.includes('confirm') && context?.lastAction === 'confirm_delete_drafts') {
       // Intent: Execute Delete
-      const { count, error } = await supabaseAdmin
+      const { count, error } = await getSupabaseAdmin()
         .from('products')
         .delete({ count: 'exact' })
         .eq('status', 'draft');
@@ -570,7 +584,7 @@ app.post('/api/admin-agent', async (req, res) => {
 
     } else if (lowerCmd.includes('stock') || lowerCmd.includes('inventory')) {
       // Intent: Check Stock
-      const { data: lowStock } = await supabaseAdmin
+      const { data: lowStock } = await getSupabaseAdmin()
         .from('products')
         .select('name, stock_qty')
         .lt('stock_qty', 5)
@@ -693,7 +707,7 @@ app.post('/api/facebook/import-album', async (req, res) => {
         }
 
         if (createProducts) {
-          const { data, error } = await supabaseAdmin.from('products').insert([{
+          const { data, error } = await getSupabaseAdmin().from('products').insert([{
             name: productData.name,
             description: productData.description,
             image_url: imageUrl,
@@ -797,7 +811,7 @@ app.post('/api/facebook/import-photo', async (req, res) => {
 
     // 2. Create Product in DB (if enabled)
     if (createProducts) {
-      const { data, error } = await supabaseAdmin.from('products').insert([finalProduct]).select().single();
+      const { data, error } = await getSupabaseAdmin().from('products').insert([finalProduct]).select().single();
 
       if (error) {
         throw error;
