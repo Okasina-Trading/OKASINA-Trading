@@ -146,7 +146,7 @@ export default function StockManagerPage() {
             const { data: jobData, error: jobError } = await supabase
                 .from('bulk_jobs')
                 .insert({
-                    type: 'smart_import',
+                    type: 'import', // Fixed to match DB constraint (was 'smart_import')
                     status: 'running',
                     file_name: file.name,
                     total_rows: mappedData.length

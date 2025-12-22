@@ -1,23 +1,18 @@
 // api/index.js
 // Vercel Serverless Function Entry Point
+// DIAGNOSTIC_MODE: Minimal Health Check
+// Updated: 2025-12-22T18:50:00
 
-let app;
-
-try {
-    console.log("Attempting to import server.js...");
-    const module = await import('../server.js');
-    app = module.default;
-    console.log("server.js imported successfully.");
-} catch (err) {
-    console.error("FATAL: Failed to import server.js", err);
-    // Fallback app if server crashes
-    app = (req, res) => {
-        res.status(500).json({
-            error: "Server Init Failed",
-            details: err.message,
-            stack: err.stack
-        });
-    };
-}
-
-export default app;
+export default (req, res) => {
+    const { name = 'World' } = req.query;
+    res.status(200).json({
+        status: 'Alive',
+        message: `Hello ${name}!`,
+        env_check: {
+            node: process.version,
+            vercel: !!process.env.VERCEL,
+            has_google_key: !!(process.env.GOOGLE_AI_KEY || process.env.VITE_GEMINI_API_KEY)
+        },
+        timestamp: new Date().toISOString()
+    });
+};
