@@ -81,8 +81,7 @@ app.get("/api/sign-upload", (req, res) => {
 
     const timestamp = Math.round((new Date()).getTime() / 1000);
     const signature = cloudinary.utils.api_sign_request({
-      timestamp: timestamp,
-      upload_preset: 'okasina_products'
+      timestamp: timestamp
     }, apiSecret);
 
     res.json({

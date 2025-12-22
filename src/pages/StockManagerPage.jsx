@@ -361,7 +361,8 @@ export default function StockManagerPage() {
                                                 formData.append('api_key', signData.api_key);
                                                 formData.append('timestamp', signData.timestamp);
                                                 formData.append('signature', signData.signature);
-                                                formData.append('upload_preset', 'okasina_products');
+                                                formData.append('signature', signData.signature);
+                                                // formData.append('upload_preset', 'okasina_products'); // REMOVED for Signed Upload
 
                                                 const uploadRes = await fetch(`https://api.cloudinary.com/v1_1/${signData.cloud_name}/image/upload`, {
                                                     method: 'POST', body: formData
