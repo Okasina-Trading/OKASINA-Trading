@@ -14,6 +14,20 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// --- DEBUG LOGGING ---
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  next();
+});
+
+console.log("--- Server Configuration Check ---");
+console.log("Vision Key Configured:", !!(process.env.GOOGLE_AI_KEY || process.env.VITE_GEMINI_API_KEY));
+console.log("Cloudinary Configured:", !!(process.env.CLOUDINARY_CLOUD_NAME));
+if (!process.env.GOOGLE_AI_KEY && !process.env.VITE_GEMINI_API_KEY) {
+  console.log("⚠️  WARNING: AI Scanner will fail locally. Please add GOOGLE_AI_KEY to your .env file.");
+}
+console.log("----------------------------------");
+
 // --- AI Chat endpoint using Ollama/Llama3 (Local only) ---
 app.get("/api/test", (req, res) => {
   console.log("Test endpoint hit!");
