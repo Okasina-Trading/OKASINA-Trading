@@ -117,56 +117,44 @@ app.post("/api/upload-image", upload.single('file'), async (req, res) => {
 });
 
 // --- Supabase Admin Endpoints ---
-const supabaseUrl = process.env.VITE_SUPABASE_URL?.trim();
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
-
+// --- Supabase Setup ---
+let supabase;
 let supabaseAdmin;
 
-if (supabaseUrl && supabaseKey) {
-  console.log('✅ Supabase Admin initialized with service role key');
-  supabaseAdmin = createClient(supabaseUrl, supabaseKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false
-    }
-  });
-} else {
-  console.warn('Supabase URL or Key missing. API endpoints requiring DB will fail safely.');
+try {
+  const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY;
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-  // Robust dummy client that supports chaining (e.g. .select().eq().limit())
-  const createDummyChain = () => {
-    const chain = {
-      select: () => chain,
-      insert: () => chain,
-      update: () => chain,
-      delete: () => chain,
-      eq: () => chain,
-      neq: () => chain,
-      gt: () => chain,
-      lt: () => chain,
-      gte: () => chain,
-      lte: () => chain,
-      like: () => chain,
-      ilike: () => chain,
-      is: () => chain,
-      in: () => chain,
-      contains: () => chain,
-      range: () => chain,
-      limit: () => chain,
-      single: () => chain,
-      maybeSingle: () => chain,
-      order: () => chain,
-      // Thenable to mimic Promise
-      then: (resolve) => resolve({ data: null, error: { message: 'Supabase not configured (Missing Envs)', code: 'MISSING_ENV' } })
-    };
-    return chain;
-  };
+  if (supabaseUrl && supabaseKey) {
+    supabase = createClient(supabaseUrl, supabaseKey);
+    console.log("✅ Supabase Public Client initialized");
+  } else {
+    console.warn("⚠️  Supabase Public Keys missing - DB features will fail");
+  }
 
-  supabaseAdmin = {
-    from: () => createDummyChain(),
-    rpc: () => createDummyChain()
-  };
+  if (supabaseUrl && supabaseServiceKey) {
+    supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+    console.log("✅ Supabase Admin initialized with service role key");
+  } else {
+    console.warn("⚠️  Supabase Admin Keys missing - Admin features will fail");
+  }
+} catch (err) {
+  console.error("❌ Critical Supabase Init Error:", err.message);
 }
+
+// Helper to check DB
+const getDbStatus = async () => {
+  if (!supabase) return { status: 'offline', error: 'Missing Configuration' };
+  const start = Date.now();
+  try {
+    const { count, error } = await supabase.from('products').select('*', { count: 'exact', head: true });
+    if (error) throw error;
+    return { status: 'connected', latency: Date.now() - start };
+  } catch (err) {
+    return { status: 'error', error: err.message };
+  }
+};
 
 // Update product categories
 app.post('/api/update-category', async (req, res) => {
@@ -969,44 +957,7 @@ app.post('/api/send-email', async (req, res) => {
   }
 });
 
-// --- Supabase Setup ---
-let supabase;
-let supabaseAdmin;
 
-try {
-  const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
-  const supabaseKey = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY;
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (supabaseUrl && supabaseKey) {
-    supabase = createClient(supabaseUrl, supabaseKey);
-    console.log("✅ Supabase Public Client initialized");
-  } else {
-    console.warn("⚠️  Supabase Public Keys missing - DB features will fail");
-  }
-
-  if (supabaseUrl && supabaseServiceKey) {
-    supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
-    console.log("✅ Supabase Admin initialized with service role key");
-  } else {
-    console.warn("⚠️  Supabase Admin Keys missing - Admin features will fail");
-  }
-} catch (err) {
-  console.error("❌ Critical Supabase Init Error:", err.message);
-}
-
-// Helper to check DB
-const getDbStatus = async () => {
-  if (!supabase) return { status: 'offline', error: 'Missing Configuration' };
-  const start = Date.now();
-  try {
-    const { count, error } = await supabase.from('products').select('*', { count: 'exact', head: true });
-    if (error) throw error;
-    return { status: 'connected', latency: Date.now() - start };
-  } catch (err) {
-    return { status: 'error', error: err.message };
-  }
-};
 
 // --- CITADEL SYSTEM VITALS ---
 app.get('/api/citadel/vitals', async (req, res) => {
