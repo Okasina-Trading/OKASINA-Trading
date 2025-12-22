@@ -969,6 +969,45 @@ app.post('/api/send-email', async (req, res) => {
   }
 });
 
+// --- Supabase Setup ---
+let supabase;
+let supabaseAdmin;
+
+try {
+  const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY;
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (supabaseUrl && supabaseKey) {
+    supabase = createClient(supabaseUrl, supabaseKey);
+    console.log("✅ Supabase Public Client initialized");
+  } else {
+    console.warn("⚠️  Supabase Public Keys missing - DB features will fail");
+  }
+
+  if (supabaseUrl && supabaseServiceKey) {
+    supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+    console.log("✅ Supabase Admin initialized with service role key");
+  } else {
+    console.warn("⚠️  Supabase Admin Keys missing - Admin features will fail");
+  }
+} catch (err) {
+  console.error("❌ Critical Supabase Init Error:", err.message);
+}
+
+// Helper to check DB
+const getDbStatus = async () => {
+  if (!supabase) return { status: 'offline', error: 'Missing Configuration' };
+  const start = Date.now();
+  try {
+    const { count, error } = await supabase.from('products').select('*', { count: 'exact', head: true });
+    if (error) throw error;
+    return { status: 'connected', latency: Date.now() - start };
+  } catch (err) {
+    return { status: 'error', error: err.message };
+  }
+};
+
 // --- CITADEL SYSTEM VITALS ---
 app.get('/api/citadel/vitals', async (req, res) => {
   const start = Date.now();
