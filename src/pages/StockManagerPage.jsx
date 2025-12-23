@@ -236,7 +236,12 @@ export default function StockManagerPage() {
                         .select()
                         .single();
 
-                    if (upsertError) throw upsertError;
+                    if (upsertError) {
+                        if (upsertError.code === '400' || upsertError.message?.includes('constraint')) {
+                            throw new Error('DATABASE ERROR: Missing SKU Constraint. Please run the SQL migration.');
+                        }
+                        throw upsertError;
+                    }
 
                     successCount++;
                 } catch (error) {
