@@ -380,8 +380,16 @@ export default function StockManagerPage() {
 
                                                 if (aiData.success) {
                                                     const p = aiData.product;
+
+                                                    // Extract SKU from filename (Priority 1)
+                                                    const filenameSkuMatch = file.name.match(/^([A-Z0-9-]+)/i);
+                                                    const derivedSku = filenameSkuMatch ? filenameSkuMatch[1].replace(/[-_]?[0-9]+$/, '') : null;
+                                                    // Improved Regex: Grabs "AZ-1125-02" from "AZ-1125-02.jpg"
+                                                    // If filename is "AZ-1125-02.jpg", match[1] is "AZ-1125-02"
+                                                    const exactSku = filenameSkuMatch ? filenameSkuMatch[1] : null;
+
                                                     newRows.push({
-                                                        sku: p.sku_suggestion || `AI-${Date.now()}-${Math.floor(Math.random() * 100)}`,
+                                                        sku: exactSku || p.sku_suggestion || `AI-${Date.now()}-${Math.floor(Math.random() * 100)}`,
                                                         name: p.name || 'Unknown Product',
                                                         category: p.category || 'Uncategorized',
                                                         selling_price: p.price || 0,
