@@ -62,7 +62,10 @@ export default function MediaManagerPage() {
                         body: formData
                     });
 
-                    if (!uploadRes.ok) throw new Error('Cloudinary Upload failed');
+                    if (!uploadRes.ok) {
+                        const errData = await uploadRes.json();
+                        throw new Error(errData.error?.message || `Upload Failed: ${uploadRes.status}`);
+                    }
                     const uploadData = await uploadRes.json();
                     const imageUrl = uploadData.secure_url;
 
