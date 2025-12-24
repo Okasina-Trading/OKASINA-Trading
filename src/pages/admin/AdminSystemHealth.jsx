@@ -18,7 +18,7 @@ export default function AdminSystemHealth() {
 
     const fetchReport = async () => {
         try {
-            const res = await fetch(`${API_URL}/api/titan/inspector/report`);
+            const res = await fetch(`${API_URL}/api/sys/diagnostics/report`);
             if (res.ok) {
                 const data = await res.json();
                 setReport(data);
@@ -32,7 +32,7 @@ export default function AdminSystemHealth() {
         setLoading(true);
         setAuditLog("Initializing Inspector... Please wait (this can take 30-60s)...");
         try {
-            const res = await fetch(`${API_URL}/api/titan/inspector/run`, {
+            const res = await fetch(`${API_URL}/api/sys/diagnostics/run`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ mode: 'journey' })
@@ -57,7 +57,7 @@ export default function AdminSystemHealth() {
         setLoading(true);
         setDoctorOutput("Summoning Doctor...");
         try {
-            const res = await fetch(`${API_URL}/api/titan/doctor/run`, { method: 'POST' });
+            const res = await fetch(`${API_URL}/api/sys/diagnostics/repair`, { method: 'POST' });
             const data = await res.json();
 
             if (data.success) {

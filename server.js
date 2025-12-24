@@ -1045,9 +1045,9 @@ if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
   });
 }
 
-// --- TITAN TOOL ENDPOINTS (Inspector & Doctor) ---
+// --- TITAN TOOL ENDPOINTS (Renamed to Diagnostics for AdBlock Evasion) ---
 
-// Helper to run shell command
+// Helper to run shell command (No change)
 const runTitanCommand = (command, cwd = process.cwd()) => {
   return new Promise((resolve, reject) => {
     exec(command, { cwd }, (error, stdout, stderr) => {
@@ -1060,7 +1060,7 @@ const runTitanCommand = (command, cwd = process.cwd()) => {
   });
 };
 
-app.post('/api/titan/inspector/run', async (req, res) => {
+app.post('/api/sys/diagnostics/run', async (req, res) => {
   try {
     const { mode = 'journey' } = req.body; // 'crawl', 'journey', 'both'
     console.log(`[TITAN] Running Inspector (${mode})...`);
@@ -1076,42 +1076,42 @@ app.post('/api/titan/inspector/run', async (req, res) => {
 
     res.json({
       success: true,
-      message: "Inspector Cycle Completed",
+      message: "Diagnostics Cycle Completed",
       output: result.stdout,
       report
     });
   } catch (error) {
-    console.error('Inspector Run Error:', error);
+    console.error('Diagnostics Run Error:', error);
     res.status(500).json({ error: error.message });
   }
 });
 
-app.get('/api/titan/inspector/report', (req, res) => {
+app.get('/api/sys/diagnostics/report', (req, res) => {
   try {
     const reportPath = path.join(process.cwd(), 'apps/inspector/reports/latest/audit.json');
     if (fs.existsSync(reportPath)) {
       const report = JSON.parse(fs.readFileSync(reportPath, 'utf-8'));
       res.json(report);
     } else {
-      res.status(404).json({ error: "No report found. Run Inspector first." });
+      res.status(404).json({ error: "No report found. Run Diagnostics first." });
     }
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
 });
 
-app.post('/api/titan/doctor/run', async (req, res) => {
+app.post('/api/sys/diagnostics/repair', async (req, res) => {
   try {
     console.log(`[TITAN] Running Doctor...`);
     const result = await runTitanCommand(`python apps/doctor/doctor.py`);
 
     res.json({
       success: true,
-      message: "Doctor Cycle Completed",
+      message: "Repair Cycle Completed",
       output: result.stdout
     });
   } catch (error) {
-    console.error('Doctor Run Error:', error);
+    console.error('Diagnostics Repair Error:', error);
     res.status(500).json({ error: error.message });
   }
 });
