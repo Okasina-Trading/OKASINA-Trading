@@ -1,20 +1,22 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Lock, Mail, Eye, EyeOff, ShoppingBag } from 'lucide-react';
+import { Lock, Mail, Eye, EyeOff, ShoppingBag, User } from 'lucide-react';
 
-export default function LoginPage() {
+export default function SignupPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [fullName, setFullName] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
-    const { signIn } = useAuth();
+    const { signUp } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
 
-    const from = location.state?.from?.pathname || '/admin';
+    // Default to home page after signup unless redirected
+    const from = location.state?.from?.pathname || '/';
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -22,10 +24,10 @@ export default function LoginPage() {
         setLoading(true);
 
         try {
-            await signIn(email, password);
+            await signUp(email, password, { full_name: fullName });
             navigate(from, { replace: true });
         } catch (err) {
-            setError(err.message || 'Failed to sign in. Please check your credentials.');
+            setError(err.message || 'Failed to sign up. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -40,18 +42,18 @@ export default function LoginPage() {
                         <ShoppingBag className="text-white" size={32} />
                     </div>
                     <h1 className="text-3xl font-bold text-gray-900 mb-2">OKASINA Trading</h1>
-                    <p className="text-gray-600">Admin Dashboard Login</p>
+                    <p className="text-gray-600">Create your customer account</p>
                 </div>
 
-                {/* Login Card */}
+                {/* Signup Card */}
                 <div className="bg-white rounded-2xl shadow-xl p-8">
                     <div className="flex items-center gap-3 mb-6">
                         <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
-                            <Lock className="text-purple-600" size={24} />
+                            <User className="text-purple-600" size={24} />
                         </div>
                         <div>
-                            <h2 className="text-xl font-semibold text-gray-900">Sign In</h2>
-                            <p className="text-sm text-gray-500">Access your admin panel</p>
+                            <h2 className="text-xl font-semibold text-gray-900">Sign Up</h2>
+                            <p className="text-sm text-gray-500">Join our community</p>
                         </div>
                     </div>
 
@@ -62,6 +64,26 @@ export default function LoginPage() {
                     )}
 
                     <form onSubmit={handleSubmit} className="space-y-6">
+                        {/* Full Name */}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Full Name
+                            </label>
+                            <div className="relative">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <User className="text-gray-400" size={20} />
+                                </div>
+                                <input
+                                    type="text"
+                                    value={fullName}
+                                    onChange={(e) => setFullName(e.target.value)}
+                                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                    placeholder="John Doe"
+                                    required
+                                />
+                            </div>
+                        </div>
+
                         {/* Email */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -76,7 +98,7 @@ export default function LoginPage() {
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                                    placeholder="admin@okasinatrading.com"
+                                    placeholder="you@example.com"
                                     required
                                 />
                             </div>
@@ -98,6 +120,7 @@ export default function LoginPage() {
                                     className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                     placeholder="••••••••"
                                     required
+                                    minLength={6}
                                 />
                                 <button
                                     type="button"
@@ -122,41 +145,32 @@ export default function LoginPage() {
                                 : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700'
                                 }`}
                         >
-                            {loading ? 'Signing in...' : 'Sign In'}
+                            {loading ? 'Creating Account...' : 'Create Account'}
                         </button>
                     </form>
 
-                    {/* Info */}
-                    <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-                        <p className="text-sm text-blue-800">
-                            <strong>Admin Access Only:</strong> Only authorized admin email addresses can access the dashboard.
-                        </p>
+                    {/* Links */}
+                    <div className="mt-6 text-center text-sm text-gray-600">
+                        Already have an account?{' '}
+                        <button
+                            onClick={() => navigate('/login')}
+                            className="text-purple-600 hover:text-purple-700 font-medium"
+                        >
+                            Sign In
+                        </button>
                     </div>
                 </div>
 
-            </div>
-
-            {/* Sign Up Link */}
-            <div className="mt-6 text-center text-sm text-gray-600">
-                Don't have an account?{' '}
-                <button
-                    onClick={() => navigate('/signup')}
-                    className="text-purple-600 hover:text-purple-700 font-medium"
-                >
-                    Sign Up
-                </button>
-            </div>
-
-            {/* Back to Store */}
-            <div className="text-center mt-6">
-                <button
-                    onClick={() => navigate('/')}
-                    className="text-gray-600 hover:text-gray-900 text-sm"
-                >
-                    ← Back to Store
-                </button>
+                {/* Back to Store */}
+                <div className="text-center mt-6">
+                    <button
+                        onClick={() => navigate('/')}
+                        className="text-gray-600 hover:text-gray-900 text-sm"
+                    >
+                        ← Back to Store
+                    </button>
+                </div>
             </div>
         </div>
-        </div >
     );
 }

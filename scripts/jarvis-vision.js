@@ -8,22 +8,44 @@ import { createClient } from '@supabase/supabase-js';
 import vision from '@google-cloud/vision';
 import dotenv from 'dotenv';
 import fetch from 'node-fetch';
+import Tesseract from 'tesseract.js';
 
-dotenv.config();
+const result = dotenv.config();
+if (result.error) {
+    console.log("⚠️  .env file not found or error loading it");
+} else {
+    console.log("✅ .env loaded");
+}
 
-const supabase = createClient(
-    process.env.VITE_SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY
-);
+console.log('Env Check:');
+console.log('VITE_SUPABASE_URL:', process.env.VITE_SUPABASE_URL ? 'Found' : 'Missing');
+console.log('SUPABASE_SERVICE_ROLE_KEY:', process.env.SUPABASE_SERVICE_ROLE_KEY ? 'Found' : 'Missing');
+console.log('VITE_SUPABASE_ANON_KEY:', process.env.VITE_SUPABASE_ANON_KEY ? 'Found' : 'Missing');
+
+const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
+// FALLBACK: Use Anon key if Service Key is invalid (based on recent test)
+const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+if (!supabaseUrl || !supabaseKey) {
+    console.error('❌ Missing Supabase credentials in .env');
+    console.log('URL:', supabaseUrl);
+    console.log('KEY:', supabaseKey ? 'Has Key' : 'Missing Key');
+    process.exit(1);
+}
+
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Initialize Google Cloud Vision client (if credentials available)
-let visionClient;
+// Initialize Google Cloud Vision client (if credentials available)
+let visionClient = null;
+/*
 try {
     visionClient = new vision.ImageAnnotatorClient();
     console.log('✅ Google Cloud Vision initialized');
 } catch (error) {
     console.log('⚠️  Google Cloud Vision not configured, using fallback OCR');
 }
+*/
 
 console.log('🤖 JARVIS Vision AI - Image Text Extraction\n');
 
@@ -61,46 +83,29 @@ async function extractTextFromImage(imageUrl) {
 /**
  * Fallback OCR using Gemini Vision (if available)
  */
+
+
+/**
+ * Fallback OCR using Tesseract.js (Local)
+ */
 async function fallbackOCR(imageUrl) {
     try {
-        const geminiKey = process.env.GOOGLE_AI_KEY || process.env.VITE_GEMINI_API_KEY;
+        console.log(`🧠 Using Tesseract.js local OCR for ${imageUrl}...`);
 
-        if (!geminiKey) {
-            console.log('⚠️  No OCR service available');
-            return { fullText: '', lines: [], success: false };
-        }
-
-        const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`,
-            {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{
-                        parts: [
-                            { text: 'Extract ALL text from this image. Include prices, sizes, product names, and descriptions. Format as plain text.' },
-                            {
-                                inline_data: {
-                                    mime_type: 'image/jpeg',
-                                    data: await imageToBase64(imageUrl)
-                                }
-                            }
-                        ]
-                    }]
-                })
-            }
+        const { data: { text } } = await Tesseract.recognize(
+            imageUrl,
+            'eng',
+            { logger: m => { } } // Silent logger
         );
 
-        const data = await response.json();
-        const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-
+        console.log(`🧠 Text Found (first 100 chars): ${text.substring(0, 100).replace(/\n/g, ' ')}...`);
         return {
             fullText: text,
             lines: text.split('\n').filter(line => line.trim()),
             success: true
         };
     } catch (error) {
-        console.error(`❌ Fallback OCR error: ${error.message}`);
+        console.error(`❌ Tesseract OCR error: ${error.message}`);
         return { fullText: '', lines: [], success: false };
     }
 }
@@ -280,9 +285,9 @@ async function processAllProducts() {
 
     const { data: products, error } = await supabase
         .from('products')
-        .select('id, name, description, image_url, image')
-        .or('description.is.null,description.eq.')
-        .not('image_url', 'is', null);
+        .select('id, name, description, image_url')
+        .not('image_url', 'is', null)
+        .order('id');
 
     if (error) {
         console.error('❌ Failed to fetch products:', error.message);
@@ -294,8 +299,8 @@ async function processAllProducts() {
     let processed = 0;
     let updated = 0;
 
-    for (const product of products.slice(0, 10)) { // Limit to 10 for testing
-        const imageUrl = product.image_url || product.image;
+    for (const product of products) {
+        const imageUrl = product.image_url;
         if (!imageUrl) continue;
 
         const details = await processProductImage(product.id, imageUrl);
@@ -313,8 +318,7 @@ async function processAllProducts() {
 }
 
 // Run if called directly
-if (import.meta.url === `file://${process.argv[1]}`) {
-    processAllProducts().catch(console.error);
-}
+// Run directly
+processAllProducts().catch(console.error);
 
 export { extractTextFromImage, parseProductDetails, processProductImage, updateProductWithExtractedData };

@@ -9,6 +9,7 @@ import OrdersPage from './pages/OrdersPage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import TermsOfServicePage from './pages/TermsOfServicePage';
 import LoginPage from './pages/LoginPage';
+import SignupPage from './pages/SignupPage';
 import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 import AdminFeedbackPage from './pages/admin/AdminFeedbackPage';
 import AdminLayout from './components/admin/AdminLayout'; // Ensure this is imported if not already, or check context
@@ -82,6 +83,7 @@ export default function App() {
                                                         <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
                                                         <Route path="/terms-of-service" element={<TermsOfServicePage />} />
                                                         <Route path="/login" element={<LoginPage />} />
+                                                        <Route path="/signup" element={<SignupPage />} />
                                                         <Route path="/new-arrivals" element={<NewArrivalsPage />} />
                                                         <Route path="/feedback" element={<FeedbackPage />} />
                                                         <Route path="/wishlist" element={<WishlistPage />} />
