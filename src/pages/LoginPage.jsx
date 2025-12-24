@@ -40,7 +40,7 @@ export default function LoginPage() {
                         <ShoppingBag className="text-white" size={32} />
                     </div>
                     <h1 className="text-3xl font-bold text-gray-900 mb-2">OKASINA Trading</h1>
-                    <p className="text-gray-600">Admin Dashboard Login</p>
+                    <p className="text-gray-600">Welcome Back</p>
                 </div>
 
                 {/* Login Card */}
@@ -126,37 +126,31 @@ export default function LoginPage() {
                         </button>
                     </form>
 
-                    {/* Info */}
-                    <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-                        <p className="text-sm text-blue-800">
-                            <strong>Admin Access Only:</strong> Only authorized admin email addresses can access the dashboard.
-                        </p>
-                    </div>
+
+
                 </div>
 
-            </div>
+                {/* Sign Up Link */}
+                <div className="mt-6 text-center text-sm text-gray-600">
+                    Don't have an account?{' '}
+                    <button
+                        onClick={() => navigate('/signup')}
+                        className="text-purple-600 hover:text-purple-700 font-medium"
+                    >
+                        Sign Up
+                    </button>
+                </div>
 
-            {/* Sign Up Link */}
-            <div className="mt-6 text-center text-sm text-gray-600">
-                Don't have an account?{' '}
-                <button
-                    onClick={() => navigate('/signup')}
-                    className="text-purple-600 hover:text-purple-700 font-medium"
-                >
-                    Sign Up
-                </button>
+                {/* Back to Store */}
+                <div className="text-center mt-6">
+                    <button
+                        onClick={() => navigate('/')}
+                        className="text-gray-600 hover:text-gray-900 text-sm"
+                    >
+                        ← Back to Store
+                    </button>
+                </div>
             </div>
-
-            {/* Back to Store */}
-            <div className="text-center mt-6">
-                <button
-                    onClick={() => navigate('/')}
-                    className="text-gray-600 hover:text-gray-900 text-sm"
-                >
-                    ← Back to Store
-                </button>
-            </div>
-        </div>
         </div >
     );
 }
