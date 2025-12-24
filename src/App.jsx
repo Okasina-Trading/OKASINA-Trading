@@ -33,6 +33,7 @@ import ComparePage from './pages/ComparePage';
 import SMSMarketingPage from './pages/admin/SMSMarketingPage';
 import AdminSocialMediaPage from './pages/admin/AdminSocialMediaPage';
 import AdminCitadelPage from './pages/admin/AdminCitadelPage';
+import AdminSystemHealth from './pages/admin/AdminSystemHealth';
 import HeaderNew from './components/HeaderNew';
 import Footer from './components/Footer';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -105,6 +106,7 @@ export default function App() {
                                                         <Route path="/admin/social-media" element={<ProtectedRoute><AdminSocialMediaPage /></ProtectedRoute>} />
                                                         <Route path="/admin/sms-marketing" element={<ProtectedRoute><SMSMarketingPage /></ProtectedRoute>} />
                                                         <Route path="/admin/citadel" element={<ProtectedRoute><AdminCitadelPage /></ProtectedRoute>} />
+                                                        <Route path="/admin/system-health" element={<ProtectedRoute><AdminSystemHealth /></ProtectedRoute>} />
                                                     </Routes>
                                                 </main>
                                                 <ProductComparisonBar />

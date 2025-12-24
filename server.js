@@ -7,6 +7,9 @@ import { createClient } from '@supabase/supabase-js';
 import { v2 as cloudinary } from 'cloudinary';
 import multer from 'multer';
 import nodemailer from 'nodemailer';
+import { exec } from 'child_process';
+import fs from 'fs';
+import path from 'path';
 
 dotenv.config();
 
@@ -363,10 +366,13 @@ app.post('/api/ai-agent/jarvis/vision', async (req, res) => {
 
     console.log(`[Vision] Analyzing image: ${imageUrl}`);
 
-    // Fetch the image and convert to base64
-    const imageResp = await fetch(imageUrl);
-    const arrayBuffer = await imageResp.arrayBuffer();
-    const base64Image = Buffer.from(arrayBuffer).toString('base64');
+    //    console.log(`[AI Scanner] Analyzing: ${imageUrl}`);
+    const imageResponse = await fetch(imageUrl);
+    if (!imageResponse.ok) throw new Error(`Failed to fetch image: ${imageResponse.statusText}`);
+
+    // Use arrayBuffer() for compatibility with native fetch in Node 18+
+    const imageBuffer = await imageResponse.arrayBuffer();
+    const base64Image = Buffer.from(imageBuffer).toString('base64');
 
     const prompt = `You are an expert fashion merchandiser. Analyze this product image and output a JSON object with these fields:
     - name: A catchy, SEO-friendly product name.
@@ -1038,5 +1044,76 @@ if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
     console.log(`Server running on port ${PORT}`);
   });
 }
+
+// --- TITAN TOOL ENDPOINTS (Inspector & Doctor) ---
+
+// Helper to run shell command
+const runTitanCommand = (command, cwd = process.cwd()) => {
+  return new Promise((resolve, reject) => {
+    exec(command, { cwd }, (error, stdout, stderr) => {
+      // Inspector returns 1 on Fail, which exec treats as error. We want to capture it.
+      if (error && error.code !== 1) { // 1 is fine (FAIL report), others are crash
+        console.warn(`Titan Command Warning/Exit: ${error.message}`);
+      }
+      resolve({ stdout, stderr, code: error ? error.code : 0 });
+    });
+  });
+};
+
+app.post('/api/titan/inspector/run', async (req, res) => {
+  try {
+    const { mode = 'journey' } = req.body; // 'crawl', 'journey', 'both'
+    console.log(`[TITAN] Running Inspector (${mode})...`);
+
+    const result = await runTitanCommand(`python apps/inspector/inspector.py --mode ${mode}`);
+
+    // Read the generated report
+    const reportPath = path.join(process.cwd(), 'apps/inspector/reports/latest/audit.json');
+    let report = null;
+    if (fs.existsSync(reportPath)) {
+      report = JSON.parse(fs.readFileSync(reportPath, 'utf-8'));
+    }
+
+    res.json({
+      success: true,
+      message: "Inspector Cycle Completed",
+      output: result.stdout,
+      report
+    });
+  } catch (error) {
+    console.error('Inspector Run Error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/titan/inspector/report', (req, res) => {
+  try {
+    const reportPath = path.join(process.cwd(), 'apps/inspector/reports/latest/audit.json');
+    if (fs.existsSync(reportPath)) {
+      const report = JSON.parse(fs.readFileSync(reportPath, 'utf-8'));
+      res.json(report);
+    } else {
+      res.status(404).json({ error: "No report found. Run Inspector first." });
+    }
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+app.post('/api/titan/doctor/run', async (req, res) => {
+  try {
+    console.log(`[TITAN] Running Doctor...`);
+    const result = await runTitanCommand(`python apps/doctor/doctor.py`);
+
+    res.json({
+      success: true,
+      message: "Doctor Cycle Completed",
+      output: result.stdout
+    });
+  } catch (error) {
+    console.error('Doctor Run Error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
 
 export default app;

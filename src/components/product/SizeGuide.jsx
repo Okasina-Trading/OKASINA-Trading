@@ -92,6 +92,7 @@ const SizeGuide = ({ isOpen, onClose, category = 'General' }) => {
                                 {category} Size Chart
                             </h3>
                             <p className="text-sm text-gray-600">{chart.description}</p>
+                            <p className="text-sm font-medium text-blue-600 mt-1">We cater for clothes upto 13 XL</p>
                         </div>
 
                         {/* Size Table */}

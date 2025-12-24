@@ -1,0 +1,308 @@
+[
+  {
+    "sku": "AZ-1125-01",
+    "name": "Anarkali Red",
+    "price": 13,
+    "image_url": "https://res.cloudinary.com/dw86lrpv6/image/upload/v1766463848/okasina_products/AZ-1125-01.jpg"
+  },
+  {
+    "sku": "AZ-1125-02",
+    "name": "Blue Kurti",
+    "price": 2,
+    "image_url": "https://res.cloudinary.com/dw86lrpv6/image/upload/v1766463851/okasina_products/AZ-1125-02.jpg"
+  },
+  {
+    "sku": "AZ-1125-03",
+    "name": "Churidar",
+    "price": 1850,
+    "image_url": "https://res.cloudinary.com/dw86lrpv6/image/upload/v1766463853/okasina_products/AZ-1125-03.jpg"
+  },
+  {
+    "sku": "L-1125-01",
+    "name": "Churidar",
+    "price": 1750,
+    "image_url": null
+  },
+  {
+    "sku": "L-1125-02",
+    "name": "Churidar",
+    "price": 3450,
+    "image_url": "https://res.cloudinary.com/dw86lrpv6/image/upload/v1766463895/okasina_products/L-1125-02.jpg"
+  },
+  {
+    "sku": "L-1125-03",
+    "name": "Churidar",
+    "price": 1450,
+    "image_url": null
+  },
+  {
+    "sku": "L-1125-04",
+    "name": "Churidar",
+    "price": 6700,
+    "image_url": null
+  },
+  {
+    "sku": "L-1125-05",
+    "name": "Churidar",
+    "price": 1000,
+    "image_url": null
+  },
+  {
+    "sku": "L-1125-06",
+    "name": "Churidar",
+    "price": 1400,
+    "image_url": null
+  },
+  {
+    "sku": "L-1125-07",
+    "name": "Churidar",
+    "price": 1600,
+    "image_url": null
+  },
+  {
+    "sku": "L-1125-08",
+    "name": "Churidar",
+    "price": 5250,
+    "image_url": null
+  },
+  {
+    "sku": "L-1125-09",
+    "name": "Churidar",
+    "price": 6150,
+    "image_url": null
+  },
+  {
+    "sku": "L-1125-10",
+    "name": "Churidar",
+    "price": 6100,
+    "image_url": null
+  },
+  {
+    "sku": "L-1125-11",
+    "name": "Churidar",
+    "price": 2650,
+    "image_url": "https://res.cloudinary.com/dw86lrpv6/image/upload/v1766463900/okasina_products/L-1125-11.jpg"
+  },
+  {
+    "sku": "L-1125-12",
+    "name": "Churidar",
+    "price": 3850,
+    "image_url": "https://res.cloudinary.com/dw86lrpv6/image/upload/v1766463902/okasina_products/L-1125-12.jpg"
+  },
+  {
+    "sku": "L-1125-13",
+    "name": "Churidar",
+    "price": 4050,
+    "image_url": "https://res.cloudinary.com/dw86lrpv6/image/upload/v1766463906/okasina_products/L-1125-13.jpg"
+  },
+  {
+    "sku": "L-1125-14",
+    "name": "Churidar",
+    "price": 1850,
+    "image_url": "https://res.cloudinary.com/dw86lrpv6/image/upload/v1766463909/okasina_products/L-1125-14.jpg"
+  },
+  {
+    "sku": "L-1125-15",
+    "name": "Churidar",
+    "price": 1850,
+    "image_url": "https://res.cloudinary.com/dw86lrpv6/image/upload/v1766463911/okasina_products/L-1125-15.jpg"
+  },
+  {
+    "sku": "L-1125-16",
+    "name": "Churidar",
+    "price": 1950,
+    "image_url": "https://res.cloudinary.com/dw86lrpv6/image/upload/v1766463913/okasina_products/L-1125-16.jpg"
+  },
+  {
+    "sku": "L-1125-17",
+    "name": "Churidar",
+    "price": 5650,
+    "image_url": "https://res.cloudinary.com/dw86lrpv6/image/upload/v1766463914/okasina_products/L-1125-17.jpg"
+  },
+  {
+    "sku": "L-1125-18",
+    "name": "Churidar",
+    "price": 3200,
+    "image_url": "https://res.cloudinary.com/dw86lrpv6/image/upload/v1766463916/okasina_products/L-1125-18.jpg"
+  },
+  {
+    "sku": "L-1125-19",
+    "name": "Churidar",
+    "price": 1850,
+    "image_url": "https://res.cloudinary.com/dw86lrpv6/image/upload/v1766463917/okasina_products/L-1125-19.jpg"
+  },
+  {
+    "sku": "L-1125-20",
+    "name": "Churidar",
+    "price": 3200,
+    "image_url": null
+  },
+  {
+    "sku": "L-1125-21",
+    "name": "Churidar",
+    "price": 3200,
+    "image_url": "https://res.cloudinary.com/dw86lrpv6/image/upload/v1766463919/okasina_products/L-1125-21.jpg"
+  },
+  {
+    "sku": "L-1125-22",
+    "name": "Churidar",
+    "price": 2200,
+    "image_url": "https://res.cloudinary.com/dw86lrpv6/image/upload/v1766463922/okasina_products/L-1125-22.jpg"
+  },
+  {
+    "sku": "L-1125-23",
+    "name": "Churidar",
+    "price": 3150,
+    "image_url": "https://res.cloudinary.com/dw86lrpv6/image/upload/v1766463923/okasina_products/L-1125-23.jpg"
+  },
+  {
+    "sku": "L-1125-24",
+    "name": "#",
+    "price": 2150,
+    "image_url": "https://res.cloudinary.com/dw86lrpv6/image/upload/v1766463925/okasina_products/L-1125-24.jpg"
+  },
+  {
+    "sku": "RiSi-1125-01",
+    "name": "Churidar",
+    "price": 750,
+    "image_url": "https://res.cloudinary.com/dw86lrpv6/image/upload/v1766463855/okasina_products/RiSi-1125-01.jpg"
+  },
+  {
+    "sku": "RiSi-1125-02",
+    "name": "Churidar",
+    "price": 1100,
+    "image_url": "https://res.cloudinary.com/dw86lrpv6/image/upload/v1766463856/okasina_products/RiSi-1125-02.jpg"
+  },
+  {
+    "sku": "RiSi-1125-03",
+    "name": "Churidar",
+    "price": 1550,
+    "image_url": "https://res.cloudinary.com/dw86lrpv6/image/upload/v1766463859/okasina_products/RiSi-1125-03.jpg"
+  },
+  {
+    "sku": "RiSi-1125-04",
+    "name": "Churidar",
+    "price": 1695,
+    "image_url": "https://res.cloudinary.com/dw86lrpv6/image/upload/v1766463861/okasina_products/RiSi-1125-04.jpg"
+  },
+  {
+    "sku": "RiSi-1125-05",
+    "name": "Churidar",
+    "price": 1950,
+    "image_url": "https://res.cloudinary.com/dw86lrpv6/image/upload/v1766463863/okasina_products/RiSi-1125-05.jpg"
+  },
+  {
+    "sku": "RiSi-1125-06",
+    "name": "Churidar",
+    "price": 1950,
+    "image_url": "https://res.cloudinary.com/dw86lrpv6/image/upload/v1766463865/okasina_products/RiSi-1125-06.jpg"
+  },
+  {
+    "sku": "RiSi-1125-07",
+    "name": "Churidar",
+    "price": 2100,
+    "image_url": "https://res.cloudinary.com/dw86lrpv6/image/upload/v1766463866/okasina_products/RiSi-1125-07.jpg"
+  },
+  {
+    "sku": "RiSi-1125-08",
+    "name": "Churidar",
+    "price": 2200,
+    "image_url": "https://res.cloudinary.com/dw86lrpv6/image/upload/v1766463869/okasina_products/RiSi-1125-08.1.jpg"
+  },
+  {
+    "sku": "RiSi-1125-09",
+    "name": "Churidar",
+    "price": 3550,
+    "image_url": "https://res.cloudinary.com/dw86lrpv6/image/upload/v1766463870/okasina_products/RiSi-1125-09.jpg"
+  },
+  {
+    "sku": "RiSi-1125-10",
+    "name": "Churidar",
+    "price": 2450,
+    "image_url": "https://res.cloudinary.com/dw86lrpv6/image/upload/v1766463872/okasina_products/RiSi-1125-10.jpg"
+  },
+  {
+    "sku": "RiSi-1125-11",
+    "name": "Churidar",
+    "price": 3650,
+    "image_url": "https://res.cloudinary.com/dw86lrpv6/image/upload/v1766463874/okasina_products/RiSi-1125-11.jpg"
+  },
+  {
+    "sku": "RiSi-1125-12",
+    "name": "Churidar",
+    "price": 2950,
+    "image_url": null
+  },
+  {
+    "sku": "RiSi-1125-13",
+    "name": "Churidar",
+    "price": 3995,
+    "image_url": "https://res.cloudinary.com/dw86lrpv6/image/upload/v1766463876/okasina_products/RiSi-1125-13.jpg"
+  },
+  {
+    "sku": "RiSi-1125-14",
+    "name": "Churidar",
+    "price": 4900,
+    "image_url": "https://res.cloudinary.com/dw86lrpv6/image/upload/v1766463878/okasina_products/RiSi-1125-14.jpg"
+  },
+  {
+    "sku": "SAW-1125-51",
+    "name": "Churidar",
+    "price": 2100,
+    "image_url": "https://res.cloudinary.com/dw86lrpv6/image/upload/v1766463879/okasina_products/SAW-1125-51.1.jpg"
+  },
+  {
+    "sku": "SAW-1125-52",
+    "name": "Churidar",
+    "price": 1350,
+    "image_url": "https://res.cloudinary.com/dw86lrpv6/image/upload/v1766463881/okasina_products/SAW-1125-52.jpg"
+  },
+  {
+    "sku": "SAW-1125-53",
+    "name": "Churidar",
+    "price": 2350,
+    "image_url": null
+  },
+  {
+    "sku": "SAW-1125-54",
+    "name": "Churidar",
+    "price": 1695,
+    "image_url": "https://res.cloudinary.com/dw86lrpv6/image/upload/v1766463883/okasina_products/SAW-1125-54.jpg"
+  },
+  {
+    "sku": "SAW-1125-55",
+    "name": "Churidar",
+    "price": 1850,
+    "image_url": "https://res.cloudinary.com/dw86lrpv6/image/upload/v1766463884/okasina_products/SAW-1125-55.jpg"
+  },
+  {
+    "sku": "SAW-1125-56",
+    "name": "Churidar",
+    "price": 2150,
+    "image_url": "https://res.cloudinary.com/dw86lrpv6/image/upload/v1766463887/okasina_products/SAW-1125-56.jpg"
+  },
+  {
+    "sku": "SAW-1125-57",
+    "name": "Churidar",
+    "price": 1950,
+    "image_url": "https://res.cloudinary.com/dw86lrpv6/image/upload/v1766463888/okasina_products/SAW-1125-57.3.jpg"
+  },
+  {
+    "sku": "SAW-1125-58",
+    "name": "Churidar",
+    "price": 1950,
+    "image_url": "https://res.cloudinary.com/dw86lrpv6/image/upload/v1766463890/okasina_products/SAW-1125-58.jpg"
+  },
+  {
+    "sku": "SAW-1125-59",
+    "name": "Churidar",
+    "price": 1695,
+    "image_url": "https://res.cloudinary.com/dw86lrpv6/image/upload/v1766463892/okasina_products/SAW-1125-59.jpg"
+  },
+  {
+    "sku": "SAW-1125-60",
+    "name": "Churidar",
+    "price": 1850,
+    "image_url": "https://res.cloudinary.com/dw86lrpv6/image/upload/v1766463893/okasina_products/SAW-1125-60.jpg"
+  }
+]

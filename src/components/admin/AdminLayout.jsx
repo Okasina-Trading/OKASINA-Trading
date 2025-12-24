@@ -18,6 +18,7 @@ import {
     Bot,
     Share2,
     Activity,
+    Terminal,
 } from 'lucide-react';
 
 export default function AdminLayout({ children }) {
@@ -48,6 +49,7 @@ export default function AdminLayout({ children }) {
         { name: 'AI Team', href: '/admin/ai-employees', icon: Bot },
         { name: 'Feedback Tracker', href: '/admin/feedback', icon: MessageSquare }, // New tracker
         { name: 'Citadel (Health)', href: '/admin/citadel', icon: Activity },
+        { name: 'Titan Tools', href: '/admin/system-health', icon: Terminal },
     ];
 
     const isActive = href => {

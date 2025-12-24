@@ -15,7 +15,8 @@ export default function SizeGuideModal({ isOpen, onClose, category }) {
                 </button>
 
                 <div className="p-8">
-                    <h2 className="text-2xl font-serif font-bold mb-6 text-center">Size Guide</h2>
+                    <h2 className="text-2xl font-serif font-bold mb-2 text-center">Size Guide</h2>
+                    <p className="text-center text-gray-600 mb-6 font-medium">We cater for clothes upto 13 XL</p>
 
                     <div className="overflow-x-auto">
                         <table className="w-full text-sm text-left">

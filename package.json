@@ -44,6 +44,7 @@
     "react-helmet-async": "^2.0.5",
     "react-router-dom": "^7.9.6",
     "recharts": "^2.15.4",
+    "tesseract.js": "^7.0.0",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {

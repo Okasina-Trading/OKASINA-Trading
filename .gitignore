@@ -38,3 +38,4 @@ service-account.json
 
 .vercel
 .env*.local
+temp_images/
