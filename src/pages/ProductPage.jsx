@@ -68,7 +68,7 @@ export default function ProductPage() {
     if (!product) return <div className="min-h-screen flex items-center justify-center">Product not found</div>;
 
     // Default sizes for products without sizes defined
-    const DEFAULT_SIZES = ['XS', 'S', 'M', 'L', 'XL'];
+    const DEFAULT_SIZES = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '6XL', '7XL', '8XL', '9XL', '10XL', '11XL', '12XL', '13XL'];
     const rawSizes = product.sizes ? (typeof product.sizes === 'string' ? product.sizes.split(',') : product.sizes).map(s => s.trim()) : [];
     const sizes = rawSizes.length > 0 ? rawSizes : (product.category === 'Accessories' ? ['One Size'] : DEFAULT_SIZES);
 
@@ -250,8 +250,8 @@ export default function ProductPage() {
                                     }
                                 }}
                                 className={`w-full py-4 text-sm font-bold uppercase tracking-widest transition-colors ${(product.stock_qty <= 0 && (!product.variants || product.variants.length === 0)) // Global OOS
-                                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                                        : 'bg-black text-white hover:bg-gray-800'
+                                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                    : 'bg-black text-white hover:bg-gray-800'
                                     }`}
                                 disabled={(product.stock_qty <= 0 && (!product.variants || product.variants.length === 0))}
                             >

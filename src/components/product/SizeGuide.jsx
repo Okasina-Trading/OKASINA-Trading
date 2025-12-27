@@ -19,7 +19,18 @@ const SizeGuide = ({ isOpen, onClose, category = 'General' }) => {
                 { size: 'M', bust: '36"', waist: '30"', hip: '38"' },
                 { size: 'L', bust: '38"', waist: '32"', hip: '40"' },
                 { size: 'XL', bust: '40"', waist: '34"', hip: '42"' },
-                { size: 'XXL', bust: '42"', waist: '36"', hip: '44"' }
+                { size: '2XL', bust: '42"', waist: '36"', hip: '44"' },
+                { size: '3XL', bust: '44"', waist: '38"', hip: '46"' },
+                { size: '4XL', bust: '46"', waist: '40"', hip: '48"' },
+                { size: '5XL', bust: '48"', waist: '42"', hip: '50"' },
+                { size: '6XL', bust: '50"', waist: '44"', hip: '52"' },
+                { size: '7XL', bust: '52"', waist: '46"', hip: '54"' },
+                { size: '8XL', bust: '54"', waist: '48"', hip: '56"' },
+                { size: '9XL', bust: '56"', waist: '50"', hip: '58"' },
+                { size: '10XL', bust: '58"', waist: '52"', hip: '60"' },
+                { size: '11XL', bust: '60"', waist: '54"', hip: '62"' },
+                { size: '12XL', bust: '62"', waist: '56"', hip: '64"' },
+                { size: '13XL', bust: '64"', waist: '58"', hip: '66"' }
             ]
         },
         'Kurtis': {
@@ -30,7 +41,18 @@ const SizeGuide = ({ isOpen, onClose, category = 'General' }) => {
                 { size: 'M', bust: '36"', length: '44-46"', shoulder: '15"' },
                 { size: 'L', bust: '38"', length: '44-46"', shoulder: '15.5"' },
                 { size: 'XL', bust: '40"', length: '46-48"', shoulder: '16"' },
-                { size: 'XXL', bust: '42"', length: '46-48"', shoulder: '16.5"' }
+                { size: '2XL', bust: '42"', length: '46-48"', shoulder: '16.5"' },
+                { size: '3XL', bust: '44"', length: '48+"', shoulder: '17"' },
+                { size: '4XL', bust: '46"', length: '48+"', shoulder: '17.5"' },
+                { size: '5XL', bust: '48"', length: '48+"', shoulder: '18"' },
+                { size: '6XL', bust: '50"', length: '48+"', shoulder: '18.5"' },
+                { size: '7XL', bust: '52"', length: '48+"', shoulder: '19"' },
+                { size: '8XL', bust: '54"', length: '48+"', shoulder: '19.5"' },
+                { size: '9XL', bust: '56"', length: '48+"', shoulder: '20"' },
+                { size: '10XL', bust: '58"', length: '48+"', shoulder: '20.5"' },
+                { size: '11XL', bust: '60"', length: '48+"', shoulder: '21"' },
+                { size: '12XL', bust: '62"', length: '48+"', shoulder: '21.5"' },
+                { size: '13XL', bust: '64"', length: '48+"', shoulder: '22"' }
             ]
         },
         'Lehengas': {
@@ -41,7 +63,18 @@ const SizeGuide = ({ isOpen, onClose, category = 'General' }) => {
                 { size: 'M', waist: '30"', length: '42-44"', hip: '38"' },
                 { size: 'L', waist: '32"', length: '42-44"', hip: '40"' },
                 { size: 'XL', waist: '34"', length: '44-46"', hip: '42"' },
-                { size: 'XXL', waist: '36"', length: '44-46"', hip: '44"' }
+                { size: '2XL', waist: '36"', length: '44-46"', hip: '44"' },
+                { size: '3XL', waist: '38"', length: '46+"', hip: '46"' },
+                { size: '4XL', waist: '40"', length: '46+"', hip: '48"' },
+                { size: '5XL', waist: '42"', length: '46+"', hip: '50"' },
+                { size: '6XL', waist: '44"', length: '46+"', hip: '52"' },
+                { size: '7XL', waist: '46"', length: '46+"', hip: '54"' },
+                { size: '8XL', waist: '48"', length: '46+"', hip: '56"' },
+                { size: '9XL', waist: '50"', length: '46+"', hip: '58"' },
+                { size: '10XL', waist: '52"', length: '46+"', hip: '60"' },
+                { size: '11XL', waist: '54"', length: '46+"', hip: '62"' },
+                { size: '12XL', waist: '56"', length: '46+"', hip: '64"' },
+                { size: '13XL', waist: '58"', length: '46+"', hip: '66"' }
             ]
         },
         'General': {
@@ -52,7 +85,18 @@ const SizeGuide = ({ isOpen, onClose, category = 'General' }) => {
                 { size: 'M', bust: '36"', waist: '30"', hip: '38"' },
                 { size: 'L', bust: '38"', waist: '32"', hip: '40"' },
                 { size: 'XL', bust: '40"', waist: '34"', hip: '42"' },
-                { size: 'XXL', bust: '42"', waist: '36"', hip: '44"' }
+                { size: '2XL', bust: '42"', waist: '36"', hip: '44"' },
+                { size: '3XL', bust: '44"', waist: '38"', hip: '46"' },
+                { size: '4XL', bust: '46"', waist: '40"', hip: '48"' },
+                { size: '5XL', bust: '48"', waist: '42"', hip: '50"' },
+                { size: '6XL', bust: '50"', waist: '44"', hip: '52"' },
+                { size: '7XL', bust: '52"', waist: '46"', hip: '54"' },
+                { size: '8XL', bust: '54"', waist: '48"', hip: '56"' },
+                { size: '9XL', bust: '56"', waist: '50"', hip: '58"' },
+                { size: '10XL', bust: '58"', waist: '52"', hip: '60"' },
+                { size: '11XL', bust: '60"', waist: '54"', hip: '62"' },
+                { size: '12XL', bust: '62"', waist: '56"', hip: '64"' },
+                { size: '13XL', bust: '64"', waist: '58"', hip: '66"' }
             ]
         }
     };

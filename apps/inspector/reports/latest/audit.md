@@ -1,5 +1,5 @@
 # TITAN Inspector Report
-Date: 2025-12-24T17:39:15.114458
+Date: 2025-12-25T02:00:22.763189
 
 # Status: [PASS]
 
@@ -7,23 +7,23 @@ Date: 2025-12-24T17:39:15.114458
 - Shopper Flow: PASS
 
 ## [WARN] Network Failures
-- GET https://ipapi.co/json/ - net::ERR_FAILED
-- GET https://ipapi.co/json/ - net::ERR_FAILED
+- GET https://ipapi.co/json/ - net::ERR_ABORTED
+- GET https://ipapi.co/json/ - net::ERR_ABORTED
 - GET https://res.cloudinary.com/dw86lrpv6/image/upload/v1766463923/okasina_products/L-1125-23.jpg - net::ERR_ABORTED
-- GET https://res.cloudinary.com/dw86lrpv6/image/upload/v1766463917/okasina_products/L-1125-19.jpg - net::ERR_ABORTED
-- GET https://res.cloudinary.com/dw86lrpv6/image/upload/v1766463922/okasina_products/L-1125-22.jpg - net::ERR_ABORTED
-- GET https://res.cloudinary.com/dw86lrpv6/image/upload/v1766463916/okasina_products/L-1125-18.jpg - net::ERR_ABORTED
-- GET https://res.cloudinary.com/dw86lrpv6/image/upload/v1766463925/okasina_products/L-1125-24.jpg - net::ERR_ABORTED
-- GET https://res.cloudinary.com/dw86lrpv6/image/upload/v1766463919/okasina_products/L-1125-21.jpg - net::ERR_ABORTED
 - GET https://res.cloudinary.com/dw86lrpv6/image/upload/v1766463914/okasina_products/L-1125-17.jpg - net::ERR_ABORTED
+- GET https://res.cloudinary.com/dw86lrpv6/image/upload/v1766463916/okasina_products/L-1125-18.jpg - net::ERR_ABORTED
+- GET https://res.cloudinary.com/dw86lrpv6/image/upload/v1766463922/okasina_products/L-1125-22.jpg - net::ERR_ABORTED
+- GET https://res.cloudinary.com/dw86lrpv6/image/upload/v1766463919/okasina_products/L-1125-21.jpg - net::ERR_ABORTED
+- GET https://res.cloudinary.com/dw86lrpv6/image/upload/v1766463925/okasina_products/L-1125-24.jpg - net::ERR_ABORTED
+- GET https://res.cloudinary.com/dw86lrpv6/image/upload/v1766463917/okasina_products/L-1125-19.jpg - net::ERR_ABORTED
 - GET https://ipapi.co/json/ - net::ERR_FAILED
 - GET https://ipapi.co/json/ - net::ERR_FAILED
 - GET https://ipapi.co/json/ - net::ERR_FAILED
 - GET https://ipapi.co/json/ - net::ERR_FAILED
 
 ## [INFO] Console Warnings
-- Location detection skipped (safe mode): Failed to fetch
-- Location detection skipped (safe mode): Failed to fetch
+- Location detection skipped (safe mode): signal is aborted without reason
+- Location detection skipped (safe mode): signal is aborted without reason
 - Location detection skipped (safe mode): Failed to fetch
 - Location detection skipped (safe mode): Failed to fetch
 - Location detection skipped (safe mode): Failed to fetch

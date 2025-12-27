@@ -92,6 +92,7 @@ export default function CheckoutPage() {
                 order_notes: formData.notes,
                 items: orderItems, // stored as JSONB
                 total_amount: total,
+                total: total, // LEGACY/COMPATIBILITY: DB has 'total' column as NOT NULL
                 subtotal_amount: subtotal,
                 shipping_cost: shippingCost,
                 status: 'pending',
