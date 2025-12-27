@@ -1,0 +1,25 @@
+
+Running 1 test using 1 worker
+
+[Shadow User] Starting patrol on: http://localhost:5173
+  Γ£ÿ  1 [chromium] ΓÇ║ tests\shadow-user.spec.js:8:5 ΓÇ║ Shadow User Protocol ΓÇ║ Complete Purchase Flow (Browse -> Cart -> Checkout) (3.7s)
+
+
+  1) [chromium] ΓÇ║ tests\shadow-user.spec.js:8:5 ΓÇ║ Shadow User Protocol ΓÇ║ Complete Purchase Flow (Browse -> Cart -> Checkout) 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/shop
+    Call log:
+    [2m  - navigating to "http://localhost:5173/shop", waiting until "domcontentloaded"[22m
+
+
+      10 |
+      11 |         // 1. DISCOVERY: Go to Shop
+    > 12 |         await page.goto(`${BASE}/shop`, { waitUntil: "domcontentloaded" });
+         |                    ^
+      13 |         await expect(page).toHaveTitle(/Shop|Collection|Okasina/i);
+      14 |
+      15 |         // 2. SELECTION: Add first product to cart
+        at C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\tests\shadow-user.spec.js:12:20
+
+  1 failed
+    [chromium] ΓÇ║ tests\shadow-user.spec.js:8:5 ΓÇ║ Shadow User Protocol ΓÇ║ Complete Purchase Flow (Browse -> Cart -> Checkout) 

@@ -206,9 +206,9 @@ export default function AdminOrdersPage() {
                 </div>
             </div>
 
-            {/* Order Details Modal */}
+            {/* Order Details Modal - Increased Z-index to cover navbar */}
             {selectedOrder && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] p-4">
                     <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
                         <div className="p-6 border-b border-gray-200 flex justify-between items-center">
                             <h2 className="text-xl font-bold text-gray-900">Order Details #{selectedOrder.id.slice(0, 8)}</h2>
@@ -263,8 +263,8 @@ export default function AdminOrdersPage() {
                                                 </div>
                                             </div>
                                             <div className="text-right">
-                                                <p className="font-medium">Rs {((item.price_mur || (Number(item.price) * 45)) * item.quantity).toLocaleString()}</p>
-                                                <p className="text-xs text-gray-500">Rs {item.price_mur || (Number(item.price) * 45)} each</p>
+                                                <p className="font-medium">Rs {(item.price * item.quantity).toLocaleString()}</p>
+                                                <p className="text-xs text-gray-500">Rs {item.price} each</p>
                                             </div>
                                         </div>
                                     ))}
@@ -276,12 +276,20 @@ export default function AdminOrdersPage() {
                                 <div className="w-64 space-y-2">
                                     <div className="flex justify-between text-gray-600">
                                         <span>Subtotal</span>
-                                        <span>Rs {(selectedOrder.total_amount - (selectedOrder.shipping_method === 'door' ? 150 : 100)).toLocaleString()}</span>
+                                        <span>Rs {(selectedOrder.subtotal_amount || selectedOrder.total_amount).toLocaleString()}</span>
                                     </div>
                                     <div className="flex justify-between text-gray-600">
                                         <span>Shipping</span>
-                                        <span>Rs {selectedOrder.shipping_method === 'door' ? '150' : '100'}</span>
+                                        <span>Rs {selectedOrder.shipping_cost || (selectedOrder.shipping_method === 'door' ? '150' : '100')}</span>
                                     </div>
+
+                                    {selectedOrder.discount_amount > 0 && (
+                                        <div className="flex justify-between text-green-600">
+                                            <span>Discount</span>
+                                            <span>- Rs {selectedOrder.discount_amount}</span>
+                                        </div>
+                                    )}
+
                                     <div className="flex justify-between text-lg font-bold text-gray-900 pt-2 border-t border-gray-200">
                                         <span>Total</span>
                                         <span>Rs {selectedOrder.total_amount?.toLocaleString()}</span>

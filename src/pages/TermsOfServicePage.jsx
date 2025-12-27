@@ -282,12 +282,14 @@ export default function TermsOfServicePage() {
                         </div>
 
                         <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-3">6.1 Return Policy</h3>
-                        <p className="text-gray-700 mb-3">You may return products within <strong>14 days</strong> of delivery if:</p>
+                        <p className="text-gray-700 mb-3">
+                            <strong>Goods once sold cannot be returned.</strong> We offer a strict <strong>48-hour return policy</strong> for exchanges or defective items only.
+                        </p>
+                        <p className="text-gray-700 mb-3">You may initiate a return within <strong>48 hours</strong> of delivery if:</p>
                         <ul className="list-disc list-inside space-y-2 text-gray-700 ml-4">
-                            <li>The product is defective or damaged</li>
+                            <li>The product is defective or damaged upon arrival</li>
                             <li>The product does not match the description</li>
                             <li>You received the wrong item</li>
-                            <li>The product has manufacturing defects</li>
                         </ul>
 
                         <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-3">6.2 Return Conditions</h3>

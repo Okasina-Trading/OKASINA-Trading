@@ -129,21 +129,35 @@ export default function OrdersPage() {
                                                         </div>
                                                     </div>
                                                     <p className="font-medium text-gray-900">
-                                                        Rs {((item.price_mur || (Number(item.price) * 45)) * item.quantity).toLocaleString()}
+                                                        Rs {(item.price * item.quantity).toLocaleString()}
                                                     </p>
                                                 </div>
                                             ))}
                                         </div>
                                     </div>
 
-                                    <div className="bg-gray-50 p-6 flex justify-between items-center">
-                                        <div>
-                                            <p className="text-sm text-gray-500">Shipping Method</p>
-                                            <p className="font-medium text-gray-900 capitalize">{order.shipping_method === 'door' ? 'Door Delivery' : 'Postage'}</p>
+                                    <div className="bg-gray-50 p-6 space-y-3 border-t border-gray-100">
+                                        {/* Summary Breakdown */}
+                                        <div className="flex justify-between items-center text-sm">
+                                            <span className="text-gray-600">Subtotal</span>
+                                            <span className="font-medium">Rs {order.subtotal_amount?.toLocaleString() || order.total_amount?.toLocaleString()}</span>
                                         </div>
-                                        <div className="text-right">
-                                            <p className="text-sm text-gray-500">Total Amount</p>
-                                            <p className="text-xl font-bold text-gray-900">Rs {order.total_amount?.toLocaleString()}</p>
+
+                                        <div className="flex justify-between items-center text-sm">
+                                            <span className="text-gray-600">Shipping ({order.shipping_method === 'door' ? 'Door Delivery' : 'Postage'})</span>
+                                            <span className="font-medium">Rs {order.shipping_cost || 0}</span>
+                                        </div>
+
+                                        {order.discount_amount > 0 && (
+                                            <div className="flex justify-between items-center text-sm text-green-700">
+                                                <span>Loyalty Discount</span>
+                                                <span>- Rs {order.discount_amount}</span>
+                                            </div>
+                                        )}
+
+                                        <div className="flex justify-between items-center pt-3 border-t border-gray-200 mt-2">
+                                            <span className="font-bold text-gray-900">Total Amount</span>
+                                            <span className="text-xl font-bold text-gray-900">Rs {order.total_amount?.toLocaleString()}</span>
                                         </div>
                                     </div>
                                 </div>

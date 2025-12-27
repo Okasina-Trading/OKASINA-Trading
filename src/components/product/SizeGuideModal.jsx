@@ -29,36 +29,25 @@ export default function SizeGuideModal({ isOpen, onClose, category }) {
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr className="bg-white border-b">
-                                    <td className="px-6 py-4 font-medium text-gray-900">XS</td>
-                                    <td className="px-6 py-4">80-84</td>
-                                    <td className="px-6 py-4">60-64</td>
-                                    <td className="px-6 py-4">86-90</td>
-                                </tr>
-                                <tr className="bg-white border-b">
-                                    <td className="px-6 py-4 font-medium text-gray-900">S</td>
-                                    <td className="px-6 py-4">84-88</td>
-                                    <td className="px-6 py-4">64-68</td>
-                                    <td className="px-6 py-4">90-94</td>
-                                </tr>
-                                <tr className="bg-white border-b">
-                                    <td className="px-6 py-4 font-medium text-gray-900">M</td>
-                                    <td className="px-6 py-4">88-92</td>
-                                    <td className="px-6 py-4">68-72</td>
-                                    <td className="px-6 py-4">94-98</td>
-                                </tr>
-                                <tr className="bg-white border-b">
-                                    <td className="px-6 py-4 font-medium text-gray-900">L</td>
-                                    <td className="px-6 py-4">92-96</td>
-                                    <td className="px-6 py-4">72-76</td>
-                                    <td className="px-6 py-4">98-102</td>
-                                </tr>
-                                <tr className="bg-white">
-                                    <td className="px-6 py-4 font-medium text-gray-900">XL</td>
-                                    <td className="px-6 py-4">96-100</td>
-                                    <td className="px-6 py-4">76-80</td>
-                                    <td className="px-6 py-4">102-106</td>
-                                </tr>
+                                {['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '6XL', '7XL', '8XL', '9XL', '10XL', '11XL', '12XL', '13XL'].map((size, index) => {
+                                    // Base measurements for XS (index 0)
+                                    // Bust: 80-84, increment 4 per size
+                                    // Waist: 60-64, increment 4 per size
+                                    // Hips: 86-90, increment 4 per size
+
+                                    const bustStart = 80 + (index * 4);
+                                    const waistStart = 60 + (index * 4);
+                                    const hipsStart = 86 + (index * 4);
+
+                                    return (
+                                        <tr key={size} className={index % 2 === 0 ? 'bg-white border-b' : 'bg-gray-50 border-b'}>
+                                            <td className="px-6 py-4 font-medium text-gray-900">{size}</td>
+                                            <td className="px-6 py-4">{bustStart}-{bustStart + 4}</td>
+                                            <td className="px-6 py-4">{waistStart}-{waistStart + 4}</td>
+                                            <td className="px-6 py-4">{hipsStart}-{hipsStart + 4}</td>
+                                        </tr>
+                                    );
+                                })}
                             </tbody>
                         </table>
                     </div>

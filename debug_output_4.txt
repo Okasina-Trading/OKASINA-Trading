@@ -1,0 +1,34 @@
+
+Running 1 test using 1 worker
+
+[Shadow User] Starting patrol on: http://localhost:5173
+[Shadow User] Product added (supposedly). Waiting 2s...
+[Shadow User] Navigating to Checkout...
+[Shadow User] Checkout loaded. Waiting for form...
+[Shadow User] Checkout state resolved.
+[Shadow User] Filling form...
+  Γ£ÿ  1 [chromium] ΓÇ║ tests\shadow-user.spec.js:8:5 ΓÇ║ Shadow User Protocol ΓÇ║ Complete Purchase Flow (Browse -> Cart -> Checkout) (30.1s)
+
+
+  1) [chromium] ΓÇ║ tests\shadow-user.spec.js:8:5 ΓÇ║ Shadow User Protocol ΓÇ║ Complete Purchase Flow (Browse -> Cart -> Checkout) 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: page.fill: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('textarea[name="address"]')[22m
+
+
+      65 |         await page.fill('input[name="email"]', "jarvis.shadow@titan.local");
+      66 |         await page.fill('input[name="phone"]', "5550001234");
+    > 67 |         await page.fill('textarea[name="address"]', "123 Virtual Lane, Digital City");
+         |                    ^
+      68 |         await page.fill('input[name="city"]', "Cybergrad");
+      69 |
+      70 |         // Select Shipping (if radio exists)
+        at C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\tests\shadow-user.spec.js:67:20
+
+    Error Context: test-results\shadow-user-Shadow-User-Pr-a83ea-w-Browse---Cart---Checkout--chromium\error-context.md
+
+  1 failed
+    [chromium] ΓÇ║ tests\shadow-user.spec.js:8:5 ΓÇ║ Shadow User Protocol ΓÇ║ Complete Purchase Flow (Browse -> Cart -> Checkout) 

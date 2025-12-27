@@ -20,8 +20,8 @@ export default function ProductTabs({ product }) {
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
                             className={`pb-4 text-sm font-medium uppercase tracking-wider transition-colors relative ${activeTab === tab.id
-                                    ? 'text-black'
-                                    : 'text-gray-500 hover:text-gray-700'
+                                ? 'text-black'
+                                : 'text-gray-500 hover:text-gray-700'
                                 }`}
                         >
                             {tab.label}
@@ -109,10 +109,14 @@ export default function ProductTabs({ product }) {
                             </div>
                             <div>
                                 <h3 className="font-medium text-gray-900 mb-1">Returns & Exchanges</h3>
-                                <p className="text-sm">
-                                    30-day return policy. Items must be unworn, unwashed, and in original
-                                    condition with tags attached. Contact us to initiate a return.
-                                </p>
+                                <div className="prose prose-sm max-w-none">
+                                    <p>
+                                        Goods once sold cannot be returned.
+                                    </p>
+                                    <p>
+                                        48 hours return policy - Items must be unworn, unwashed, and in original condition with tags attached. Contact us to initiate a return.
+                                    </p>
+                                </div>
                             </div>
                         </div>
 

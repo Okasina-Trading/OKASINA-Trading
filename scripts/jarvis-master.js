@@ -176,6 +176,24 @@ async function checkDataIntegrity() {
 // DEPLOYMENT VERIFICATION
 // ============================================
 
+// ============================================
+// SHADOW USER PROTOCOL (E2E)
+// ============================================
+
+async function runShadowUser() {
+    console.log('\n🕵️ PHASE 7: SHADOW USER PROTOCOL\n');
+
+    await runModule(
+        'Shadow User Test',
+        'node scripts/jarvis-shadow-user.js',
+        'Simulating real user purchase flow (Browse -> Checkout)'
+    );
+}
+
+// ============================================
+// DEPLOYMENT VERIFICATION
+// ============================================
+
 async function verifyDeployment() {
     console.log('\n🚀 PHASE 4: DEPLOYMENT VERIFICATION\n');
 
@@ -366,6 +384,7 @@ async function runMasterOrchestrator() {
     try {
         await runCoreChecks();
         await runAutoRepair();
+        await runShadowUser(); // Phase 7: Shadow User E2E
         await checkDataIntegrity();
         await verifyDeployment();
         await validateEnvironment();

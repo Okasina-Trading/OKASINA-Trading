@@ -1,0 +1,31 @@
+
+Running 1 test using 1 worker
+
+[Shadow User] Starting patrol on: http://localhost:5173
+  Γ£ÿ  1 [chromium] ΓÇ║ tests\shadow-user.spec.js:8:5 ΓÇ║ Shadow User Protocol ΓÇ║ Complete Purchase Flow (Browse -> Cart -> Checkout) (9.3s)
+
+
+  1) [chromium] ΓÇ║ tests\shadow-user.spec.js:8:5 ΓÇ║ Shadow User Protocol ΓÇ║ Complete Purchase Flow (Browse -> Cart -> Checkout) 
+
+    Error: locator.waitFor: Error: strict mode violation: locator('form') resolved to 3 elements:
+        1) <form class="relative w-full">ΓÇª</form> aka getByRole('banner').locator('form')
+        2) <form class="space-y-8">ΓÇª</form> aka getByText('1. Contact Info2.')
+        3) <form class="flex flex-col space-y-3">ΓÇª</form> aka locator('form').filter({ hasText: 'Subscribe' })
+
+    Call log:
+    [2m  - waiting for locator('form') to be visible[22m
+
+
+      43 |         // Wait for one of them to be visible
+      44 |         await Promise.race([
+    > 45 |             form.waitFor({ state: 'visible' }),
+         |                  ^
+      46 |             emptyMsg.waitFor({ state: 'visible' })
+      47 |         ]);
+      48 |
+        at C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\tests\shadow-user.spec.js:45:18
+
+    Error Context: test-results\shadow-user-Shadow-User-Pr-a83ea-w-Browse---Cart---Checkout--chromium\error-context.md
+
+  1 failed
+    [chromium] ΓÇ║ tests\shadow-user.spec.js:8:5 ΓÇ║ Shadow User Protocol ΓÇ║ Complete Purchase Flow (Browse -> Cart -> Checkout) 
