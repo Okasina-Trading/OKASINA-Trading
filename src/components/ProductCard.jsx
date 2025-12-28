@@ -122,6 +122,8 @@ const ProductCard = memo(({ product, onQuickView, viewMode = 'grid' }) => {
     }
 
     // Grid View Layout (default)
+    const isOutOfStock = product.stock_qty === 0;
+
     return (
         <div className="group relative bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
             {/* Image Container */}
@@ -143,18 +145,31 @@ const ProductCard = memo(({ product, onQuickView, viewMode = 'grid' }) => {
                     <LazyImage
                         src={product.image_url || product.image || 'https://via.placeholder.com/400x600?text=No+Image'}
                         alt={product.name}
-                        className="h-full w-full object-contain md:object-cover object-center transition-transform duration-700 group-hover:scale-110"
+                        className={`h-full w-full object-contain md:object-cover object-center transition-transform duration-700 group-hover:scale-110 ${isOutOfStock ? 'opacity-75 grayscale' : ''}`}
                     />
+
+                    {/* Sold Out Overlay */}
+                    {isOutOfStock && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/40 z-20">
+                            <span className="bg-white/90 text-black px-4 py-2 text-sm font-bold uppercase tracking-widest shadow-lg transform -rotate-12 border-2 border-black">
+                                Sold Out
+                            </span>
+                        </div>
+                    )}
                 </Link>
 
-                {/* Overlay Actions */}
+                {/* Overlay Actions (Desktop) */}
                 <div className="absolute inset-x-0 bottom-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col gap-2 justify-end bg-gradient-to-t from-black/50 to-transparent pb-6">
                     <button
                         onClick={handleAddToCart}
-                        className="w-full bg-white text-black py-2.5 px-4 text-sm font-bold uppercase tracking-wider hover:bg-[#d4af37] hover:text-white transition-colors shadow-lg flex items-center justify-center gap-2"
+                        disabled={isOutOfStock}
+                        className={`w-full py-2.5 px-4 text-sm font-bold uppercase tracking-wider transition-colors shadow-lg flex items-center justify-center gap-2 ${isOutOfStock
+                                ? 'bg-gray-400 text-white cursor-not-allowed'
+                                : 'bg-white text-black hover:bg-[#d4af37] hover:text-white'
+                            }`}
                     >
                         <ShoppingCart size={16} />
-                        Add to Cart
+                        {isOutOfStock ? 'Sold Out' : 'Add to Cart'}
                     </button>
                     {onQuickView && (
                         <button
@@ -207,10 +222,14 @@ const ProductCard = memo(({ product, onQuickView, viewMode = 'grid' }) => {
             {/* Mobile Add to Cart Button */}
             <button
                 onClick={handleAddToCart}
-                className="w-full mt-3 lg:hidden bg-black text-white py-2 px-4 text-xs font-bold uppercase tracking-wider hover:bg-gray-800 transition-colors flex items-center justify-center gap-2 rounded"
+                disabled={isOutOfStock}
+                className={`w-full mt-3 lg:hidden py-2 px-4 text-xs font-bold uppercase tracking-wider transition-colors flex items-center justify-center gap-2 rounded ${isOutOfStock
+                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        : 'bg-black text-white hover:bg-gray-800'
+                    }`}
             >
                 <ShoppingCart size={14} />
-                Add to Cart
+                {isOutOfStock ? 'Sold Out' : 'Add to Cart'}
             </button>
         </div>
     );
