@@ -230,8 +230,15 @@ export default function CheckoutPage() {
                                     <label className={`flex p-4 border cursor-pointer ${paymentMethod === 'juice' ? 'bg-gray-50 border-black' : ''}`}>
                                         <input type="radio" onChange={() => setPaymentMethod('juice')} checked={paymentMethod === 'juice'} className="mr-3" />
                                         <div className="flex-1">
-                                            <span className="font-bold block">Juice by MCB</span>
-                                            {paymentMethod === 'juice' && <div className="text-sm text-gray-600 mt-2 bg-white p-2 border rounded">Pay to: <strong>000449347214</strong> (A-ONE GLOBAL)</div>}
+                                            <span className="font-bold block">Juice by MCB / Bank Transfer</span>
+                                            {paymentMethod === 'juice' && (
+                                                <div className="text-sm text-gray-600 mt-2 bg-white p-3 border rounded shadow-sm">
+                                                    <p className="font-bold">OKASINA Trading Co. Ltd</p>
+                                                    <p>BRN: C12112347</p>
+                                                    <p>MCB Account: <strong>000020126824</strong></p>
+                                                    <p className="text-xs text-gray-500 mt-1">(Ref: {formData.fullName})</p>
+                                                </div>
+                                            )}
                                         </div>
                                     </label>
                                     <label className={`flex p-4 border cursor-pointer ${paymentMethod === 'card' ? 'bg-gray-50 border-black' : ''}`}>

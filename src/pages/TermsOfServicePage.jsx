@@ -27,7 +27,8 @@ export default function TermsOfServicePage() {
                 <div className="bg-white rounded-xl shadow-sm p-8 mb-8">
                     <h2 className="text-2xl font-serif font-bold text-gray-900 mb-4">About OKASINA Trading</h2>
                     <div className="space-y-3 text-gray-700">
-                        <p><strong>Business Name:</strong> OKASINA Trading</p>
+                        <p><strong>Business Name:</strong> OKASINA Trading Co. Ltd</p>
+                        <p><strong>BRN:</strong> C12112347</p>
                         <p><strong>Business Type:</strong> Women's & Children's Fashion Retailer</p>
                         <div className="flex items-start gap-3 mt-4">
                             <MapPin className="text-purple-600 mt-1 flex-shrink-0" size={20} />
