@@ -287,7 +287,6 @@ app.post('/api/update-order-status', async (req, res) => {
 });
 
 // Delete single order
-// Delete single order
 app.post('/api/delete-order', async (req, res) => {
   try {
     const { orderId } = req.body;
@@ -326,29 +325,42 @@ app.post('/api/delete-order', async (req, res) => {
 // Clear all orders (Bogus cleanup)
 app.post('/api/clear-orders', async (req, res) => {
   try {
-    console.log('CLEARING ALL ORDERS');
+    console.log('CLEARING ALL ORDERS - Aggressive Mode');
 
-    // 1. Clear loyalty transactions related to orders
-    const { error: loyaltyError } = await getSupabaseAdmin()
+    // 1. Fetch and Clear Loyalty Transactions attached to ANY order
+    // Using NOT NULL check is safer than NEQ UUID
+    const { data: loyaltyData, error: lFetchError } = await getSupabaseAdmin()
       .from('loyalty_transactions')
-      .delete()
-      .neq('order_id', '00000000-0000-0000-0000-000000000000');
+      .select('id')
+      .not('order_id', 'is', null);
 
-    if (loyaltyError) console.warn('Loyalty cleanup warning:', loyaltyError);
+    if (lFetchError) throw new Error('Loyalty Fetch Error: ' + lFetchError.message);
 
-    // 2. Clear all order items
-    const { error: itemsError } = await getSupabaseAdmin()
+    if (loyaltyData && loyaltyData.length > 0) {
+      const lIds = loyaltyData.map(l => l.id);
+      const { error: lDelError } = await getSupabaseAdmin()
+        .from('loyalty_transactions')
+        .delete()
+        .in('id', lIds);
+
+      if (lDelError) throw new Error('Loyalty Delete Error: ' + lDelError.message);
+      console.log(`Deleted ${lIds.length} loyalty transactions`);
+    }
+
+    // 2. Clear all order items (Delete all rows that are not header/metadata if any?)
+    // Actually safe to delete all where id > 0 if they are just items.
+    const { error: iDelError } = await getSupabaseAdmin()
       .from('order_items')
       .delete()
-      .neq('id', 0);
+      .neq('id', 0); // Delete all items
 
-    if (itemsError) console.warn('Items cleanup warning:', itemsError);
+    if (iDelError) throw new Error('Order Items Delete Error: ' + iDelError.message);
 
     // 3. Clear all orders
     const { error, count } = await getSupabaseAdmin()
       .from('orders')
       .delete({ count: 'exact' })
-      .neq('id', '00000000-0000-0000-0000-000000000000'); // Hack to delete all
+      .neq('id', '00000000-0000-0000-0000-000000000000');
 
     if (error) throw error;
     res.json({ success: true, message: `Cleared ${count} orders` });
@@ -882,310 +894,41 @@ app.post('/api/facebook/import-photo', async (req, res) => {
         });
 
         const aiData = await aiResponse.json();
-        let aiText = aiData.candidates?.[0]?.content?.parts?.[0]?.text;
+        const aiText = aiData.candidates?.[0]?.content?.parts?.[0]?.text;
 
         if (aiText) {
-          aiText = aiText.replace(/```json/g, '').replace(/```/g, '');
-          const parsed = JSON.parse(aiText);
-          // Merge AI data
-          finalProduct = { ...finalProduct, ...parsed };
+          const cleanJson = aiText.replace(/```json/g, '').replace(/```/g, '');
+          const aiParsed = JSON.parse(cleanJson);
+          finalProduct = { ...finalProduct, ...aiParsed };
         }
       } catch (aiErr) {
-        console.error("[Import-Photo] AI Analysis Failed:", aiErr.message);
-        // Continue without AI data
+        console.warn("AI Analysis Skipped:", aiErr.message);
       }
     }
 
-    // 2. Create Product in DB (if enabled)
+    // 2. Insert to Supabase (if requested)
     if (createProducts) {
-      const { data, error } = await getSupabaseAdmin().from('products').insert([finalProduct]).select().single();
+      const { data, error } = await getSupabaseAdmin()
+        .from('products')
+        .insert([finalProduct])
+        .select()
+        .single();
 
-      if (error) {
-        throw error;
-      }
-
-      return res.json({
-        success: true,
-        product: data,
-        message: 'Product imported successfully'
-      });
+      if (error) throw error;
+      return res.json({ success: true, product: data });
     }
 
-    // Dry run
-    res.json({
-      success: true,
-      product: finalProduct,
-      message: 'Dry run complete (Product not saved)'
-    });
+    // Return preview
+    res.json({ success: true, product: finalProduct, preview: true });
 
   } catch (error) {
-    console.error('[Import-Photo] Error:', error.message);
+    console.error('Import Photo Error:', error);
     res.status(500).json({ error: error.message });
   }
 });
 
-
-// --- Vision AI - Extract Text from Images ---
-app.post('/api/extract-image-text', async (req, res) => {
-  try {
-    const { imageUrl } = req.body;
-    if (!imageUrl) return res.status(400).json({ error: 'imageUrl is required' });
-
-    const geminiKey = process.env.GOOGLE_AI_KEY || process.env.VITE_GEMINI_API_KEY;
-    if (!geminiKey) return res.status(501).json({ error: 'Vision AI not configured' });
-
-    const imageResponse = await fetch(imageUrl);
-    if (!imageResponse.ok) throw new Error(`Failed to fetch image: ${imageResponse.statusText}`);
-
-    // Use arrayBuffer() for compatibility
-    const imageBuffer = await imageResponse.arrayBuffer();
-    const base64Image = Buffer.from(imageBuffer).toString('base64');
-
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{
-            parts: [
-              { text: 'Extract ALL text from this image. Include product names, prices, sizes, colors, materials, and descriptions. Format as structured data.' },
-              { inline_data: { mime_type: 'image/jpeg', data: base64Image } }
-            ]
-          }]
-        })
-      }
-    );
-
-    const data = await response.json();
-    const extractedText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    res.json({ success: true, extractedText, imageUrl });
-
-  } catch (error) {
-    console.error('Vision AI error:', error);
-    res.status(500).json({ error: 'Failed to extract text from image', details: error.message });
-  }
-});
-
-// --- NEW: AI Product Scanner (Structured) ---
-app.post('/api/analyze-product-image', async (req, res) => {
-  try {
-    const { imageUrl } = req.body;
-    if (!imageUrl) return res.status(400).json({ error: 'imageUrl is required' });
-
-    const geminiKey = process.env.GOOGLE_AI_KEY || process.env.VITE_GEMINI_API_KEY;
-    if (!geminiKey) return res.status(501).json({ error: 'Vision AI not configured' });
-
-    console.log(`[AI Scanner] Analyzing: ${imageUrl}`);
-    const imageResponse = await fetch(imageUrl);
-    if (!imageResponse.ok) throw new Error(`Failed to fetch image: ${imageResponse.statusText}`);
-
-    // Use arrayBuffer() for compatibility with native fetch in Node 18+
-    const imageBuffer = await imageResponse.arrayBuffer();
-    const base64Image = Buffer.from(imageBuffer).toString('base64');
-
-    const prompt = `
-      Analyze this product image and extract the following details into a valid JSON object:
-      - name: A short, descriptive product name (e.g. "Cotton Dress with Pockets").
-      - price: The price as a number (remove currency symbols).
-      - sizes: A string of available sizes (e.g. "S, M, L").
-      - fabric: The material/fabric if mentioned.
-      - color: The primary color.
-      - category: Suggested category (e.g. Kurtis, Suits, Dresses).
-      - sku_suggestion: A short SKU code based on the name (e.g. COT-DRS-001).
-      
-      Return ONLY the JSON. Do not include markdown formatting.
-    `;
-
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{
-            parts: [
-              { text: prompt },
-              { inline_data: { mime_type: 'image/jpeg', data: base64Image } }
-            ]
-          }]
-        })
-      }
-    );
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error(`[AI Scanner] Google API Error (${response.status}):`, errorText);
-      throw new Error(`Google AI API Error: ${response.status} ${response.statusText} - ${errorText}`);
-    }
-
-    const data = await response.json();
-    let text = data.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
-
-    // Clean markdown if present
-    text = text.replace(/```json/g, '').replace(/```/g, '').trim();
-
-    const productData = JSON.parse(text);
-    res.json({ success: true, product: productData });
-
-  } catch (error) {
-    console.error('AI Scanner Error:', error);
-    res.status(500).json({ error: 'AI Analysis Failed', details: error.message });
-  }
-});
-
-// --- Email Service ---
-// --- Email Service ---
-app.post('/api/send-email', async (req, res) => {
-  try {
-    const { to, subject, html } = req.body;
-
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-      console.warn('Email credentials missing. Logging email instead.');
-      console.log(`[EMAIL STUB] To: ${to}, Subject: ${subject}`);
-      return res.json({ success: true, message: 'Email logged (Credentials missing)' });
-    }
-
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-      }
-    });
-
-    const info = await transporter.sendMail({
-      from: `"Okasina Fashion" <${process.env.EMAIL_USER}>`,
-      to,
-      subject,
-      html
-    });
-
-    console.log('Email sent:', info.messageId);
-    res.json({ success: true, messageId: info.messageId });
-  } catch (error) {
-    console.error('Email Error:', error);
-    // Don't fail the client completely, just log it
-    res.status(200).json({ success: false, error: error.message, message: 'Failed to send email' });
-  }
-});
-
-
-
-// --- CITADEL SYSTEM VITALS ---
-app.get('/api/citadel/vitals', async (req, res) => {
-  const start = Date.now();
-  let dbStatus = 'disconnected';
-  let dbLatency = 0;
-
-  try {
-    // Check Supabase connection
-    const { data, error } = await getSupabaseAdmin().from('products').select('id').limit(1);
-    if (!error) {
-      dbStatus = 'connected';
-      dbLatency = Date.now() - start;
-    }
-  } catch (e) {
-    console.error('Citadel DB Check Failed', e);
-  }
-
-  const memUsage = process.memoryUsage();
-
-  res.json({
-    status: 'operational',
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
-    system: {
-      memory_rss: Math.round(memUsage.rss / 1024 / 1024) + ' MB',
-      memory_heap: Math.round(memUsage.heapUsed / 1024 / 1024) + ' MB',
-      node_version: process.version
-    },
-    services: {
-      database: { status: dbStatus, latency_ms: dbLatency },
-      ai_vision: { status: (process.env.GOOGLE_AI_KEY || process.env.VITE_GEMINI_API_KEY) ? 'ready' : 'offline' },
-      cloudinary: { status: (process.env.CLOUDINARY_CLOUD_NAME) ? 'configured' : 'missing_config' }
-    }
-  });
-});
-
-const PORT = process.env.PORT || 3001;
-
-// Only listen if run directly (not imported)
-if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-  });
-}
-
-// --- TITAN TOOL ENDPOINTS (Renamed to Diagnostics for AdBlock Evasion) ---
-
-// Helper to run shell command (No change)
-const runTitanCommand = (command, cwd = process.cwd()) => {
-  return new Promise((resolve, reject) => {
-    exec(command, { cwd }, (error, stdout, stderr) => {
-      // Inspector returns 1 on Fail, which exec treats as error. We want to capture it.
-      if (error && error.code !== 1) { // 1 is fine (FAIL report), others are crash
-        console.warn(`Titan Command Warning/Exit: ${error.message}`);
-      }
-      resolve({ stdout, stderr, code: error ? error.code : 0 });
-    });
-  });
-};
-
-app.post('/api/sys/diagnostics/run', async (req, res) => {
-  try {
-    const { mode = 'journey' } = req.body; // 'crawl', 'journey', 'both'
-    console.log(`[TITAN] Running Inspector (${mode})...`);
-
-    const result = await runTitanCommand(`python apps/inspector/inspector.py --mode ${mode}`);
-
-    // Read the generated report
-    const reportPath = path.join(process.cwd(), 'apps/inspector/reports/latest/audit.json');
-    let report = null;
-    if (fs.existsSync(reportPath)) {
-      report = JSON.parse(fs.readFileSync(reportPath, 'utf-8'));
-    }
-
-    res.json({
-      success: true,
-      message: "Diagnostics Cycle Completed",
-      output: result.stdout,
-      report
-    });
-  } catch (error) {
-    console.error('Diagnostics Run Error:', error);
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.get('/api/sys/diagnostics/report', (req, res) => {
-  try {
-    const reportPath = path.join(process.cwd(), 'apps/inspector/reports/latest/audit.json');
-    if (fs.existsSync(reportPath)) {
-      const report = JSON.parse(fs.readFileSync(reportPath, 'utf-8'));
-      res.json(report);
-    } else {
-      res.status(404).json({ error: "No report found. Run Diagnostics first." });
-    }
-  } catch (e) {
-    res.status(500).json({ error: e.message });
-  }
-});
-
-app.post('/api/sys/diagnostics/repair', async (req, res) => {
-  try {
-    console.log(`[TITAN] Running Doctor...`);
-    const result = await runTitanCommand(`python apps/doctor/doctor.py`);
-
-    res.json({
-      success: true,
-      message: "Repair Cycle Completed",
-      output: result.stdout
-    });
-  } catch (error) {
-    console.error('Diagnostics Repair Error:', error);
-    res.status(500).json({ error: error.message });
-  }
+app.listen(3000, () => {
+  console.log("Server running on port 3000");
 });
 
 export default app;
