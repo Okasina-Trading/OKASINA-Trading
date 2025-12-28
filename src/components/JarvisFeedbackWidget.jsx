@@ -57,7 +57,7 @@ export default function JarvisFeedbackWidget() {
         return (
             <button
                 onClick={() => setIsOpen(true)}
-                className="fixed bottom-6 right-6 z-50 bg-gray-900 text-white p-4 rounded-full shadow-lg hover:bg-gray-800 transition-all hover:scale-105 group"
+                className="hidden md:block fixed bottom-6 right-6 z-50 bg-gray-900 text-white p-4 rounded-full shadow-lg hover:bg-gray-800 transition-all hover:scale-105 group"
                 aria-label="Report to JARVIS"
             >
                 <div className="absolute -top-10 right-0 bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
@@ -101,8 +101,8 @@ export default function JarvisFeedbackWidget() {
                                     type="button"
                                     onClick={() => setType(t)}
                                     className={`flex-1 py-1 text-xs font-medium rounded-md capitalize transition-colors ${type === t
-                                            ? 'bg-white text-gray-900 shadow-sm'
-                                            : 'text-gray-500 hover:text-gray-700'
+                                        ? 'bg-white text-gray-900 shadow-sm'
+                                        : 'text-gray-500 hover:text-gray-700'
                                         }`}
                                 >
                                     {t}

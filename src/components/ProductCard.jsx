@@ -143,7 +143,7 @@ const ProductCard = memo(({ product, onQuickView, viewMode = 'grid' }) => {
                     <LazyImage
                         src={product.image_url || product.image || 'https://via.placeholder.com/400x600?text=No+Image'}
                         alt={product.name}
-                        className="h-full w-full object-cover object-center transition-transform duration-700 group-hover:scale-110"
+                        className="h-full w-full object-contain md:object-cover object-center transition-transform duration-700 group-hover:scale-110"
                     />
                 </Link>
 

@@ -51,6 +51,7 @@ import { HelmetProvider } from 'react-helmet-async';
 
 const StylistChatWidget = React.lazy(() => import('./components/ai/StylistChatWidget'));
 import JarvisFeedbackWidget from './components/JarvisFeedbackWidget';
+import TitanAssistWidget from './components/common/TitanAssistWidget';
 
 export default function App() {
     return (
@@ -116,6 +117,7 @@ export default function App() {
                                                     <StylistChatWidget />
                                                 </React.Suspense>
                                                 <JarvisFeedbackWidget />
+                                                <TitanAssistWidget />
                                                 <Footer />
                                             </div>
                                         </BrowserRouter>
