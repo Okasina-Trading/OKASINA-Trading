@@ -41,7 +41,7 @@ export default function CheckoutPage() {
         setLoyaltyProfile(profile);
     };
 
-    const SHIPPING_RATES = { postage: 100, door: 150 };
+    const SHIPPING_RATES = { pickup: 0, postage: 100, door: 150 };
 
     // Calculations
     const subtotal = cart.reduce((sum, item) => {
@@ -217,6 +217,13 @@ export default function CheckoutPage() {
                             <section>
                                 <h2 className="text-lg font-bold uppercase tracking-widest mb-6 border-b pb-2">2. Shipping</h2>
                                 <div className="space-y-3">
+                                    <label className={`flex p-4 border cursor-pointer ${shippingMethod === 'pickup' ? 'bg-gray-50 border-black' : ''}`}>
+                                        <input type="radio" onChange={() => setShippingMethod('pickup')} checked={shippingMethod === 'pickup'} className="mr-3" />
+                                        <div className="flex-1">
+                                            <span className="font-bold block">Store Pick Up</span>
+                                            Free
+                                        </div>
+                                    </label>
                                     <label className={`flex p-4 border cursor-pointer ${shippingMethod === 'postage' ? 'bg-gray-50 border-black' : ''}`}>
                                         <input type="radio" onChange={() => setShippingMethod('postage')} checked={shippingMethod === 'postage'} className="mr-3" />
                                         <div className="flex-1"><span className="font-bold block">Standard Postage</span>Rs 100 via Mauritius Post</div>
