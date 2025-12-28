@@ -85,9 +85,8 @@ export default function CheckoutPage() {
     let flashSaleDiscount = 0;
     let flashSalePercent = 0;
 
-    if (flashSale) {
+    if (flashSale && flashSale.text && typeof flashSale.text === 'string') {
         // Extract percentage from text (e.g. "Up to 30% OFF")
-        // If not found, default to 0 or manual overrides
         const match = flashSale.text.match(/(\d+)%/);
         if (match) {
             flashSalePercent = parseInt(match[1]);
