@@ -20,9 +20,9 @@ console.log(`   - URL Present: ${!!SUPABASE_URL}`);
 console.log(`   - Key Present: ${!!SUPABASE_SERVICE_KEY}`);
 console.log(`   - URL: ${SUPABASE_URL}`);
 
-// FORCE ANON KEY for debugging purpose since Service Key is failing
-const EFFECTIVE_KEY = process.env.VITE_SUPABASE_ANON_KEY ? process.env.VITE_SUPABASE_ANON_KEY.trim() : '';
-console.log(`   - Using Key: ANON_KEY (Forced)`);
+// Use Service Role Key for full access
+const EFFECTIVE_KEY = SUPABASE_SERVICE_KEY;
+console.log(`   - Using Key: SERVICE_ROLE_KEY (Privileged)`);
 
 if (!SUPABASE_URL || !EFFECTIVE_KEY) {
     console.error('❌ [Sentry] Critical Error: Missing Environment Variables.');
