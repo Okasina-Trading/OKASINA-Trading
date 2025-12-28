@@ -211,10 +211,10 @@ export default function ProductEditModal({ product, isOpen, onClose, onUpdate })
                             <label className="block text-sm font-medium text-gray-700 mb-2 text-center">
                                 Product Image
                             </label>
-                            <div className="relative border-2 border-dashed border-gray-400 rounded-lg p-6 hover:border-blue-600 transition-colors bg-white flex flex-col items-center justify-center min-h-[200px] shadow-sm group">
+                            <div className="relative border-2 border-dashed border-blue-400 rounded-lg p-6 hover:border-blue-600 transition-colors bg-blue-50 flex flex-col items-center justify-center min-h-[220px] shadow-sm group cursor-pointer">
                                 {imagePreview ? (
                                     <>
-                                        <img src={imagePreview} alt="Preview" className="w-full h-48 object-contain rounded-md mb-2 bg-gray-50" />
+                                        <img src={imagePreview} alt="Preview" className="w-full h-48 object-contain rounded-md mb-2 bg-gray-50 border border-gray-200" />
                                         <button
                                             type="button"
                                             onClick={(e) => {
@@ -223,23 +223,24 @@ export default function ProductEditModal({ product, isOpen, onClose, onUpdate })
                                                 setImageFile(null);
                                                 setImagePreview(null);
                                             }}
-                                            className="absolute top-2 right-2 bg-white text-red-600 p-1 rounded-full shadow-md hover:bg-red-50 z-20"
+                                            className="absolute top-2 right-2 bg-white text-red-600 p-1.5 rounded-full shadow-md hover:bg-red-50 z-20 border border-gray-200"
                                             title="Remove Image"
                                         >
-                                            <X size={16} />
+                                            <X size={18} />
                                         </button>
                                     </>
                                 ) : (
-                                    <div className="text-center group-hover:scale-105 transition-transform z-10 pointer-events-none py-4">
-                                        <div className="mx-auto h-16 w-16 text-blue-600 mb-3 bg-blue-100 rounded-full flex items-center justify-center border-2 border-blue-200 shadow-sm">
-                                            <Upload size={32} strokeWidth={2.5} />
+                                    <div className="text-center group-hover:scale-105 transition-transform z-10 py-6 pointer-events-none">
+                                        <div className="mx-auto h-20 w-20 text-blue-600 mb-4 bg-white rounded-full flex items-center justify-center border-2 border-blue-200 shadow-md">
+                                            <Upload size={40} strokeWidth={2} />
                                         </div>
-                                        <p className="text-lg font-bold text-gray-900">Click to Upload Image</p>
-                                        <p className="text-sm text-gray-500 mt-1">PNG, JPG or WEBP (Max 5MB)</p>
+                                        <p className="text-xl font-bold text-gray-900 mb-1">Upload Product Image</p>
+                                        <p className="text-sm font-medium text-gray-600">Click here to browse files</p>
+                                        <p className="text-xs text-gray-500 mt-2">Supports JPG, PNG, WEBP (Max 5MB)</p>
                                     </div>
                                 )}
                                 {analyzing && (
-                                    <div className="absolute inset-0 bg-white/90 flex flex-col items-center justify-center z-10 backdrop-blur-sm">
+                                    <div className="absolute inset-0 bg-white/95 flex flex-col items-center justify-center z-30 backdrop-blur-sm rounded-lg border-2 border-blue-500">
                                         <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-3"></div>
                                         <p className="text-lg font-bold text-blue-600 animate-pulse">Running AI Analysis...</p>
                                     </div>
@@ -248,7 +249,7 @@ export default function ProductEditModal({ product, isOpen, onClose, onUpdate })
                                     type="file"
                                     accept="image/*"
                                     onChange={handleImageChange}
-                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-0"
+                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                                     title="Upload an image"
                                 />
                             </div>
