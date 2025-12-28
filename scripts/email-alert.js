@@ -11,7 +11,7 @@ const rootDir = path.resolve(__dirname, '..');
 // Load .env from root
 dotenv.config({ path: path.join(rootDir, '.env') });
 
-const RECIPIENT_EMAIL = 'dubsy1983@gmail.com';
+const RECIPIENT_EMAIL = process.env.VITE_ALERT_RECIPIENT || process.env.VITE_SMTP_USER;
 
 const transporter = nodemailer.createTransport({
     host: process.env.VITE_SMTP_HOST || 'smtpout.secureserver.net',
