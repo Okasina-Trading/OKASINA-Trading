@@ -287,11 +287,29 @@ app.post('/api/update-order-status', async (req, res) => {
 });
 
 // Delete single order
+// Delete single order
 app.post('/api/delete-order', async (req, res) => {
   try {
     const { orderId } = req.body;
     console.log(`Deleting order ${orderId}`);
 
+    // 1. Delete associated loyalty transactions
+    const { error: loyaltyError } = await getSupabaseAdmin()
+      .from('loyalty_transactions')
+      .delete()
+      .eq('order_id', orderId);
+
+    if (loyaltyError) console.warn('Loyalty delete warning:', loyaltyError);
+
+    // 2. Delete order items
+    const { error: itemsError } = await getSupabaseAdmin()
+      .from('order_items')
+      .delete()
+      .eq('order_id', orderId);
+
+    if (itemsError) console.warn('Items delete warning:', itemsError);
+
+    // 3. Delete order
     const { error } = await getSupabaseAdmin()
       .from('orders')
       .delete()
@@ -310,7 +328,23 @@ app.post('/api/clear-orders', async (req, res) => {
   try {
     console.log('CLEARING ALL ORDERS');
 
-    // Using simple delete of all rows
+    // 1. Clear loyalty transactions related to orders
+    const { error: loyaltyError } = await getSupabaseAdmin()
+      .from('loyalty_transactions')
+      .delete()
+      .neq('order_id', '00000000-0000-0000-0000-000000000000');
+
+    if (loyaltyError) console.warn('Loyalty cleanup warning:', loyaltyError);
+
+    // 2. Clear all order items
+    const { error: itemsError } = await getSupabaseAdmin()
+      .from('order_items')
+      .delete()
+      .neq('id', 0);
+
+    if (itemsError) console.warn('Items cleanup warning:', itemsError);
+
+    // 3. Clear all orders
     const { error, count } = await getSupabaseAdmin()
       .from('orders')
       .delete({ count: 'exact' })
