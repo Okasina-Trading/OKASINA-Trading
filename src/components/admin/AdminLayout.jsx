@@ -190,9 +190,23 @@ export default function AdminLayout({ children }) {
                         <Link to="/" className="hidden sm:block px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors">
                             View Store
                         </Link>
+                        {/* New Mobile-Friendly Add Product Shortcut */}
+                        <button
+                            onClick={() => {
+                                if (location.pathname === '/admin/products') {
+                                    window.dispatchEvent(new CustomEvent('open-add-product'));
+                                } else {
+                                    navigate('/admin/products?action=add');
+                                }
+                            }}
+                            className="flex items-center gap-2 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium shadow-sm"
+                        >
+                            <Package size={18} />
+                            <span>Add<span className="hidden sm:inline"> Product</span></span>
+                        </button>
                         <Link
                             to="/admin/stock-manager"
-                            className="px-3 py-2 lg:px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium whitespace-nowrap"
+                            className="hidden xs:flex px-3 py-2 lg:px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium whitespace-nowrap"
                         >
                             <span className="hidden sm:inline">Bulk </span>Import
                         </Link>

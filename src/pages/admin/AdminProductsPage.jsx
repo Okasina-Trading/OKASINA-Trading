@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { supabase } from '../../supabase';
 import AdminLayout from '../../components/admin/AdminLayout';
 import ProductEditModal from '../../components/admin/ProductEditModal';
@@ -45,9 +45,27 @@ export default function AdminProductsPage() {
     const [showBulkCategoryModal, setShowBulkCategoryModal] = useState(false);
     const [newCategory, setNewCategory] = useState('');
 
+    const [searchParams, setSearchParams] = useSearchParams();
+
     useEffect(() => {
         fetchProducts();
-    }, []);
+
+        // Check for ?action=add in URL
+        if (searchParams.get('action') === 'add') {
+            setEditingProduct(null);
+            setShowEditModal(true);
+            // Clean up URL
+            setSearchParams({}, { replace: true });
+        }
+
+        // Mobile listener for header shortcut (instant if already on page)
+        const handler = () => {
+            setEditingProduct(null);
+            setShowEditModal(true);
+        };
+        window.addEventListener('open-add-product', handler);
+        return () => window.removeEventListener('open-add-product', handler);
+    }, [searchParams]);
 
     const fetchProducts = async () => {
         try {
@@ -482,6 +500,17 @@ export default function AdminProductsPage() {
                         </div>
 
                         <div className="flex flex-wrap gap-3 w-full md:w-auto">
+                            <button
+                                onClick={() => {
+                                    setEditingProduct(null);
+                                    setShowEditModal(true);
+                                }}
+                                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 whitespace-nowrap shadow-sm order-first md:order-none"
+                            >
+                                <Plus size={20} />
+                                Add Product
+                            </button>
+
                             <select
                                 value={statusFilter}
                                 onChange={(e) => setStatusFilter(e.target.value)}
@@ -538,17 +567,6 @@ export default function AdminProductsPage() {
                                 <Upload size={20} />
                                 Bulk CSV Import
                             </Link>
-
-                            <button
-                                onClick={() => {
-                                    setEditingProduct(null);
-                                    setShowEditModal(true);
-                                }}
-                                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 whitespace-nowrap"
-                            >
-                                <Plus size={20} />
-                                Add Product
-                            </button>
 
                             <Link
                                 to="/admin/automation"

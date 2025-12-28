@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
 import metaService from '../../services/metaService';
+import { supabase } from '../../supabase';
+import { Zap } from 'lucide-react';
 import {
     Megaphone,
     Mail,
@@ -52,13 +53,60 @@ export default function AdminMarketingPage() {
     const [isPosting, setIsPosting] = useState(false);
     const [postStatus, setPostStatus] = useState(null); // { type: 'success' | 'error', message: string }
 
+    // Banner Settings State
+    const [bannerSettings, setBannerSettings] = useState({
+        text: 'Flash Sale: Up to 70% OFF!',
+        end_date: '2025-12-31T00:00:00Z',
+        is_active: true
+    });
+    const [savingBanner, setSavingBanner] = useState(false);
+
     useEffect(() => {
         // Check if already connected
         if (metaService.isAuthenticated()) {
             setIsConnected(true);
             loadPages();
         }
+        fetchBannerSettings();
     }, []);
+
+    const fetchBannerSettings = async () => {
+        try {
+            const { data, error } = await supabase
+                .from('site_settings')
+                .select('value')
+                .eq('key', 'flash_sale')
+                .single();
+
+            if (data) {
+                setBannerSettings(data.value);
+            }
+        } catch (error) {
+            console.error('Error fetching banner settings:', error);
+        }
+    };
+
+    const handleSaveBanner = async (e) => {
+        e.preventDefault();
+        setSavingBanner(true);
+        try {
+            const { error } = await supabase
+                .from('site_settings')
+                .upsert({
+                    key: 'flash_sale',
+                    value: bannerSettings,
+                    updated_at: new Date().toISOString()
+                });
+
+            if (error) throw error;
+            alert('Banner settings saved successfully!');
+        } catch (error) {
+            console.error('Error saving banner settings:', error);
+            alert('Failed to save banner settings');
+        } finally {
+            setSavingBanner(false);
+        }
+    };
 
     const loadPages = async () => {
         try {
@@ -239,6 +287,15 @@ export default function AdminMarketingPage() {
                                 }`}
                         >
                             Promotions
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('banner')}
+                            className={`flex-1 px-4 py-3 rounded-lg font-medium transition-colors ${activeTab === 'banner'
+                                ? 'bg-blue-600 text-white'
+                                : 'text-gray-600 hover:bg-gray-100'
+                                }`}
+                        >
+                            Flash Sale Banner
                         </button>
                     </div>
                 </div>
@@ -863,6 +920,85 @@ export default function AdminMarketingPage() {
                             <Plus size={20} />
                             Create New Promotion
                         </button>
+                    </div>
+                )}
+
+                {/* Banner Tab */}
+                {activeTab === 'banner' && (
+                    <div className="bg-white rounded-xl p-6 border border-gray-200">
+                        <div className="flex items-center gap-3 mb-6">
+                            <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                                <Zap className="text-orange-600" size={24} />
+                            </div>
+                            <div>
+                                <h2 className="text-xl font-semibold text-gray-900">Flash Sale Banner Settings</h2>
+                                <p className="text-sm text-gray-500">Manage the promotional banner shown at the top of every page</p>
+                            </div>
+                        </div>
+
+                        <form onSubmit={handleSaveBanner} className="space-y-6 max-w-2xl">
+                            <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-6">
+                                <p className="text-sm font-medium text-gray-700 mb-2 underline">Live Preview:</p>
+                                <div className="bg-gradient-to-r from-orange-600 to-red-600 text-white py-2 px-4 rounded shadow-sm text-center">
+                                    <span className="font-bold text-sm uppercase tracking-wide">
+                                        {bannerSettings.text}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center gap-3 p-4 bg-blue-50 rounded-lg border border-blue-100 mb-6">
+                                <input
+                                    type="checkbox"
+                                    id="is_active"
+                                    checked={bannerSettings.is_active}
+                                    onChange={(e) => setBannerSettings(prev => ({ ...prev, is_active: e.target.checked }))}
+                                    className="w-5 h-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                                />
+                                <label htmlFor="is_active" className="font-medium text-blue-900">
+                                    Show Banner on Site
+                                </label>
+                            </div>
+
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Banner Text
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={bannerSettings.text}
+                                        onChange={(e) => setBannerSettings(prev => ({ ...prev, text: e.target.value }))}
+                                        placeholder="e.g. Flash Sale: Up to 70% OFF!"
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                                        required
+                                    />
+                                    <p className="text-xs text-gray-500 mt-1">Keep it short and catchy for best results.</p>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Sale End Date & Time
+                                    </label>
+                                    <input
+                                        type="datetime-local"
+                                        value={bannerSettings.end_date.slice(0, 16)}
+                                        onChange={(e) => setBannerSettings(prev => ({ ...prev, end_date: new Date(e.target.value).toISOString() }))}
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                                        required
+                                    />
+                                    <p className="text-xs text-gray-500 mt-1">The countdown timer will count down to this date.</p>
+                                </div>
+                            </div>
+
+                            <button
+                                type="submit"
+                                disabled={savingBanner}
+                                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 font-medium disabled:opacity-50"
+                            >
+                                {savingBanner ? <Loader2 className="animate-spin" size={20} /> : <CheckCircle size={20} />}
+                                {savingBanner ? 'Saving...' : 'Save Banner Settings'}
+                            </button>
+                        </form>
                     </div>
                 )}
             </div>

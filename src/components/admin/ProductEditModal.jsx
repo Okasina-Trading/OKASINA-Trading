@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
+import { X, Upload } from 'lucide-react';
 import { supabase } from '../../supabase';
 import { API_BASE_URL as API_URL } from '../../config';
 
@@ -21,7 +21,8 @@ export default function ProductEditModal({ product, isOpen, onClose, onUpdate })
         sizes: '',
         material: '',
         colors: '',
-        image_url: ''
+        image_url: '',
+        mrp: ''
     });
     const [saving, setSaving] = useState(false);
 
@@ -40,7 +41,8 @@ export default function ProductEditModal({ product, isOpen, onClose, onUpdate })
                 sizes: Array.isArray(product.sizes) ? product.sizes.join(', ') : (product.sizes || ''),
                 material: product.material || '',
                 colors: product.colors || '',
-                image_url: product.image_url || ''
+                image_url: product.image_url || '',
+                mrp: product.mrp || ''
             });
             setImagePreview(product.image_url || null);
         } else {
@@ -48,7 +50,8 @@ export default function ProductEditModal({ product, isOpen, onClose, onUpdate })
             setFormData({
                 name: '', description: '', category: '', subcategory: '',
                 price: '', price_mur: '', stock_qty: '', sku: '',
-                status: 'active', sizes: '', material: '', colors: '', image_url: ''
+                status: 'active', sizes: '', material: '', colors: '', image_url: '',
+                mrp: ''
             });
             setImagePreview(null);
             setImageFile(null);
@@ -154,7 +157,8 @@ export default function ProductEditModal({ product, isOpen, onClose, onUpdate })
                 sizes: formData.sizes.split(',').map(s => s.trim()).filter(s => s),
                 material: formData.material,
                 colors: formData.colors,
-                image_url: finalImageUrl
+                image_url: finalImageUrl,
+                mrp: formData.mrp ? parseFloat(formData.mrp) : null
             };
 
             let response;
@@ -191,8 +195,8 @@ export default function ProductEditModal({ product, isOpen, onClose, onUpdate })
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-            <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full my-8">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start md:items-center justify-center z-[60] p-0 sm:p-4 overflow-y-auto">
+            <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full my-0 sm:my-8 relative min-h-screen sm:min-h-0">
                 <div className="bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center rounded-t-xl sticky top-0 z-10">
                     <h2 className="text-xl font-bold text-gray-900">{product ? 'Edit Product' : 'Add New Product'}</h2>
                     <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
@@ -317,6 +321,19 @@ export default function ProductEditModal({ product, isOpen, onClose, onUpdate })
                             <p className="text-xs text-gray-500 mt-1">This will be used as the main selling price.</p>
                         </div>
 
+                        <div className="md:col-span-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Original Price (MRP) - Optional</label>
+                            <input
+                                type="number"
+                                name="mrp"
+                                value={formData.mrp}
+                                onChange={handleChange}
+                                step="0.01"
+                                placeholder="Used for showing slashed price/discounts"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                            />
+                        </div>
+
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Stock Quantity *</label>
                             <input
@@ -392,18 +409,18 @@ export default function ProductEditModal({ product, isOpen, onClose, onUpdate })
                         </div>
                     </div>
 
-                    <div className="flex gap-3 pt-4 border-t border-gray-200">
+                    <div className="flex gap-3 p-6 border-t border-gray-200 bg-gray-50 rounded-b-xl sticky bottom-0 z-10">
                         <button
                             type="button"
                             onClick={onClose}
-                            className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                            className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 bg-white rounded-lg hover:bg-gray-100 transition-colors"
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
                             disabled={saving}
-                            className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 font-medium"
+                            className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 font-medium shadow-md"
                         >
                             {saving ? 'Saving...' : 'Save Product'}
                         </button>
