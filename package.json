@@ -8,6 +8,8 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
+    "doctor": "node scripts/titan-doctor.js",
+    "sentry": "node scripts/inventory-sentry.js",
     "test": "vitest run",
     "jarvis:check": "node scripts/jarvis-health-check.js",
     "jarvis:repair": "node scripts/jarvis-auto-repair.js",
