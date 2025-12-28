@@ -31,7 +31,9 @@ jobs:
           cache: "npm"
 
       - name: Install dependencies
-        run: npm ci
+        run: |
+          npm ci
+          npx playwright install --with-deps
 
       - name: Run JARVIS Master Orchestrator
         env:
@@ -42,6 +44,7 @@ jobs:
           CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
           CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
           CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+          BASE_URL: https://okasinatrading.com
         run: npm run jarvis:master
 
       - name: Upload JARVIS Report
