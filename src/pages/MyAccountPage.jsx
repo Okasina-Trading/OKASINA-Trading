@@ -5,18 +5,20 @@ import { useNavigate } from 'react-router-dom';
 import { Package, LogOut, User, Crown } from 'lucide-react';
 
 export default function MyAccountPage() {
-    const { user, signOut } = useAuth();
+    const { user, signOut, loading: authLoading } = useAuth(); // rename to avoid conflict with local loading
     const navigate = useNavigate();
     const [orders, setOrders] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [dataLoading, setDataLoading] = useState(true); // rename local state
 
     useEffect(() => {
+        if (authLoading) return; // Wait for auth check
+
         if (!user) {
             navigate('/login');
             return;
         }
         fetchOrders();
-    }, [user]);
+    }, [user, authLoading]);
 
     const fetchOrders = async () => {
         // Fetch orders where customer_email matches the logged-in user's email
@@ -29,13 +31,17 @@ export default function MyAccountPage() {
         if (!error) {
             setOrders(data);
         }
-        setLoading(false);
+        setDataLoading(false);
     };
 
     const handleSignOut = async () => {
         await signOut();
         navigate('/');
     };
+
+    if (authLoading) {
+        return <div className="flex h-screen items-center justify-center">Loading account...</div>;
+    }
 
     if (!user) return null;
 
@@ -104,7 +110,7 @@ export default function MyAccountPage() {
                         <Package size={24} className="mr-2" /> Order History
                     </h2>
 
-                    {loading ? (
+                    {dataLoading ? (
                         <p>Loading orders...</p>
                     ) : orders.length === 0 ? (
                         <div className="bg-gray-50 p-8 text-center rounded-lg">
