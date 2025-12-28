@@ -21,6 +21,9 @@ export default function CheckoutPage() {
     const [loyaltyProfile, setLoyaltyProfile] = useState(null);
     const [redeemPoints, setRedeemPoints] = useState(false);
 
+    // Flash Sale State
+    const [flashSale, setFlashSale] = useState(null);
+
     const [formData, setFormData] = useState({
         fullName: '',
         email: user?.email || '',
@@ -34,11 +37,32 @@ export default function CheckoutPage() {
         if (user) {
             loadLoyaltyProfile();
         }
+        checkFlashSale();
     }, [user]);
 
     const loadLoyaltyProfile = async () => {
         const profile = await LoyaltyService.getProfile(user.id);
         setLoyaltyProfile(profile);
+    };
+
+    const checkFlashSale = async () => {
+        try {
+            const { data } = await supabase
+                .from('site_settings')
+                .select('value')
+                .eq('key', 'flash_sale')
+                .single();
+
+            if (data?.value?.is_active) {
+                const now = new Date();
+                const end = new Date(data.value.end_date);
+                if (now < end) {
+                    setFlashSale(data.value);
+                }
+            }
+        } catch (e) {
+            console.error('Error checking flash sale:', e);
+        }
     };
 
     const SHIPPING_RATES = { pickup: 0, postage: 100, door: 150 };
@@ -54,10 +78,25 @@ export default function CheckoutPage() {
     // Loyalty Logic
     const pointsAvailable = loyaltyProfile?.points_balance || 0;
     const maxDiscount = LoyaltyService.calculateDiscount(pointsAvailable);
-    // Don't allow discount > subtotal
-    const appliedDiscount = redeemPoints ? Math.min(maxDiscount, subtotal) : 0;
-    const pointsToRedeem = redeemPoints ? Math.ceil(appliedDiscount / 1) : 0; // 1 Point = 1 Rs (as per service)
+    const loyaltyDiscount = redeemPoints ? Math.min(maxDiscount, subtotal) : 0;
+    const pointsToRedeem = redeemPoints ? Math.ceil(loyaltyDiscount / 1) : 0;
 
+    // Flash Sale Logic
+    let flashSaleDiscount = 0;
+    let flashSalePercent = 0;
+
+    if (flashSale) {
+        // Extract percentage from text (e.g. "Up to 30% OFF")
+        // If not found, default to 0 or manual overrides
+        const match = flashSale.text.match(/(\d+)%/);
+        if (match) {
+            flashSalePercent = parseInt(match[1]);
+            // Apply to subtotal
+            flashSaleDiscount = Math.round(subtotal * (flashSalePercent / 100));
+        }
+    }
+
+    const appliedDiscount = loyaltyDiscount + flashSaleDiscount;
     const total = subtotal + shippingCost - appliedDiscount;
 
     const handleChange = (e) => {
@@ -89,7 +128,7 @@ export default function CheckoutPage() {
                 shipping_address: `${formData.address}${formData.city ? ', ' + formData.city : ''}`,
                 shipping_method: shippingMethod,
                 payment_method: paymentMethod,
-                order_notes: formData.notes,
+                order_notes: `${formData.notes}${flashSale ? ` [Flash Sale: ${flashSalePercent}% Applied]` : ''}`,
                 items: orderItems, // stored as JSONB
                 total_amount: total,
                 total: total, // LEGACY/COMPATIBILITY: DB has 'total' column as NOT NULL
@@ -98,7 +137,7 @@ export default function CheckoutPage() {
                 status: 'pending',
                 // Loyalty Fields
                 points_redeemed: pointsToRedeem,
-                discount_amount: appliedDiscount
+                discount_amount: appliedDiscount // Includes both loyalty + flash sale
             };
 
 
@@ -169,7 +208,7 @@ export default function CheckoutPage() {
                     <p>Hi ${formData.fullName}, thanks for your order #${orderId.slice(0, 8)}.</p>
                     <table style="width: 100%;">${itemsHtml}</table>
                     <p><strong>Total: Rs ${total.toLocaleString()}</strong></p>
-                    ${appliedDiscount > 0 ? `<p style="color: green;">(Includes Rs ${appliedDiscount} Loyalty Discount)</p>` : ''}
+                    ${appliedDiscount > 0 ? `<p style="color: green;">(Includes Rs ${appliedDiscount} Discount)</p>` : ''}
                 </div>
             `;
 
@@ -303,10 +342,19 @@ export default function CheckoutPage() {
                         <div className="border-t pt-4 space-y-2">
                             <div className="flex justify-between text-gray-600"><span>Subtotal</span><span>Rs {subtotal.toLocaleString()}</span></div>
                             <div className="flex justify-between text-gray-600"><span>Shipping</span><span>Rs {shippingCost}</span></div>
+
+                            {/* Flash Sale Line Item */}
+                            {flashSaleDiscount > 0 && (
+                                <div className="flex justify-between text-red-600 font-bold">
+                                    <span>Flash Sale ({flashSalePercent}% OFF)</span>
+                                    <span>- Rs {flashSaleDiscount.toLocaleString()}</span>
+                                </div>
+                            )}
+
                             {redeemPoints && (
                                 <div className="flex justify-between text-green-600 font-medium">
                                     <span>Loyalty Discount</span>
-                                    <span>- Rs {appliedDiscount.toLocaleString()}</span>
+                                    <span>- Rs {loyaltyDiscount.toLocaleString()}</span>
                                 </div>
                             )}
                             <div className="flex justify-between text-xl font-bold pt-4 border-t mt-4">

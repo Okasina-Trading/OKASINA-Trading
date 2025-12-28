@@ -15,6 +15,8 @@ const FlashSaleBanner = () => {
     });
     const [loading, setLoading] = useState(true);
 
+    const navigate = useNavigate();
+
     useEffect(() => {
         fetchSettings();
     }, []);
@@ -92,9 +94,12 @@ const FlashSaleBanner = () => {
 
                 {/* Right: CTA */}
                 <div className="hidden sm:block">
-                    <span className="text-xs bg-white text-red-600 font-bold px-3 py-1 rounded-full uppercase tracking-wider hover:bg-yellow-100 cursor-pointer transition-colors">
+                    <button
+                        onClick={() => navigate('/shop')}
+                        className="text-xs bg-white text-red-600 font-bold px-3 py-1 rounded-full uppercase tracking-wider hover:bg-yellow-100 cursor-pointer transition-colors shadow-sm"
+                    >
                         Shop Now
-                    </span>
+                    </button>
                 </div>
             </div>
         </div>
