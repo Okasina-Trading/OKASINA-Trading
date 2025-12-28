@@ -230,12 +230,12 @@ export default function ProductEditModal({ product, isOpen, onClose, onUpdate })
                                         </button>
                                     </>
                                 ) : (
-                                    <div className="text-center group-hover:scale-105 transition-transform">
-                                        <div className="mx-auto h-16 w-16 text-blue-500 mb-3 bg-blue-50 rounded-full flex items-center justify-center">
-                                            <Upload size={32} />
+                                    <div className="text-center group-hover:scale-105 transition-transform z-10 pointer-events-none py-4">
+                                        <div className="mx-auto h-16 w-16 text-blue-600 mb-3 bg-blue-100 rounded-full flex items-center justify-center border-2 border-blue-200 shadow-sm">
+                                            <Upload size={32} strokeWidth={2.5} />
                                         </div>
-                                        <p className="text-base font-bold text-gray-700">Click to Upload Image</p>
-                                        <p className="text-xs text-gray-500 mt-1">Supports JPG, PNG, WEBP</p>
+                                        <p className="text-lg font-bold text-gray-900">Click to Upload Image</p>
+                                        <p className="text-sm text-gray-500 mt-1">PNG, JPG or WEBP (Max 5MB)</p>
                                     </div>
                                 )}
                                 {analyzing && (

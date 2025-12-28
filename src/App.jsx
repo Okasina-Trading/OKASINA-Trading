@@ -54,6 +54,70 @@ import JarvisFeedbackWidget from './components/JarvisFeedbackWidget';
 import TitanAssistWidget from './components/common/TitanAssistWidget';
 import FlashSaleBanner from './components/common/FlashSaleBanner';
 
+import { useLocation } from 'react-router-dom';
+
+function AppContent() {
+    const location = useLocation();
+    const isAdminPath = location.pathname.startsWith('/admin');
+
+    return (
+        <div className="flex flex-col min-h-screen">
+            <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-black focus:text-white focus:rounded-md">
+                Skip to content
+            </a>
+            {!isAdminPath && <FlashSaleBanner />}
+            {!isAdminPath && <HeaderNew />}
+            <main id="main-content" className="flex-grow">
+                {!isAdminPath && <Breadcrumbs />}
+                <Routes>
+                    <Route path="/" element={<HomePage />} />
+                    <Route path="/shop" element={<ShopPage />} />
+                    <Route path="/product/:id" element={<ProductPage />} />
+                    <Route path="/cart" element={<CartPage />} />
+                    <Route path="/checkout" element={<CheckoutPage />} />
+                    <Route path="/orders" element={<OrdersPage />} />
+                    <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+                    <Route path="/terms-of-service" element={<TermsOfServicePage />} />
+                    <Route path="/login" element={<LoginPage />} />
+                    <Route path="/signup" element={<SignupPage />} />
+                    <Route path="/new-arrivals" element={<NewArrivalsPage />} />
+                    <Route path="/feedback" element={<FeedbackPage />} />
+                    <Route path="/wishlist" element={<WishlistPage />} />
+                    <Route path="/account" element={<MyAccountPage />} />
+                    <Route path="/compare" element={<ComparePage />} />
+                    <Route path="/rewards" element={<MyRewardsPage />} />
+
+                    {/* Protected Admin Routes */}
+                    <Route path="/admin" element={<ProtectedRoute><AdminDashboardPage /></ProtectedRoute>} />
+                    <Route path="/admin/products" element={<ProtectedRoute><AdminProductsPage /></ProtectedRoute>} />
+                    <Route path="/admin/orders" element={<ProtectedRoute><AdminOrdersPage /></ProtectedRoute>} />
+                    <Route path="/admin/analytics" element={<ProtectedRoute><AdminAnalyticsPage /></ProtectedRoute>} />
+                    <Route path="/admin/marketing" element={<ProtectedRoute><AdminMarketingPage /></ProtectedRoute>} />
+                    <Route path="/admin/reviews" element={<ProtectedRoute><AdminReviewsPage /></ProtectedRoute>} />
+                    <Route path="/admin/media" element={<ProtectedRoute><MediaManagerPage /></ProtectedRoute>} />
+                    <Route path="/admin/stock-manager" element={<ProtectedRoute><StockManagerPage /></ProtectedRoute>} />
+                    <Route path="/admin/coupons" element={<ProtectedRoute><AdminCouponsPage /></ProtectedRoute>} />
+                    <Route path="/admin/automation" element={<ProtectedRoute><AdminAutomationPage /></ProtectedRoute>} />
+                    <Route path="/admin/ai-employees" element={<ProtectedRoute><AdminAiEmployeesPage /></ProtectedRoute>} />
+                    <Route path="/admin/ai-enrichment" element={<ProtectedRoute><AiEnrichmentCenter /></ProtectedRoute>} />
+                    <Route path="/admin/album-import" element={<ProtectedRoute><AlbumImportPage /></ProtectedRoute>} />
+                    <Route path="/admin/social-media" element={<ProtectedRoute><AdminSocialMediaPage /></ProtectedRoute>} />
+                    <Route path="/admin/sms-marketing" element={<ProtectedRoute><SMSMarketingPage /></ProtectedRoute>} />
+                    <Route path="/admin/citadel" element={<ProtectedRoute><AdminCitadelPage /></ProtectedRoute>} />
+                    <Route path="/admin/system-health" element={<ProtectedRoute><AdminSystemHealth /></ProtectedRoute>} />
+                </Routes>
+            </main>
+            {!isAdminPath && <ProductComparisonBar />}
+            <React.Suspense fallback={null}>
+                <StylistChatWidget />
+            </React.Suspense>
+            <JarvisFeedbackWidget />
+            <TitanAssistWidget />
+            {!isAdminPath && <Footer />}
+        </div>
+    );
+}
+
 export default function App() {
     return (
         <ErrorBoundary>
@@ -65,60 +129,7 @@ export default function App() {
                                 <WishlistProvider>
                                     <CurrencyProvider>
                                         <BrowserRouter>
-                                            <div className="flex flex-col min-h-screen">
-                                                <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-black focus:text-white focus:rounded-md">
-                                                    Skip to content
-                                                </a>
-                                                <FlashSaleBanner />
-                                                <HeaderNew />
-                                                <main id="main-content" className="flex-grow">
-                                                    <Breadcrumbs />
-                                                    <Routes>
-                                                        <Route path="/" element={<HomePage />} />
-                                                        <Route path="/shop" element={<ShopPage />} />
-                                                        <Route path="/product/:id" element={<ProductPage />} />
-                                                        <Route path="/cart" element={<CartPage />} />
-                                                        <Route path="/checkout" element={<CheckoutPage />} />
-                                                        <Route path="/orders" element={<OrdersPage />} />
-                                                        <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
-                                                        <Route path="/terms-of-service" element={<TermsOfServicePage />} />
-                                                        <Route path="/login" element={<LoginPage />} />
-                                                        <Route path="/signup" element={<SignupPage />} />
-                                                        <Route path="/new-arrivals" element={<NewArrivalsPage />} />
-                                                        <Route path="/feedback" element={<FeedbackPage />} />
-                                                        <Route path="/wishlist" element={<WishlistPage />} />
-                                                        <Route path="/account" element={<MyAccountPage />} />
-                                                        <Route path="/compare" element={<ComparePage />} />
-                                                        <Route path="/rewards" element={<MyRewardsPage />} />
-
-                                                        {/* Protected Admin Routes */}
-                                                        <Route path="/admin" element={<ProtectedRoute><AdminDashboardPage /></ProtectedRoute>} />
-                                                        <Route path="/admin/products" element={<ProtectedRoute><AdminProductsPage /></ProtectedRoute>} />
-                                                        <Route path="/admin/orders" element={<ProtectedRoute><AdminOrdersPage /></ProtectedRoute>} />
-                                                        <Route path="/admin/analytics" element={<ProtectedRoute><AdminAnalyticsPage /></ProtectedRoute>} />
-                                                        <Route path="/admin/marketing" element={<ProtectedRoute><AdminMarketingPage /></ProtectedRoute>} />
-                                                        <Route path="/admin/reviews" element={<ProtectedRoute><AdminReviewsPage /></ProtectedRoute>} />
-                                                        <Route path="/admin/media" element={<ProtectedRoute><MediaManagerPage /></ProtectedRoute>} />
-                                                        <Route path="/admin/stock-manager" element={<ProtectedRoute><StockManagerPage /></ProtectedRoute>} />
-                                                        <Route path="/admin/coupons" element={<ProtectedRoute><AdminCouponsPage /></ProtectedRoute>} />
-                                                        <Route path="/admin/automation" element={<ProtectedRoute><AdminAutomationPage /></ProtectedRoute>} />
-                                                        <Route path="/admin/ai-employees" element={<ProtectedRoute><AdminAiEmployeesPage /></ProtectedRoute>} />
-                                                        <Route path="/admin/ai-enrichment" element={<ProtectedRoute><AiEnrichmentCenter /></ProtectedRoute>} />
-                                                        <Route path="/admin/album-import" element={<ProtectedRoute><AlbumImportPage /></ProtectedRoute>} />
-                                                        <Route path="/admin/social-media" element={<ProtectedRoute><AdminSocialMediaPage /></ProtectedRoute>} />
-                                                        <Route path="/admin/sms-marketing" element={<ProtectedRoute><SMSMarketingPage /></ProtectedRoute>} />
-                                                        <Route path="/admin/citadel" element={<ProtectedRoute><AdminCitadelPage /></ProtectedRoute>} />
-                                                        <Route path="/admin/system-health" element={<ProtectedRoute><AdminSystemHealth /></ProtectedRoute>} />
-                                                    </Routes>
-                                                </main>
-                                                <ProductComparisonBar />
-                                                <React.Suspense fallback={null}>
-                                                    <StylistChatWidget />
-                                                </React.Suspense>
-                                                <JarvisFeedbackWidget />
-                                                <TitanAssistWidget />
-                                                <Footer />
-                                            </div>
+                                            <AppContent />
                                         </BrowserRouter>
                                     </CurrencyProvider>
                                 </WishlistProvider>

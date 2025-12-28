@@ -252,9 +252,16 @@ export default function AdminMarketingPage() {
     return (
         <AdminLayout>
             <div className="space-y-6">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <h1 className="text-2xl font-bold text-gray-900">Marketing Hub</h1>
+                        <p className="text-sm text-gray-500 mt-1">Manage your storefront promotions and social reach</p>
+                    </div>
+                </div>
+
                 {/* Tab Navigation */}
-                <div className="bg-white rounded-xl border border-gray-200 p-2">
-                    <div className="flex gap-2">
+                <div className="bg-gray-100 rounded-xl border border-gray-200 p-1.5 shadow-inner">
+                    <div className="flex flex-wrap gap-1">
                         <button
                             onClick={() => setActiveTab('overview')}
                             className={`flex-1 px-4 py-3 rounded-lg font-medium transition-colors ${activeTab === 'overview'
