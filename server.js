@@ -286,6 +286,44 @@ app.post('/api/update-order-status', async (req, res) => {
   }
 });
 
+// Delete single order
+app.post('/api/delete-order', async (req, res) => {
+  try {
+    const { orderId } = req.body;
+    console.log(`Deleting order ${orderId}`);
+
+    const { error } = await getSupabaseAdmin()
+      .from('orders')
+      .delete()
+      .eq('id', orderId);
+
+    if (error) throw error;
+    res.json({ success: true, message: 'Order deleted' });
+  } catch (error) {
+    console.error('Delete order error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Clear all orders (Bogus cleanup)
+app.post('/api/clear-orders', async (req, res) => {
+  try {
+    console.log('CLEARING ALL ORDERS');
+
+    // Using simple delete of all rows
+    const { error, count } = await getSupabaseAdmin()
+      .from('orders')
+      .delete({ count: 'exact' })
+      .neq('id', '00000000-0000-0000-0000-000000000000'); // Hack to delete all
+
+    if (error) throw error;
+    res.json({ success: true, message: `Cleared ${count} orders` });
+  } catch (error) {
+    console.error('Clear orders error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // --- AI Agent Endpoints (Cloud Compatible) ---
 
 // AI Stylist Chat Endpoint

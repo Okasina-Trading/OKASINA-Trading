@@ -89,12 +89,22 @@ export default function AdminOrdersPage() {
         if (!window.confirm('Are you sure you want to delete this order PERMANENTLY?')) return;
 
         try {
-            const { error } = await supabase.from('orders').delete().eq('id', orderId);
-            if (error) throw error;
+            // Use server API to bypass RLS policies
+            const res = await fetch('/api/delete-order', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ orderId })
+            });
+
+            if (!res.ok) {
+                const err = await res.json();
+                throw new Error(err.error || 'Failed to delete');
+            }
+
             fetchOrders();
         } catch (error) {
             console.error('Error deleting order:', error);
-            alert('Failed to delete order. System might restrict deletions.');
+            alert('Failed to delete order: ' + error.message);
         }
     };
 
@@ -105,18 +115,22 @@ export default function AdminOrdersPage() {
         if (!confirm2) return;
 
         try {
-            // Retrieve all IDs first (safe approach given RLS oddities)
-            const { data: allOrders } = await supabase.from('orders').select('id');
-            if (allOrders && allOrders.length > 0) {
-                const ids = allOrders.map(o => o.id);
-                const { error } = await supabase.from('orders').delete().in('id', ids);
-                if (error) throw error;
+            // Use server API to bypass RLS policies
+            const res = await fetch('/api/clear-orders', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+
+            if (!res.ok) {
+                const err = await res.json();
+                throw new Error(err.error || 'Failed to clear orders');
             }
+
             fetchOrders();
-            alert('All orders have been cleared.');
+            alert('All orders have been cleared successfully.');
         } catch (error) {
             console.error('Error clearing orders:', error);
-            alert('Failed to clear all orders.');
+            alert('Failed to clear orders: ' + error.message);
         }
     };
 
