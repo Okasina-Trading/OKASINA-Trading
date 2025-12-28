@@ -11,6 +11,7 @@ import { exec } from 'child_process';
 import { promisify } from 'util';
 import fs from 'fs';
 import path from 'path';
+import { sendAlert } from './email-alert.js';
 
 const execAsync = promisify(exec);
 dotenv.config();
@@ -397,6 +398,7 @@ async function runMasterOrchestrator() {
 
     } catch (error) {
         console.error('\n❌ FATAL ERROR:', error);
+        await sendAlert('JARVIS System Crash', `JARVIS Master System encountered a fatal error:\n${error.message}`);
         process.exit(1);
     }
 }

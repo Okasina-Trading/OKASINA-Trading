@@ -3,6 +3,7 @@ import path from 'path';
 import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
+import { sendAlert } from './email-alert.js';
 
 // Setup paths
 const __filename = fileURLToPath(import.meta.url);
@@ -81,7 +82,18 @@ async function runDoctor() {
     // Report
     console.log('\n----------------------------------------');
     if (errors > 0) {
+        const report = `
+            <h2>🩺 TITAN Doctor Report</h2>
+            <p><strong>Status:</strong> <span style="color:red">CRITICAL HEALTH</span></p>
+            <p><strong>Errors:</strong> ${errors}</p>
+            <p><strong>Warnings:</strong> ${warnings}</p>
+            <p>Please check your local console or GitHub Actions logs for details.</p>
+            <br>
+            <a href="https://github.com/Okasina-Trading/OKASINA-Trading/settings/secrets/actions">Manage GitHub Secrets</a>
+        `;
+
         console.log(`❌ DIAGNOSIS: CRIMINAL HEALTH (Errors: ${errors}, Warnings: ${warnings})`);
+        await sendAlert('System Health Critical', report, true);
         process.exit(1);
     } else if (warnings > 0) {
         console.log(`⚠️  DIAGNOSIS: STABLE WITH WARNINGS (Errors: 0, Warnings: ${warnings})`);

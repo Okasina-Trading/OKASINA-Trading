@@ -45,6 +45,10 @@ jobs:
           CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
           CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
           BASE_URL: https://okasinatrading.com
+          VITE_SMTP_HOST: ${{ secrets.VITE_SMTP_HOST }}
+          VITE_SMTP_PORT: ${{ secrets.VITE_SMTP_PORT }}
+          VITE_SMTP_USER: ${{ secrets.VITE_SMTP_USER }}
+          VITE_SMTP_PASS: ${{ secrets.VITE_SMTP_PASS }}
         run: npm run jarvis:master
 
       - name: Upload JARVIS Report
