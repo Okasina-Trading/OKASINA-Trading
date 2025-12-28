@@ -104,68 +104,72 @@ const SizeGuide = ({ isOpen, onClose, category = 'General' }) => {
     const chart = sizeCharts[category] || sizeCharts['General'];
 
     return (
-        <>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-4">
             {/* Backdrop */}
             <div
-                className="fixed inset-0 bg-black bg-opacity-50 z-50"
+                className="absolute inset-0 bg-black/50 backdrop-blur-sm"
                 onClick={onClose}
             />
 
-            {/* Modal */}
-            <div className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4">
-                <div
-                    className="bg-white rounded-lg shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto"
-                    onClick={(e) => e.stopPropagation()}
-                >
-                    {/* Header */}
-                    <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+            {/* Modal Panel - Flex Column for Perfect Scroll */}
+            <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-3xl h-[100dvh] sm:h-auto sm:max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200">
+
+                {/* Header (fixed) */}
+                <div className="flex-none border-b border-gray-200 px-6 py-4 flex items-center justify-between bg-white z-10">
+                    <div>
                         <h2 className="text-2xl font-bold text-gray-900">Size Guide</h2>
-                        <button
-                            onClick={onClose}
-                            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                        >
-                            <X size={24} />
-                        </button>
+                        <p className="text-xs text-gray-500 mt-1">{category} Measurement Chart</p>
+                    </div>
+                    <button
+                        onClick={onClose}
+                        className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-500 hover:text-gray-900"
+                        aria-label="Close size guide"
+                    >
+                        <X size={24} />
+                    </button>
+                </div>
+
+                {/* Scrollable Content */}
+                <div className="flex-1 overflow-y-auto p-6 space-y-8 bg-gray-50/50">
+
+                    {/* Category Intro */}
+                    <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r">
+                        <div className="flex justify-between items-start">
+                            <div>
+                                <p className="font-semibold text-blue-900">{chart.description}</p>
+                                <p className="text-sm text-blue-700 mt-1">We cater for inclusive sizing up to 13 XL</p>
+                            </div>
+                        </div>
                     </div>
 
-                    {/* Content */}
-                    <div className="p-6 space-y-6">
-                        {/* Category Info */}
-                        <div>
-                            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                                {category} Size Chart
-                            </h3>
-                            <p className="text-sm text-gray-600">{chart.description}</p>
-                            <p className="text-sm font-medium text-blue-600 mt-1">We cater for clothes upto 13 XL</p>
-                        </div>
-
-                        {/* Size Table */}
+                    {/* Size Table */}
+                    <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
                         <div className="overflow-x-auto">
-                            <table className="min-w-full border border-gray-200">
-                                <thead className="bg-gray-50">
+                            <table className="min-w-full divide-y divide-gray-200">
+                                <thead className="bg-gray-100">
                                     <tr>
-                                        <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 border-b">
+                                        <th className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider sticky left-0 bg-gray-100 z-10">
                                             Size
                                         </th>
                                         {Object.keys(chart.measurements[0])
                                             .filter(key => key !== 'size')
                                             .map(key => (
-                                                <th key={key} className="px-4 py-3 text-left text-sm font-semibold text-gray-900 border-b capitalize">
+                                                <th key={key} className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider capitalize">
                                                     {key}
                                                 </th>
                                             ))}
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody className="bg-white divide-y divide-gray-200">
                                     {chart.measurements.map((measurement, index) => (
-                                        <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                                            <td className="px-4 py-3 text-sm font-medium text-gray-900 border-b">
+                                        <tr key={index} className="hover:bg-gray-50 transition-colors">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900 sticky left-0 bg-white shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
                                                 {measurement.size}
                                             </td>
                                             {Object.entries(measurement)
                                                 .filter(([key]) => key !== 'size')
                                                 .map(([key, value]) => (
-                                                    <td key={key} className="px-4 py-3 text-sm text-gray-600 border-b">
+                                                    <td key={key} className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 font-mono">
                                                         {value}
                                                     </td>
                                                 ))}
@@ -174,44 +178,45 @@ const SizeGuide = ({ isOpen, onClose, category = 'General' }) => {
                                 </tbody>
                             </table>
                         </div>
+                    </div>
 
-                        {/* Measurement Guide */}
-                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                            <h4 className="font-semibold text-gray-900 mb-3">How to Measure</h4>
-                            <ul className="space-y-2 text-sm text-gray-700">
-                                <li className="flex items-start">
-                                    <span className="font-medium mr-2">Bust:</span>
+                    {/* Measurement Guide Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="bg-white border rounded-xl p-5 shadow-sm">
+                            <h4 className="font-bold text-gray-900 mb-4 border-b pb-2">How to Measure</h4>
+                            <ul className="space-y-3 text-sm text-gray-600">
+                                <li className="flex gap-3">
+                                    <span className="font-bold text-gray-900 min-w-[60px]">Bust:</span>
                                     <span>Measure around the fullest part of your bust</span>
                                 </li>
-                                <li className="flex items-start">
-                                    <span className="font-medium mr-2">Waist:</span>
+                                <li className="flex gap-3">
+                                    <span className="font-bold text-gray-900 min-w-[60px]">Waist:</span>
                                     <span>Measure around the narrowest part of your waist</span>
                                 </li>
-                                <li className="flex items-start">
-                                    <span className="font-medium mr-2">Hip:</span>
+                                <li className="flex gap-3">
+                                    <span className="font-bold text-gray-900 min-w-[60px]">Hip:</span>
                                     <span>Measure around the fullest part of your hips</span>
                                 </li>
-                                <li className="flex items-start">
-                                    <span className="font-medium mr-2">Length:</span>
+                                <li className="flex gap-3">
+                                    <span className="font-bold text-gray-900 min-w-[60px]">Length:</span>
                                     <span>Measure from shoulder to desired hem length</span>
                                 </li>
                             </ul>
                         </div>
 
-                        {/* Tips */}
-                        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                            <h4 className="font-semibold text-gray-900 mb-2">Fit Tips</h4>
-                            <ul className="space-y-1 text-sm text-gray-700 list-disc list-inside">
-                                <li>Measurements are in inches</li>
-                                <li>If between sizes, we recommend sizing up</li>
-                                <li>For custom sizing, please contact us</li>
-                                <li>Allow 1-2 inches variation due to manual measurement</li>
+                        <div className="bg-yellow-50 border border-yellow-100 rounded-xl p-5 shadow-sm">
+                            <h4 className="font-bold text-yellow-900 mb-4 border-b border-yellow-200 pb-2">Pro Fit Tips</h4>
+                            <ul className="space-y-2 text-sm text-yellow-800 list-disc list-inside">
+                                <li>All measurements are in <span className="font-bold">inches</span></li>
+                                <li>If you are between sizes, <strong>size up</strong> for comfort</li>
+                                <li>Need custom fitting? Contact us via WhatsApp</li>
+                                <li>Allow ±1-2 inches for manual variations</li>
                             </ul>
                         </div>
                     </div>
                 </div>
             </div>
-        </>
+        </div>
     );
 };
 
