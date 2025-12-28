@@ -1,9 +1,12 @@
+import React, { useState, useEffect } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
 import metaService from '../../services/metaService';
 import { supabase } from '../../supabase';
-import { Zap } from 'lucide-react';
 import {
+    Zap,
     Megaphone,
+    Save,
+    AlertTriangle,
     Mail,
     Send,
     Users,
