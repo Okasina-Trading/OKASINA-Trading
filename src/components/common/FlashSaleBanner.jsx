@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Timer, Zap } from 'lucide-react';
 import { supabase } from '../../supabase';
 
