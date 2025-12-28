@@ -211,7 +211,7 @@ export default function ProductEditModal({ product, isOpen, onClose, onUpdate })
                             <label className="block text-sm font-medium text-gray-700 mb-2 text-center">
                                 Product Image
                             </label>
-                            <div className="relative border-2 border-dashed border-blue-400 rounded-lg p-6 hover:border-blue-600 transition-colors bg-blue-50 flex flex-col items-center justify-center min-h-[220px] shadow-sm group cursor-pointer">
+                            <label className="relative border-2 border-dashed border-blue-400 rounded-lg p-6 hover:border-blue-600 transition-colors bg-blue-50 flex flex-col items-center justify-center min-h-[220px] shadow-sm group cursor-pointer">
                                 {imagePreview ? (
                                     <>
                                         <img src={imagePreview} alt="Preview" className="w-full h-48 object-contain rounded-md mb-2 bg-gray-50 border border-gray-200" />
@@ -219,7 +219,7 @@ export default function ProductEditModal({ product, isOpen, onClose, onUpdate })
                                             type="button"
                                             onClick={(e) => {
                                                 e.preventDefault();
-                                                e.stopPropagation();
+                                                e.stopPropagation(); // Prevents label click
                                                 setImageFile(null);
                                                 setImagePreview(null);
                                             }}
@@ -230,12 +230,12 @@ export default function ProductEditModal({ product, isOpen, onClose, onUpdate })
                                         </button>
                                     </>
                                 ) : (
-                                    <div className="text-center group-hover:scale-105 transition-transform z-10 py-6 pointer-events-none">
+                                    <div className="text-center group-hover:scale-105 transition-transform py-6">
                                         <div className="mx-auto h-20 w-20 text-blue-600 mb-4 bg-white rounded-full flex items-center justify-center border-2 border-blue-200 shadow-md">
                                             <Upload size={40} strokeWidth={2} />
                                         </div>
                                         <p className="text-xl font-bold text-gray-900 mb-1">Upload Product Image</p>
-                                        <p className="text-sm font-medium text-gray-600">Click here to browse files</p>
+                                        <p className="text-sm font-medium text-gray-600">Click to browse files</p>
                                         <p className="text-xs text-gray-500 mt-2">Supports JPG, PNG, WEBP (Max 5MB)</p>
                                     </div>
                                 )}
@@ -249,10 +249,9 @@ export default function ProductEditModal({ product, isOpen, onClose, onUpdate })
                                     type="file"
                                     accept="image/*"
                                     onChange={handleImageChange}
-                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                                    title="Upload an image"
+                                    className="hidden"
                                 />
-                            </div>
+                            </label>
                         </div>
                     </div>
 
