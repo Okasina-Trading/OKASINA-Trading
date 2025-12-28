@@ -195,54 +195,54 @@ export default function ProductEditModal({ product, isOpen, onClose, onUpdate })
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start md:items-center justify-center z-[60] p-0 sm:p-4 overflow-y-auto">
-            <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full my-0 sm:my-8 relative min-h-screen sm:min-h-0">
-                <div className="bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center rounded-t-xl sticky top-0 z-10">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4 overflow-y-auto">
+            <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full relative flex flex-col max-h-[90vh]">
+                {/* Header - No Sticky */}
+                <div className="flex-shrink-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center rounded-t-xl">
                     <h2 className="text-xl font-bold text-gray-900">{product ? 'Edit Product' : 'Add New Product'}</h2>
                     <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
                         <X size={24} />
                     </button>
                 </div>
 
-                <form onSubmit={handleSubmit} className="p-6 space-y-6">
-                    {/* Image Upload Section */}
-                    <div className="flex justify-center">
-                        <div className="w-full max-w-xs">
-                            <label className="block text-sm font-medium text-gray-700 mb-2 text-center">
+                {/* Content - Scrollable */}
+                <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                    <form id="product-form" onSubmit={handleSubmit} className="space-y-6">
+
+                        {/* Image Upload - Full Width, No Fancy Centering */}
+                        <div className="border-2 border-dashed border-blue-500 bg-blue-50 rounded-lg p-6">
+                            <label className="block text-lg font-bold text-blue-900 mb-4 text-center">
                                 Product Image
                             </label>
-                            <label className="relative border-2 border-dashed border-blue-400 rounded-lg p-6 hover:border-blue-600 transition-colors bg-blue-50 flex flex-col items-center justify-center min-h-[220px] shadow-sm group cursor-pointer">
+
+                            <label className="block w-full cursor-pointer text-center">
                                 {imagePreview ? (
-                                    <>
-                                        <img src={imagePreview} alt="Preview" className="w-full h-48 object-contain rounded-md mb-2 bg-gray-50 border border-gray-200" />
+                                    <div className="relative">
+                                        <img
+                                            src={imagePreview}
+                                            alt="Preview"
+                                            className="w-full h-64 object-contain rounded-md bg-white border border-gray-300"
+                                        />
                                         <button
                                             type="button"
                                             onClick={(e) => {
                                                 e.preventDefault();
-                                                e.stopPropagation(); // Prevents label click
+                                                e.stopPropagation();
                                                 setImageFile(null);
                                                 setImagePreview(null);
                                             }}
-                                            className="absolute top-2 right-2 bg-white text-red-600 p-1.5 rounded-full shadow-md hover:bg-red-50 z-20 border border-gray-200"
-                                            title="Remove Image"
+                                            className="absolute top-2 right-2 bg-red-600 text-white p-2 rounded-full shadow-lg hover:bg-red-700"
                                         >
-                                            <X size={18} />
+                                            <X size={20} />
                                         </button>
-                                    </>
-                                ) : (
-                                    <div className="text-center group-hover:scale-105 transition-transform py-6">
-                                        <div className="mx-auto h-20 w-20 text-blue-600 mb-4 bg-white rounded-full flex items-center justify-center border-2 border-blue-200 shadow-md">
-                                            <Upload size={40} strokeWidth={2} />
-                                        </div>
-                                        <p className="text-xl font-bold text-gray-900 mb-1">Upload Product Image</p>
-                                        <p className="text-sm font-medium text-gray-600">Click to browse files</p>
-                                        <p className="text-xs text-gray-500 mt-2">Supports JPG, PNG, WEBP (Max 5MB)</p>
                                     </div>
-                                )}
-                                {analyzing && (
-                                    <div className="absolute inset-0 bg-white/95 flex flex-col items-center justify-center z-30 backdrop-blur-sm rounded-lg border-2 border-blue-500">
-                                        <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-3"></div>
-                                        <p className="text-lg font-bold text-blue-600 animate-pulse">Running AI Analysis...</p>
+                                ) : (
+                                    <div className="py-8 bg-white rounded-lg border-2 border-blue-200 hover:border-blue-500 transition-all shadow-sm group">
+                                        <div className="mx-auto h-20 w-20 text-blue-600 mb-4 bg-blue-50 rounded-full flex items-center justify-center">
+                                            <Upload size={40} />
+                                        </div>
+                                        <span className="block text-xl font-bold text-gray-900">Click to Upload Image</span>
+                                        <span className="block text-sm text-gray-500 mt-2">Supports JPG, PNG, WEBP</span>
                                     </div>
                                 )}
                                 <input
@@ -252,180 +252,157 @@ export default function ProductEditModal({ product, isOpen, onClose, onUpdate })
                                     className="hidden"
                                 />
                             </label>
-                        </div>
-                    </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="md:col-span-2">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Product Name *</label>
-                            <input
-                                type="text"
-                                name="name"
-                                value={formData.name}
-                                onChange={handleChange}
-                                required
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                            />
+                            {analyzing && (
+                                <div className="mt-4 p-4 bg-white rounded border border-blue-200 flex items-center justify-center text-blue-700 animate-pulse">
+                                    <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mr-3"></div>
+                                    <span className="font-bold">Analyzing image with AI...</span>
+                                </div>
+                            )}
                         </div>
 
-                        <div className="md:col-span-2">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                            <textarea
-                                name="description"
-                                value={formData.description}
-                                onChange={handleChange}
-                                rows="3"
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                            />
-                        </div>
+                        {/* Basic Fields */}
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-bold text-gray-900 mb-1">Product Name *</label>
+                                <input
+                                    type="text"
+                                    name="name"
+                                    value={formData.name}
+                                    onChange={handleChange}
+                                    required
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
+                                    placeholder="e.g. Summer Floral Dress"
+                                />
+                            </div>
 
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Category *</label>
-                            <select
-                                name="category"
-                                value={formData.category}
-                                onChange={handleChange}
-                                required
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                            >
-                                <option value="">Select Category</option>
-                                <option value="Clothing">Clothing</option>
-                                <option value="Accessories">Accessories</option>
-                                <option value="Shoes">Shoes</option>
-                                <option value="Bags">Bags</option>
-                            </select>
-                        </div>
+                            <div>
+                                <label className="block text-sm font-bold text-gray-900 mb-1">Description</label>
+                                <textarea
+                                    name="description"
+                                    value={formData.description}
+                                    onChange={handleChange}
+                                    rows="4"
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                />
+                            </div>
 
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Subcategory</label>
-                            <input
-                                type="text"
-                                name="subcategory"
-                                value={formData.subcategory}
-                                onChange={handleChange}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                            />
-                        </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-bold text-gray-900 mb-1">Category *</label>
+                                    <select
+                                        name="category"
+                                        value={formData.category}
+                                        onChange={handleChange}
+                                        required
+                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white"
+                                    >
+                                        <option value="">Select...</option>
+                                        <option value="Clothing">Clothing</option>
+                                        <option value="Accessories">Accessories</option>
+                                        <option value="Shoes">Shoes</option>
+                                        <option value="Bags">Bags</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-bold text-gray-900 mb-1">Subcategory</label>
+                                    <input
+                                        type="text"
+                                        name="subcategory"
+                                        value={formData.subcategory}
+                                        onChange={handleChange}
+                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg"
+                                    />
+                                </div>
+                            </div>
 
-                        <div className="md:col-span-2">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Price (MUR) *</label>
-                            <input
-                                type="number"
-                                name="price"
-                                value={formData.price}
-                                onChange={handleChange}
-                                step="0.01"
-                                required
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                            />
-                            <p className="text-xs text-gray-500 mt-1">This will be used as the main selling price.</p>
-                        </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-bold text-gray-900 mb-1">Price (MUR) *</label>
+                                    <input
+                                        type="number"
+                                        name="price"
+                                        value={formData.price}
+                                        onChange={handleChange}
+                                        required
+                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-bold text-gray-900 mb-1">Stock *</label>
+                                    <input
+                                        type="number"
+                                        name="stock_qty"
+                                        value={formData.stock_qty}
+                                        onChange={handleChange}
+                                        required
+                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg"
+                                    />
+                                </div>
+                            </div>
 
-                        <div className="md:col-span-2">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Original Price (MRP) - Optional</label>
-                            <input
-                                type="number"
-                                name="mrp"
-                                value={formData.mrp}
-                                onChange={handleChange}
-                                step="0.01"
-                                placeholder="Used for showing slashed price/discounts"
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                            />
+                            <div className="border-t border-gray-200 pt-4 mt-4">
+                                <h3 className="font-bold text-gray-900 mb-3">Variants & Status</h3>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700">Status</label>
+                                        <select
+                                            name="status"
+                                            value={formData.status}
+                                            onChange={handleChange}
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg mt-1"
+                                        >
+                                            <option value="active">Active</option>
+                                            <option value="draft">Draft</option>
+                                            <option value="archived">Archived</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700">SKU</label>
+                                        <input
+                                            type="text"
+                                            name="sku"
+                                            value={formData.sku}
+                                            onChange={handleChange}
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg mt-1"
+                                        />
+                                    </div>
+                                    <div className="col-span-2">
+                                        <label className="block text-sm font-medium text-gray-700">Sizes</label>
+                                        <input
+                                            type="text"
+                                            name="sizes"
+                                            value={formData.sizes}
+                                            onChange={handleChange}
+                                            placeholder="S, M, L, XL"
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg mt-1"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+                    </form>
+                </div>
 
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Stock Quantity *</label>
-                            <input
-                                type="number"
-                                name="stock_qty"
-                                value={formData.stock_qty}
-                                onChange={handleChange}
-                                required
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">SKU</label>
-                            <input
-                                type="text"
-                                name="sku"
-                                value={formData.sku}
-                                onChange={handleChange}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Status *</label>
-                            <select
-                                name="status"
-                                value={formData.status}
-                                onChange={handleChange}
-                                required
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                            >
-                                <option value="active">Active</option>
-                                <option value="draft">Draft</option>
-                                <option value="archived">Archived</option>
-                            </select>
-                        </div>
-
-                        <div className="md:col-span-2">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Sizes (comma-separated)</label>
-                            <input
-                                type="text"
-                                name="sizes"
-                                value={formData.sizes}
-                                onChange={handleChange}
-                                placeholder="XS, S, M, L, XL"
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Material</label>
-                            <input
-                                type="text"
-                                name="material"
-                                value={formData.material}
-                                onChange={handleChange}
-                                placeholder="e.g. Cotton, Silk"
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Colors (comma-separated)</label>
-                            <input
-                                type="text"
-                                name="colors"
-                                value={formData.colors}
-                                onChange={handleChange}
-                                placeholder="e.g. Red, Blue, Green"
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                            />
-                        </div>
-                    </div>
-
-                    <div className="flex gap-3 p-6 border-t border-gray-200 bg-gray-50 rounded-b-xl sticky bottom-0 z-10">
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 bg-white rounded-lg hover:bg-gray-100 transition-colors"
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            type="submit"
-                            disabled={saving}
-                            className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 font-medium shadow-md"
-                        >
-                            {saving ? 'Saving...' : 'Save Product'}
-                        </button>
-                    </div>
-                </form>
+                {/* Footer - No Sticky */}
+                <div className="flex-shrink-0 border-t border-gray-200 px-6 py-4 bg-gray-50 rounded-b-xl flex gap-3">
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 bg-white rounded-lg hover:bg-gray-100 font-bold"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        type="submit"
+                        disabled={saving}
+                        // Connect to form explicitly
+                        form="product-form"
+                        className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-bold shadow-md"
+                    >
+                        {saving ? 'Saving...' : 'Save Product'}
+                    </button>
+                </div>
             </div>
         </div>
     );
