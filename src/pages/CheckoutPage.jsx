@@ -142,7 +142,11 @@ export default function CheckoutPage() {
 
         } catch (error) {
             console.error('Checkout Error:', error);
-            addToast(`Failed to place order: ${error.message}`, 'error');
+            if (error.message && (error.message.includes('check_stock') || error.message.includes('stock_qty'))) {
+                addToast('Order failed: One or more items are out of stock.', 'error');
+            } else {
+                addToast(`Failed to place order: ${error.message}`, 'error');
+            }
         } finally {
             setLoading(false);
         }
@@ -241,10 +245,6 @@ export default function CheckoutPage() {
                                             )}
                                         </div>
                                     </label>
-                                    <label className={`flex p-4 border cursor-pointer ${paymentMethod === 'card' ? 'bg-gray-50 border-black' : ''}`}>
-                                        <input type="radio" onChange={() => setPaymentMethod('card')} checked={paymentMethod === 'card'} className="mr-3" />
-                                        <div className="flex-1"><span className="font-bold block">Credit Card (Stripe)</span></div>
-                                    </label>
                                 </div>
                             </section>
 
@@ -308,8 +308,8 @@ export default function CheckoutPage() {
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
+                </div >
+            </div >
+        </div >
     );
 }
