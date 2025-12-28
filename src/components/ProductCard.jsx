@@ -61,11 +61,29 @@ const ProductCard = memo(({ product, onQuickView, viewMode = 'grid' }) => {
                         />
                     </Link>
 
-                    {product.stock_qty < 5 && product.stock_qty > 0 && (
-                        <span className="absolute bottom-2 left-2 bg-red-500 text-white text-[10px] font-bold px-2 py-1 uppercase tracking-wider">
-                            Low Stock
-                        </span>
-                    )}
+                    {/* Badge Stack (Left Side) */}
+                    <div className="absolute top-12 left-2 flex flex-col gap-1 items-start z-10">
+                        {product.stock_qty < 5 && product.stock_qty > 0 && (
+                            <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-1 uppercase tracking-wider rounded-sm shadow-sm">
+                                Low Stock
+                            </span>
+                        )}
+                        {(product.is_new || product.new) && (
+                            <span className="bg-emerald-600 text-white text-[10px] font-bold px-2 py-1 uppercase tracking-wider rounded-sm shadow-sm">
+                                New
+                            </span>
+                        )}
+                        {(product.is_featured || product.featured) && (
+                            <span className="bg-purple-600 text-white text-[10px] font-bold px-2 py-1 uppercase tracking-wider rounded-sm shadow-sm">
+                                Featured
+                            </span>
+                        )}
+                        {(product.bestseller || product.is_bestseller) && (
+                            <span className="bg-orange-500 text-white text-[10px] font-bold px-2 py-1 uppercase tracking-wider rounded-sm shadow-sm">
+                                Best Seller
+                            </span>
+                        )}
+                    </div>
                     {product.mrp > product.price_mur && (
                         <span className="absolute top-2 right-2 bg-[#d4af37] text-white text-[10px] font-bold px-2 py-1 uppercase tracking-wider">
                             {Math.round(((product.mrp - product.price_mur) / product.mrp) * 100)}% OFF
@@ -164,8 +182,8 @@ const ProductCard = memo(({ product, onQuickView, viewMode = 'grid' }) => {
                         onClick={handleAddToCart}
                         disabled={isOutOfStock}
                         className={`w-full py-2.5 px-4 text-sm font-bold uppercase tracking-wider transition-colors shadow-lg flex items-center justify-center gap-2 ${isOutOfStock
-                                ? 'bg-gray-400 text-white cursor-not-allowed'
-                                : 'bg-white text-black hover:bg-[#d4af37] hover:text-white'
+                            ? 'bg-gray-400 text-white cursor-not-allowed'
+                            : 'bg-white text-black hover:bg-[#d4af37] hover:text-white'
                             }`}
                     >
                         <ShoppingCart size={16} />
@@ -182,12 +200,29 @@ const ProductCard = memo(({ product, onQuickView, viewMode = 'grid' }) => {
                     )}
                 </div>
 
-                {/* Badges */}
-                {product.stock_qty < 5 && product.stock_qty > 0 && (
-                    <span className="absolute top-12 left-2 bg-red-500 text-white text-[10px] font-bold px-2 py-1 uppercase tracking-wider">
-                        Low Stock
-                    </span>
-                )}
+                {/* Badge Stack (Left Side) - Grid View */}
+                <div className="absolute top-12 left-2 flex flex-col gap-1 items-start z-10">
+                    {product.stock_qty < 5 && product.stock_qty > 0 && (
+                        <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-1 uppercase tracking-wider rounded-sm shadow-sm">
+                            Low Stock
+                        </span>
+                    )}
+                    {(product.is_new || product.new) && (
+                        <span className="bg-emerald-600 text-white text-[10px] font-bold px-2 py-1 uppercase tracking-wider rounded-sm shadow-sm">
+                            New
+                        </span>
+                    )}
+                    {(product.is_featured || product.featured) && (
+                        <span className="bg-purple-600 text-white text-[10px] font-bold px-2 py-1 uppercase tracking-wider rounded-sm shadow-sm">
+                            Featured
+                        </span>
+                    )}
+                    {(product.bestseller || product.is_bestseller) && (
+                        <span className="bg-orange-500 text-white text-[10px] font-bold px-2 py-1 uppercase tracking-wider rounded-sm shadow-sm">
+                            Best Seller
+                        </span>
+                    )}
+                </div>
                 {product.mrp > product.price_mur && (
                     <span className="absolute top-2 right-2 bg-[#d4af37] text-white text-[10px] font-bold px-2 py-1 uppercase tracking-wider">
                         {Math.round(((product.mrp - product.price_mur) / product.mrp) * 100)}% OFF
@@ -224,8 +259,8 @@ const ProductCard = memo(({ product, onQuickView, viewMode = 'grid' }) => {
                 onClick={handleAddToCart}
                 disabled={isOutOfStock}
                 className={`w-full mt-3 lg:hidden py-2 px-4 text-xs font-bold uppercase tracking-wider transition-colors flex items-center justify-center gap-2 rounded ${isOutOfStock
-                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                        : 'bg-black text-white hover:bg-gray-800'
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-black text-white hover:bg-gray-800'
                     }`}
             >
                 <ShoppingCart size={14} />

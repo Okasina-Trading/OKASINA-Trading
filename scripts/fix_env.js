@@ -1,0 +1,19 @@
+
+import fs from 'fs';
+import path from 'path';
+
+const content = `GOOGLE_AI_KEY=AIzaSyC4f1A8FgW7TwStjWQlhfre3vhD7uEtb4A
+CLOUDINARY_CLOUD_NAME=dw86lrpv6
+CLOUDINARY_API_KEY=121943449379972
+CLOUDINARY_API_SECRET=uVWGCQ4jKjQWo5xZMCdRMs7rdLo
+VITE_SUPABASE_URL=https://hthkrbtwfymaxtnvshfz.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh0aGtyYnR3ZnltYXh0bnZzaGZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2NTQ1ODMsImV4cCI6MjA4MTIzMDU4M30.EMVEObVRAOe3cuQ7mRGiB4pPqLQwdkuiCQisNlJdiio
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh0aGtyYnR3ZnltYXh0bnZzaGZ6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NTY1NDU4MywiZXhwIjoyMDgxMjMwNTgzfQ.F4NrM1Bo2yC8tfEeDqgyzAv8LzFqIRRR3EnyYzIHyQs
+VITE_SMTP_HOST=smtpout.secureserver.net
+VITE_SMTP_PORT=465
+VITE_SMTP_USER=info@okasinatrading.com
+VITE_SMTP_PASS=Letme_1n2025
+VITE_ALERT_RECIPIENT=info@okasinatrading.com`;
+
+fs.writeFileSync('.env', content.trim(), 'utf8');
+console.log('✅ .env file successfully regenerated with clean encoding.');

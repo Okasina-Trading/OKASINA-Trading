@@ -81,6 +81,21 @@ export default function ProductList({ filters, viewMode = 'grid' }) {
                 }
             }
 
+            // 7. Material Filter
+            if (filters?.material) {
+                if (!product.material || !product.material.toLowerCase().includes(filters.material.toLowerCase())) {
+                    return false;
+                }
+            }
+
+            // 8. Color Filter
+            if (filters?.color) {
+                // Check if product.colors (e.g. "Red, Blue") includes the filter (e.g. "Red")
+                if (!product.colors || !product.colors.toLowerCase().includes(filters.color.toLowerCase())) {
+                    return false;
+                }
+            }
+
             return true;
         });
     }, [products, filters]);

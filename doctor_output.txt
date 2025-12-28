@@ -1,0 +1,20 @@
+Loading .env from C:\Users\ICL  ZAMBIA\Desktop\okasina-fashion-store-vite\.env
+
+🩺 TITAN DOCTOR: System Health Check
+
+1️⃣  Environment Variables
+   ✅ VITE_SUPABASE_URL: Present (40 chars)
+   ✅ VITE_SUPABASE_ANON_KEY: Present (208 chars)
+   ✅ SUPABASE_SERVICE_ROLE_KEY: Present (219 chars)
+
+2️⃣  Supabase Connectivity
+
+3️⃣  Critical Files
+   ✅ Found: package.json
+   ✅ Found: vite.config.js
+   ✅ Found: src/App.jsx
+
+----------------------------------------
+❌ DIAGNOSIS: CRIMINAL HEALTH (Errors: 1, Warnings: 0)
+📧 [Titan Uplink] Preparing alert: "System Health Critical" to info@okasinatrading.com
+✅ [Titan Uplink] Email Sent! ID: <3e44a019-5c41-6fbe-c8ee-3434a9d9a85f@okasinatrading.com>

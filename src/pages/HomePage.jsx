@@ -4,6 +4,7 @@ import { ArrowRight, ShoppingBag } from 'lucide-react';
 import { supabase } from '../supabase';
 import NewsletterSignup from '../components/NewsletterSignup';
 import RecommendedProducts from '../components/products/RecommendedProducts';
+import ProductCard from '../components/ProductCard';
 
 export default function HomePage() {
     const [products, setProducts] = useState([]);
@@ -87,32 +88,9 @@ export default function HomePage() {
                         <p>No products found. Check back soon!</p>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                         {products.map((product) => (
-                            <Link key={product.id} to={`/product/${product.id}`} className="group">
-                                <div className="relative aspect-[3/4] overflow-hidden bg-gray-100 mb-4">
-                                    <img
-                                        src={product.image_url}
-                                        alt={product.name}
-                                        className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
-                                    />
-                                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
-
-                                    {/* Quick Add Button */}
-                                    <button className="absolute bottom-4 right-4 bg-white p-3 rounded-full shadow-lg translate-y-12 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 hover:bg-yellow-400">
-                                        <ShoppingBag className="w-5 h-5 text-gray-900" />
-                                    </button>
-                                </div>
-                                <div>
-                                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">{product.category}</p>
-                                    <h3 className="text-lg font-medium text-gray-900 mb-1 group-hover:text-yellow-600 transition-colors">
-                                        {product.name}
-                                    </h3>
-                                    <p className="text-gray-900 font-bold">
-                                        Rs {product.price_mur?.toLocaleString() || (product.price * 45).toLocaleString()}
-                                    </p>
-                                </div>
-                            </Link>
+                            <ProductCard key={product.id} product={product} />
                         ))}
                     </div>
                 )}

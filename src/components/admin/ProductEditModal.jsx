@@ -19,6 +19,8 @@ export default function ProductEditModal({ product, isOpen, onClose, onUpdate })
         sku: '',
         status: 'active',
         sizes: '',
+        material: '',
+        colors: '',
         image_url: ''
     });
     const [saving, setSaving] = useState(false);
@@ -36,6 +38,8 @@ export default function ProductEditModal({ product, isOpen, onClose, onUpdate })
                 sku: product.sku || '',
                 status: product.status || 'active',
                 sizes: Array.isArray(product.sizes) ? product.sizes.join(', ') : (product.sizes || ''),
+                material: product.material || '',
+                colors: product.colors || '',
                 image_url: product.image_url || ''
             });
             setImagePreview(product.image_url || null);
@@ -44,7 +48,7 @@ export default function ProductEditModal({ product, isOpen, onClose, onUpdate })
             setFormData({
                 name: '', description: '', category: '', subcategory: '',
                 price: '', price_mur: '', stock_qty: '', sku: '',
-                status: 'active', sizes: '', image_url: ''
+                status: 'active', sizes: '', material: '', colors: '', image_url: ''
             });
             setImagePreview(null);
             setImageFile(null);
@@ -148,6 +152,8 @@ export default function ProductEditModal({ product, isOpen, onClose, onUpdate })
                 stock_qty: parseInt(formData.stock_qty),
                 sku: formData.sku && formData.sku.trim() !== '' ? formData.sku.trim() : null,
                 sizes: formData.sizes.split(',').map(s => s.trim()).filter(s => s),
+                material: formData.material,
+                colors: formData.colors,
                 image_url: finalImageUrl
             };
 
@@ -201,37 +207,45 @@ export default function ProductEditModal({ product, isOpen, onClose, onUpdate })
                             <label className="block text-sm font-medium text-gray-700 mb-2 text-center">
                                 Product Image
                             </label>
-                            <div className="relative border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-blue-500 transition-colors bg-gray-50 flex flex-col items-center justify-center min-h-[200px]">
+                            <div className="relative border-2 border-dashed border-gray-400 rounded-lg p-6 hover:border-blue-600 transition-colors bg-white flex flex-col items-center justify-center min-h-[200px] shadow-sm group">
                                 {imagePreview ? (
                                     <>
-                                        <img src={imagePreview} alt="Preview" className="w-full h-48 object-contain rounded-md mb-2" />
+                                        <img src={imagePreview} alt="Preview" className="w-full h-48 object-contain rounded-md mb-2 bg-gray-50" />
                                         <button
                                             type="button"
-                                            onClick={() => { setImageFile(null); setImagePreview(null); }}
-                                            className="text-red-500 text-sm hover:underline"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                                setImageFile(null);
+                                                setImagePreview(null);
+                                            }}
+                                            className="absolute top-2 right-2 bg-white text-red-600 p-1 rounded-full shadow-md hover:bg-red-50 z-20"
+                                            title="Remove Image"
                                         >
-                                            Remove
+                                            <X size={16} />
                                         </button>
                                     </>
                                 ) : (
-                                    <div className="text-center">
-                                        <div className="mx-auto h-12 w-12 text-gray-400 mb-2">
-                                            <svg className="w-full h-full" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                    <div className="text-center group-hover:scale-105 transition-transform">
+                                        <div className="mx-auto h-16 w-16 text-blue-500 mb-3 bg-blue-50 rounded-full flex items-center justify-center">
+                                            <Upload size={32} />
                                         </div>
-                                        <p className="text-sm text-gray-500">Tap to upload image</p>
+                                        <p className="text-base font-bold text-gray-700">Click to Upload Image</p>
+                                        <p className="text-xs text-gray-500 mt-1">Supports JPG, PNG, WEBP</p>
                                     </div>
                                 )}
                                 {analyzing && (
-                                    <div className="absolute inset-0 bg-white/80 flex flex-col items-center justify-center z-10">
-                                        <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-2"></div>
-                                        <p className="text-sm font-bold text-blue-600 animate-pulse">AI Analyzing...</p>
+                                    <div className="absolute inset-0 bg-white/90 flex flex-col items-center justify-center z-10 backdrop-blur-sm">
+                                        <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-3"></div>
+                                        <p className="text-lg font-bold text-blue-600 animate-pulse">Running AI Analysis...</p>
                                     </div>
                                 )}
                                 <input
                                     type="file"
                                     accept="image/*"
                                     onChange={handleImageChange}
-                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-0"
+                                    title="Upload an image"
                                 />
                             </div>
                         </div>
@@ -349,6 +363,30 @@ export default function ProductEditModal({ product, isOpen, onClose, onUpdate })
                                 value={formData.sizes}
                                 onChange={handleChange}
                                 placeholder="XS, S, M, L, XL"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Material</label>
+                            <input
+                                type="text"
+                                name="material"
+                                value={formData.material}
+                                onChange={handleChange}
+                                placeholder="e.g. Cotton, Silk"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Colors (comma-separated)</label>
+                            <input
+                                type="text"
+                                name="colors"
+                                value={formData.colors}
+                                onChange={handleChange}
+                                placeholder="e.g. Red, Blue, Green"
                                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                             />
                         </div>

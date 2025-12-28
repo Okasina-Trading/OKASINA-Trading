@@ -9,7 +9,7 @@ import {
     ReactFlowProvider,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { Play, Save } from 'lucide-react';
+import { Play, Save, X } from 'lucide-react';
 import { supabase } from '../../../supabase';
 
 import Sidebar from './Sidebar';
@@ -41,6 +41,15 @@ const AutomationBuilderContent = () => {
     const [reactFlowInstance, setReactFlowInstance] = useState(null);
     const [selectedTemplate, setSelectedTemplate] = useState('');
     const { addToast } = useToast();
+
+    // Execution Logging State
+    const [executionLog, setExecutionLog] = useState(null); // 'open' or null
+    const [logs, setLogs] = useState([]);
+    const [isExecuting, setIsExecuting] = useState(false);
+
+    const addLog = (message) => {
+        setLogs(prev => [...prev, message]);
+    };
 
     const onConnect = useCallback(
         (params) => setEdges((eds) => addEdge(params, eds)),
@@ -103,9 +112,11 @@ const AutomationBuilderContent = () => {
     };
 
     const handleRun = async () => {
-        // Auto-save before running
         handleSave();
-        addToast('Starting workflow execution...', 'info');
+        setExecutionLog('open');
+        setLogs([]);
+        setIsExecuting(true);
+        addLog('🚀 Starting execution sequence...');
 
         try {
             const triggerNode = nodes.find(n => n.type === 'trigger');
@@ -114,76 +125,69 @@ const AutomationBuilderContent = () => {
             const connectedEdges = edges.filter(e => e.source === triggerNode.id);
             if (connectedEdges.length === 0) throw new Error('No actions connected!');
 
-            // 1. Get initial products (All active for now, or filter by trigger context if we had one)
-            // For "Manual Start", we assume all active products
+            addLog('📦 Fetching products database...');
             let { data: products, error } = await supabase.from('products').select('*');
             if (error) throw error;
-
-            console.log(`Starting with ${products.length} products`);
-
-            // 2. Process Nodes Sequentially
-            // We need to traverse the graph. For simplicity, we assume a linear chain for this hotfix.
-            // Trigger -> Action1 -> Action2...
+            addLog(`✅ Loaded ${products.length} active products.`);
 
             let currentNode = triggerNode;
             let currentProducts = products;
 
             while (true) {
                 const edge = edges.find(e => e.source === currentNode.id);
-                if (!edge) break; // End of chain
+                if (!edge) break;
 
                 const nextNode = nodes.find(n => n.id === edge.target);
                 if (!nextNode) break;
 
-                addToast(`Executing: ${nextNode.data.label}`, 'info');
+                addLog(`⚙️ Step: ${nextNode.data.label}...`);
 
-                // Execute Action
-                const actionType = nextNode.data.actionType; // e.g., 'filter_category', 'decrease_price'
-                // Note: The drag-and-drop data needs to populate 'actionType'. 
-                // We'll infer from label if missing for this hotfix.
+                const actionType = nextNode.data.actionType;
                 const label = nextNode.data.label.toLowerCase();
-                const value = nextNode.data.description; // User entered value
+                const value = nextNode.data.description;
 
                 if (label.includes('filter')) {
-                    // Filter Logic
                     if (label.includes('category')) {
-                        const cat = value || 'Accessories'; // Default
+                        const cat = value || 'Accessories';
                         currentProducts = currentProducts.filter(p => p.category === cat);
+                        addLog(`   ↪ Filtered by Category '${cat}'. Remaining: ${currentProducts.length}`);
                     }
                     if (label.includes('stock')) {
                         currentProducts = currentProducts.filter(p => p.stock_qty <= 5);
+                        addLog(`   ↪ Filtered by Low Stock. Remaining: ${currentProducts.length}`);
                     }
                 } else if (label.includes('price')) {
-                    // Price Logic
                     if (label.includes('decrease')) {
                         const percent = parseInt(value) || 10;
-                        // Execute Update on DB
-                        const ids = currentProducts.map(p => p.id);
-                        if (ids.length > 0) {
-                            // We can't do bulk update with different values easily in one query valid for all dialects
-                            // But here we apply same math. Supabase doesn't support "update x = x * 0.9" easily via JS client without RPC.
-                            // We'll use RPC or individual updates. RPC is better.
-                            // For hotfix: loop top 50 to avoid timeouts? Or just simple approach.
-                            // Let's just update the local state to show "Simulated Success" effectively,
-                            // OR actually update them.
-                            // User wants it to WORK.
-                            // RPC 'decrease_price' likely doesn't exist.
-                            // We will loop.
-                            // Execute Update via Backend API to bypass RLS
-                            for (const p of currentProducts) {
-                                const newPrice = Math.floor(p.price * (1 - percent / 100));
-                                // Call Backend API
-                                await fetch(`${process.env.NODE_ENV === 'production' ? '' : 'http://localhost:3001'}/api/update-product`, {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({ id: p.id, price: newPrice })
-                                });
-                            }
+                        addLog(`   ↪ Applying ${percent}% discount to ${currentProducts.length} items...`);
+
+                        for (const p of currentProducts) {
+                            const currentPrice = p.price;
+                            // Ensure valid MRP: If existing MRP > currentPrice, keep it. Else set MRP to currentPrice.
+                            const currentMRP = (p.mrp && p.mrp > currentPrice) ? p.mrp : currentPrice;
+
+                            const newPrice = Math.floor(currentPrice * (1 - percent / 100));
+
+                            addLog(`      - Updated ${p.name}: Rs ${currentPrice} -> Rs ${newPrice} (MRP: Rs ${currentMRP})`);
+
+                            // Call Backend API
+                            const payload = {
+                                id: p.id,
+                                price: newPrice,
+                                price_mur: newPrice, // Sync MUR
+                                mrp: currentMRP // Set MRP to display strike-through
+                            };
+
+                            await fetch(`${process.env.NODE_ENV === 'production' ? '' : 'http://localhost:3001'}/api/update-product`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(payload)
+                            });
                         }
                     }
                 } else if (label.includes('tag')) {
-                    // Add Tag
                     const tag = value || 'Sale';
+                    addLog(`   ↪ Tagging ${currentProducts.length} items with '${tag}'...`);
                     for (const p of currentProducts) {
                         const newTags = [...(p.tags || []), tag];
                         await supabase.from('products').update({ tags: newTags }).eq('id', p.id);
@@ -191,15 +195,18 @@ const AutomationBuilderContent = () => {
                 }
 
                 currentNode = nextNode;
-                // Wait a bit for visual effect
-                await new Promise(r => setTimeout(r, 500));
+                await new Promise(r => setTimeout(r, 800)); // Visible delay
             }
 
+            addLog('🎉 Workflow execution completed successfully!');
             addToast(`Workflow completed on ${currentProducts.length} products!`, 'success');
 
         } catch (err) {
             console.error(err);
+            addLog(`❌ Error: ${err.message}`);
             addToast(err.message, 'error');
+        } finally {
+            setIsExecuting(false);
         }
     };
 
@@ -327,6 +334,48 @@ const AutomationBuilderContent = () => {
                                 >
                                     Save Changes
                                 </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Execution Log Modal */}
+                {executionLog && (
+                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-50">
+                        <div className="bg-gray-900 text-green-400 p-6 rounded-xl shadow-2xl w-[600px] font-mono h-[500px] flex flex-col">
+                            <div className="flex justify-between items-center mb-4 border-b border-gray-700 pb-2">
+                                <h3 className="text-lg font-bold flex items-center gap-2">
+                                    <Play size={18} className="animate-pulse" />
+                                    Execution Log
+                                </h3>
+                                {!isExecuting && (
+                                    <button
+                                        onClick={() => setExecutionLog(null)}
+                                        className="text-gray-400 hover:text-white"
+                                    >
+                                        <X size={20} />
+                                    </button>
+                                )}
+                            </div>
+                            <div className="flex-1 overflow-y-auto space-y-2 p-2 bg-black/50 rounded-lg">
+                                {logs.map((log, index) => (
+                                    <div key={index} className="text-sm border-l-2 border-green-500 pl-2">
+                                        <span className="opacity-50 text-xs">[{new Date().toLocaleTimeString()}]</span> {log}
+                                    </div>
+                                ))}
+                                {isExecuting && (
+                                    <div className="animate-pulse text-green-600">_</div>
+                                )}
+                            </div>
+                            <div className="mt-4 flex justify-end">
+                                {!isExecuting && (
+                                    <button
+                                        onClick={() => setExecutionLog(null)}
+                                        className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 font-bold"
+                                    >
+                                        Close
+                                    </button>
+                                )}
                             </div>
                         </div>
                     </div>

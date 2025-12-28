@@ -39,6 +39,9 @@ export default function ProductFilters({ filters, setFilters, mobileOpen, setMob
         { label: 'Out of Stock', value: 'out_of_stock' }
     ];
 
+    const materials = ['Cotton', 'Silk', 'Linen', 'Chiffon', 'Georgette', 'Velvet', 'Denim'];
+    const colors = ['Red', 'Blue', 'Green', 'Black', 'White', 'Yellow', 'Pink', 'Purple', 'Gold', 'Silver', 'Beige'];
+
     // Dropdown states for desktop
     const [activeDropdown, setActiveDropdown] = useState(null);
     const dropdownRef = useRef(null);
@@ -78,10 +81,17 @@ export default function ProductFilters({ filters, setFilters, mobileOpen, setMob
     };
 
     const handleAvailabilityChange = (value) => {
-        setFilters(prev => ({
-            ...prev,
-            availability: value
-        }));
+        setFilters(prev => ({ ...prev, availability: value }));
+        setActiveDropdown(null);
+    };
+
+    const handleMaterialChange = (material) => {
+        setFilters(prev => ({ ...prev, material: prev.material === material ? null : material }));
+        setActiveDropdown(null);
+    };
+
+    const handleColorChange = (color) => {
+        setFilters(prev => ({ ...prev, color: prev.color === color ? null : color }));
         setActiveDropdown(null);
     };
 
@@ -91,12 +101,14 @@ export default function ProductFilters({ filters, setFilters, mobileOpen, setMob
             category: null,
             subcategory: null,
             priceRange: null,
-            availability: 'all'
+            availability: 'all',
+            material: null,
+            color: null
         }));
         setActiveDropdown(null);
     };
 
-    const hasActiveFilters = filters.category || filters.priceRange || filters.availability !== 'all';
+    const hasActiveFilters = filters.category || filters.priceRange || filters.availability !== 'all' || filters.material || filters.color;
 
     return (
         <>
@@ -208,8 +220,8 @@ export default function ProductFilters({ filters, setFilters, mobileOpen, setMob
                             type="button"
                             onClick={() => toggleDropdown('category')}
                             className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full border transition-colors ${filters.category
-                                    ? 'border-yellow-600 text-yellow-700 bg-yellow-50'
-                                    : 'border-gray-300 text-gray-700 hover:border-gray-400'
+                                ? 'border-yellow-600 text-yellow-700 bg-yellow-50'
+                                : 'border-gray-300 text-gray-700 hover:border-gray-400'
                                 }`}
                         >
                             {filters.category || 'Category'}
@@ -253,8 +265,8 @@ export default function ProductFilters({ filters, setFilters, mobileOpen, setMob
                             type="button"
                             onClick={() => toggleDropdown('price')}
                             className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full border transition-colors ${filters.priceRange
-                                    ? 'border-yellow-600 text-yellow-700 bg-yellow-50'
-                                    : 'border-gray-300 text-gray-700 hover:border-gray-400'
+                                ? 'border-yellow-600 text-yellow-700 bg-yellow-50'
+                                : 'border-gray-300 text-gray-700 hover:border-gray-400'
                                 }`}
                         >
                             {filters.priceRange ? filters.priceRange.label : 'Price'}
@@ -283,8 +295,8 @@ export default function ProductFilters({ filters, setFilters, mobileOpen, setMob
                             type="button"
                             onClick={() => toggleDropdown('availability')}
                             className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full border transition-colors ${filters.availability !== 'all'
-                                    ? 'border-yellow-600 text-yellow-700 bg-yellow-50'
-                                    : 'border-gray-300 text-gray-700 hover:border-gray-400'
+                                ? 'border-yellow-600 text-yellow-700 bg-yellow-50'
+                                : 'border-gray-300 text-gray-700 hover:border-gray-400'
                                 }`}
                         >
                             {availabilityOptions.find(o => o.value === filters.availability)?.label || 'Availability'}
@@ -301,6 +313,62 @@ export default function ProductFilters({ filters, setFilters, mobileOpen, setMob
                                             }`}
                                     >
                                         {option.label}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Material Dropdown */}
+                    <div className="relative">
+                        <button
+                            type="button"
+                            onClick={() => toggleDropdown('material')}
+                            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full border transition-colors ${filters.material
+                                ? 'border-yellow-600 text-yellow-700 bg-yellow-50'
+                                : 'border-gray-300 text-gray-700 hover:border-gray-400'
+                                }`}
+                        >
+                            {filters.material || 'Material'}
+                            <ChevronDown size={16} />
+                        </button>
+                        {activeDropdown === 'material' && (
+                            <div className="absolute top-full left-0 mt-2 w-40 bg-white rounded-lg shadow-lg border border-gray-100 z-30 p-2 max-h-60 overflow-y-auto">
+                                {materials.map((m) => (
+                                    <button
+                                        key={m}
+                                        onClick={() => handleMaterialChange(m)}
+                                        className={`w-full text-left px-3 py-2 text-sm rounded-md hover:bg-gray-50 ${filters.material === m ? 'font-medium text-yellow-700 bg-yellow-50' : 'text-gray-700'}`}
+                                    >
+                                        {m}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Color Dropdown */}
+                    <div className="relative">
+                        <button
+                            type="button"
+                            onClick={() => toggleDropdown('color')}
+                            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full border transition-colors ${filters.color
+                                ? 'border-yellow-600 text-yellow-700 bg-yellow-50'
+                                : 'border-gray-300 text-gray-700 hover:border-gray-400'
+                                }`}
+                        >
+                            {filters.color || 'Color'}
+                            <ChevronDown size={16} />
+                        </button>
+                        {activeDropdown === 'color' && (
+                            <div className="absolute top-full left-0 mt-2 w-40 bg-white rounded-lg shadow-lg border border-gray-100 z-30 p-2 max-h-60 overflow-y-auto">
+                                {colors.map((c) => (
+                                    <button
+                                        key={c}
+                                        onClick={() => handleColorChange(c)}
+                                        className={`w-full text-left px-3 py-2 text-sm rounded-md hover:bg-gray-50 ${filters.color === c ? 'font-medium text-yellow-700 bg-yellow-50' : 'text-gray-700'}`}
+                                    >
+                                        {c}
                                     </button>
                                 ))}
                             </div>

@@ -19,6 +19,8 @@ export default function ShopPage() {
         sale: searchParams.get('sale') === 'true',
         priceRange: null,
         availability: 'all', // Added availability filter
+        material: null,
+        color: null,
         sort: 'newest'
     });
 
@@ -29,6 +31,8 @@ export default function ShopPage() {
         if (filters.subcategory) params.subcategory = filters.subcategory;
         if (filters.search) params.search = filters.search;
         if (filters.sale) params.sale = 'true';
+        if (filters.material) params.material = filters.material;
+        if (filters.color) params.color = filters.color;
         setSearchParams(params);
     }, [filters, setSearchParams]);
 
