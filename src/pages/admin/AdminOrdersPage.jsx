@@ -85,6 +85,31 @@ export default function AdminOrdersPage() {
         }
     };
 
+    const updatePaymentStatus = async (orderId, newStatus) => {
+        try {
+            const res = await fetch('/api/update-order-status', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ orderId, payment_status: newStatus })
+            });
+
+            if (!res.ok) {
+                const err = await res.json();
+                // Warn about migration if applicable
+                if (err.warning) alert(err.warning);
+                else throw new Error(err.error || 'Failed to update payment status');
+            } else {
+                const data = await res.json();
+                if (data.warning) alert(data.warning);
+            }
+
+            fetchOrders();
+        } catch (error) {
+            console.error('Error updating payment:', error);
+            alert('Failed to update payment status: ' + error.message);
+        }
+    };
+
     const deleteOrder = async (orderId) => {
         if (!window.confirm('Are you sure you want to delete this order PERMANENTLY?')) return;
 
@@ -236,6 +261,7 @@ export default function AdminOrdersPage() {
                                     <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
                                     <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
                                     <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment</th>
                                     <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                                     <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                                 </tr>
@@ -257,6 +283,22 @@ export default function AdminOrdersPage() {
                                             </td>
                                             <td className="px-6 py-4 text-sm text-gray-600">{new Date(order.created_at).toLocaleDateString()}</td>
                                             <td className="px-6 py-4 text-sm font-medium text-gray-900">Rs {order.total_amount?.toLocaleString()}</td>
+                                            <td className="px-6 py-4">
+                                                <select
+                                                    value={order.payment_status || 'pending'}
+                                                    onChange={(e) => updatePaymentStatus(order.id, e.target.value)}
+                                                    className={`px-2 py-1 text-xs font-bold rounded-full border-0 cursor-pointer focus:ring-2 focus:ring-black ${order.payment_status === 'paid' ? 'bg-green-100 text-green-800' :
+                                                            order.payment_status === 'failed' ? 'bg-red-100 text-red-800' :
+                                                                order.payment_status === 'refunded' ? 'bg-orange-100 text-orange-800' :
+                                                                    'bg-yellow-100 text-yellow-800'
+                                                        }`}
+                                                >
+                                                    <option value="pending">Pending</option>
+                                                    <option value="paid">Paid</option>
+                                                    <option value="failed">Failed</option>
+                                                    <option value="refunded">Refunded</option>
+                                                </select>
+                                            </td>
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center gap-2">
                                                     {getStatusIcon(order.status)}

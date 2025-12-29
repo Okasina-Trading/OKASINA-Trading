@@ -6,16 +6,23 @@ export default function SizeGuideModal({ isOpen, onClose, category }) {
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-            <div className="bg-white w-full max-w-2xl rounded-lg shadow-xl overflow-hidden relative animate-in fade-in zoom-in duration-200">
-                <button
-                    onClick={onClose}
-                    className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full transition-colors"
-                >
-                    <X size={24} />
-                </button>
+            {/* Backdrop click handler if needed, or just allow closing via X */}
+            <div className="absolute inset-0" onClick={onClose} />
 
-                <div className="p-8">
-                    <h2 className="text-2xl font-serif font-bold mb-2 text-center">Size Guide</h2>
+            <div className="relative bg-white w-full max-w-2xl rounded-lg shadow-xl max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200 z-10">
+                {/* Fixed Header */}
+                <div className="flex-none flex items-center justify-between p-4 border-b border-gray-100">
+                    <h2 className="text-xl font-serif font-bold text-gray-900">Size Guide</h2>
+                    <button
+                        onClick={onClose}
+                        className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-500 hover:text-gray-900"
+                    >
+                        <X size={24} />
+                    </button>
+                </div>
+
+                {/* Scrollable Content */}
+                <div className="flex-1 overflow-y-auto p-6 sm:p-8">
                     <p className="text-center text-gray-600 mb-6 font-medium">We cater for clothes upto 13 XL</p>
 
                     <div className="overflow-x-auto">
@@ -30,11 +37,6 @@ export default function SizeGuideModal({ isOpen, onClose, category }) {
                             </thead>
                             <tbody>
                                 {['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '6XL', '7XL', '8XL', '9XL', '10XL', '11XL', '12XL', '13XL'].map((size, index) => {
-                                    // Base measurements for XS (index 0)
-                                    // Bust: 80-84, increment 4 per size
-                                    // Waist: 60-64, increment 4 per size
-                                    // Hips: 86-90, increment 4 per size
-
                                     const bustStart = 80 + (index * 4);
                                     const waistStart = 60 + (index * 4);
                                     const hipsStart = 86 + (index * 4);

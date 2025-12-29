@@ -24,8 +24,16 @@ export default function SignupPage() {
         setLoading(true);
 
         try {
-            await signUp(email, password, { full_name: fullName });
-            navigate(from, { replace: true });
+            const { session } = await signUp(email, password, { full_name: fullName });
+
+            if (!session) {
+                // Email confirmation required
+                alert('Account created! Please check your email to confirm your account before logging in.');
+                navigate('/login');
+            } else {
+                // Auto-logged in
+                navigate(from, { replace: true });
+            }
         } catch (err) {
             setError(err.message || 'Failed to sign up. Please try again.');
         } finally {

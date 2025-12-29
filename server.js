@@ -261,18 +261,38 @@ app.post('/api/update-product', async (req, res) => {
 // Update order status
 app.post('/api/update-order-status', async (req, res) => {
   try {
-    const { orderId, status } = req.body;
+    const { orderId, status, payment_status } = req.body;
 
-    console.log(`Updating order ${orderId} to ${status}`);
+    console.log(`Updating order ${orderId} -> Status: ${status}, Payment: ${payment_status}`);
+
+    const updateData = {};
+    if (status) updateData.status = status;
+    if (payment_status) updateData.payment_status = payment_status;
 
     const { data, error } = await getSupabaseAdmin()
       .from('orders')
-      .update({ status })
+      .update(updateData)
       .eq('id', orderId)
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      // If column missing, retry without payment_status properly
+      if (error.message && (error.message.includes('payment_status') || error.message.includes('Undefined Column'))) {
+        console.warn('Payment Status column missing. Updating status only.');
+        if (status) {
+          const { data: retryData, error: retryError } = await getSupabaseAdmin()
+            .from('orders')
+            .update({ status })
+            .eq('id', orderId)
+            .select()
+            .single();
+          if (retryError) throw retryError;
+          return res.json({ success: true, order: retryData, warning: 'Payment status not saved (DB update needed)' });
+        }
+      }
+      throw error;
+    }
 
     // Send email notification (optional/future)
     if (status === 'shipped' || status === 'completed') {

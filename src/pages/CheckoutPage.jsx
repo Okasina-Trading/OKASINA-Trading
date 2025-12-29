@@ -285,7 +285,7 @@ export default function CheckoutPage() {
                                                     <p className="font-bold">OKASINA Trading Co. Ltd</p>
                                                     <p>BRN: C12112347</p>
                                                     <p>MCB Account: <strong>000020126824</strong></p>
-                                                    <p className="text-xs text-gray-500 mt-1">(Ref: {formData.fullName})</p>
+                                                    <p className="text-xs text-red-600 mt-2 font-bold uppercase">Please include your Order Number as a reference when checking out.</p>
                                                 </div>
                                             )}
                                         </div>
