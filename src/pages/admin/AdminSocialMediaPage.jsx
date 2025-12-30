@@ -26,7 +26,7 @@ export default function AdminSocialMediaPage() {
     const fetchSettings = async () => {
         try {
             const { data, error } = await supabase
-                .from('settings')
+                .from('site_settings')
                 .select('*')
                 .eq('key', 'social_media')
                 .single();
@@ -49,7 +49,7 @@ export default function AdminSocialMediaPage() {
 
     const createDefaultSettings = async () => {
         const { error } = await supabase
-            .from('settings')
+            .from('site_settings')
             .insert({
                 key: 'social_media',
                 value: socialMedia,
@@ -65,7 +65,7 @@ export default function AdminSocialMediaPage() {
         setSaving(true);
         try {
             const { error } = await supabase
-                .from('settings')
+                .from('site_settings')
                 .upsert({
                     key: 'social_media',
                     value: socialMedia,
