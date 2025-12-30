@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { supabase } from '../supabase';
 import { MessageSquare, X, Send, Loader, AlertTriangle } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 
@@ -17,26 +18,17 @@ export default function JarvisFeedbackWidget() {
         setError(null);
 
         try {
-            const response = await fetch('/api/jarvis/feedback', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
+            const { error: submitError } = await supabase
+                .from('jarvis_feedback')
+                .insert([{
                     message,
                     type,
-                    url: window.location.href,
                     path: location.pathname,
-                    userAgent: navigator.userAgent,
-                    timestamp: new Date().toISOString()
-                }),
-            });
+                    user_agent: navigator.userAgent,
+                    status: 'open'
+                }]);
 
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.error || 'Failed to send feedback');
-            }
+            if (submitError) throw submitError;
 
             setSent(true);
             setMessage('');

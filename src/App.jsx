@@ -97,14 +97,14 @@ function AppContent() {
                     <Route path="/admin/media" element={<ProtectedRoute><MediaManagerPage /></ProtectedRoute>} />
                     <Route path="/admin/stock-manager" element={<ProtectedRoute><StockManagerPage /></ProtectedRoute>} />
                     <Route path="/admin/coupons" element={<ProtectedRoute><AdminCouponsPage /></ProtectedRoute>} />
-                    <Route path="/admin/automation" element={<ProtectedRoute><AdminAutomationPage /></ProtectedRoute>} />
-                    <Route path="/admin/ai-employees" element={<ProtectedRoute><AdminAiEmployeesPage /></ProtectedRoute>} />
-                    <Route path="/admin/ai-enrichment" element={<ProtectedRoute><AiEnrichmentCenter /></ProtectedRoute>} />
+                    {/* <Route path="/admin/automation" element={<ProtectedRoute><AdminAutomationPage /></ProtectedRoute>} /> */}
+                    {/* <Route path="/admin/ai-employees" element={<ProtectedRoute><AdminAiEmployeesPage /></ProtectedRoute>} /> */}
+                    {/* <Route path="/admin/ai-enrichment" element={<ProtectedRoute><AiEnrichmentCenter /></ProtectedRoute>} /> */}
                     <Route path="/admin/album-import" element={<ProtectedRoute><AlbumImportPage /></ProtectedRoute>} />
                     <Route path="/admin/social-media" element={<ProtectedRoute><AdminSocialMediaPage /></ProtectedRoute>} />
                     <Route path="/admin/sms-marketing" element={<ProtectedRoute><SMSMarketingPage /></ProtectedRoute>} />
-                    <Route path="/admin/citadel" element={<ProtectedRoute><AdminCitadelPage /></ProtectedRoute>} />
-                    <Route path="/admin/system-health" element={<ProtectedRoute><AdminSystemHealth /></ProtectedRoute>} />
+                    {/* <Route path="/admin/citadel" element={<ProtectedRoute><AdminCitadelPage /></ProtectedRoute>} /> */}
+                    {/* <Route path="/admin/system-health" element={<ProtectedRoute><AdminSystemHealth /></ProtectedRoute>} /> */}
                 </Routes>
             </main>
             {!isAdminPath && <ProductComparisonBar />}
@@ -112,7 +112,7 @@ function AppContent() {
                 <StylistChatWidget />
             </React.Suspense>
             <JarvisFeedbackWidget />
-            <TitanAssistWidget />
+            {/* <TitanAssistWidget /> */}
             {!isAdminPath && <Footer />}
         </div>
     );

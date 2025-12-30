@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../supabase';
 import smsGatewayService from '../../services/smsGatewayService';
-import { Send, Users, FileText, Upload, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Send, Users, FileText, Upload, CheckCircle, XCircle, Clock, ArrowLeft } from 'lucide-react';
 
 export default function SMSMarketingPage() {
     const [campaigns, setCampaigns] = useState([]);
     const [contacts, setContacts] = useState([]);
     const [selectedContacts, setSelectedContacts] = useState([]);
     const [message, setMessage] = useState('');
+    const [manualRecipients, setManualRecipients] = useState('');
     const [campaignName, setCampaignName] = useState('');
     const [loading, setLoading] = useState(false);
     const [activeTab, setActiveTab] = useState('compose'); // compose, campaigns, contacts
@@ -38,8 +40,14 @@ export default function SMSMarketingPage() {
     };
 
     const handleSendCampaign = async () => {
-        if (!campaignName || !message || selectedContacts.length === 0) {
-            alert('Please fill in campaign name, message, and select recipients');
+        // Parse manual numbers
+        const manualNumbers = manualRecipients
+            .split(',')
+            .map(num => num.trim())
+            .filter(num => num.length > 0);
+
+        if (!campaignName || !message || (selectedContacts.length === 0 && manualNumbers.length === 0)) {
+            alert('Please fill in campaign name, message, and select at least one recipient (or add manual numbers)');
             return;
         }
 
@@ -53,7 +61,7 @@ export default function SMSMarketingPage() {
                     name: campaignName,
                     message: message,
                     status: 'sending',
-                    total_recipients: selectedContacts.length,
+                    total_recipients: selectedContacts.length + manualNumbers.length,
                     created_by: 'admin'
                 })
                 .select()
@@ -62,14 +70,21 @@ export default function SMSMarketingPage() {
             if (campaignError) throw campaignError;
 
             // Send bulk SMS
-            const recipients = selectedContacts.map(id => {
+            const dbRecipients = selectedContacts.map(id => {
                 const contact = contacts.find(c => c.id === id);
                 return { phone: contact.phone_number, name: contact.name };
             });
 
+            const manualRecipientObjects = manualNumbers.map(num => ({
+                phone: num,
+                name: 'Manual Contact'
+            }));
+
+            const allRecipients = [...dbRecipients, ...manualRecipientObjects];
+
             const result = await smsGatewayService.sendBulkSMS(
                 campaign.id,
-                recipients,
+                allRecipients,
                 message
             );
 
@@ -135,6 +150,10 @@ export default function SMSMarketingPage() {
     return (
         <div className="p-6 max-w-7xl mx-auto">
             <div className="mb-6">
+                <Link to="/admin" className="inline-flex items-center text-gray-600 hover:text-gray-900 mb-4 transition-colors">
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Back to Dashboard
+                </Link>
                 <h1 className="text-3xl font-bold mb-2">SMS Marketing</h1>
                 <p className="text-gray-600">Send bulk SMS campaigns to your customers</p>
             </div>
@@ -218,9 +237,24 @@ export default function SMSMarketingPage() {
                             </div>
                         </div>
 
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium mb-2">
+                                Manual Phone Numbers (Optional)
+                            </label>
+                            <textarea
+                                value={manualRecipients}
+                                onChange={(e) => setManualRecipients(e.target.value)}
+                                className="w-full border rounded px-3 py-2 h-20"
+                                placeholder="Enter phone numbers separated by commas (e.g., +23051234567, +23057654321)"
+                            />
+                            <p className="text-xs text-gray-500 mt-1">
+                                Add extra numbers manually correctly formatted with country code
+                            </p>
+                        </div>
+
                         <button
                             onClick={handleSendCampaign}
-                            disabled={loading || !campaignName || !message || selectedContacts.length === 0}
+                            disabled={loading || !campaignName || !message}
                             className="w-full bg-blue-600 text-white py-3 rounded font-semibold hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                         >
                             {loading ? (
@@ -369,3 +403,4 @@ export default function SMSMarketingPage() {
         </div>
     );
 }
+

@@ -43,14 +43,14 @@ export default function AdminLayout({ children }) {
         { name: 'Reviews', href: '/admin/reviews', icon: MessageSquare },
         { name: 'Media Manager', href: '/admin/media', icon: UploadCloud },
         { name: 'Social Media', href: '/admin/social-media', icon: Share2 },
-        { name: 'Automation', href: '/admin/automation', icon: Workflow },
+        { name: 'Automation', href: '/admin/automation', icon: Workflow, hidden: true },
         // { name: 'Album Import', href: '/admin/album-import', icon: UploadCloud }, // Disabled - requires Facebook API
         { name: 'Stock Manager', href: '/admin/stock-manager', icon: Package },
-        { name: 'AI Team', href: '/admin/ai-employees', icon: Bot },
+        // { name: 'AI Team', href: '/admin/ai-employees', icon: Bot },
         { name: 'Feedback Tracker', href: '/admin/feedback', icon: MessageSquare }, // New tracker
-        { name: 'Citadel (Health)', href: '/admin/citadel', icon: Activity },
-        { name: 'Titan Tools', href: '/admin/system-health', icon: Terminal },
-    ];
+        // { name: 'Citadel (Health)', href: '/admin/citadel', icon: Activity },
+        // { name: 'Titan Tools', href: '/admin/system-health', icon: Terminal },
+    ].filter(item => !item.hidden);
 
     const isActive = href => {
         if (href === '/admin') return location.pathname === '/admin';
@@ -216,7 +216,7 @@ export default function AdminLayout({ children }) {
                 {/* Page Content */}
                 <main className="flex-1 overflow-auto p-4 lg:p-8">{children}</main>
             </div>
-            <AdminAssistantWidget />
+            {/* AdminAssistantWidget removed as per user request */}
         </div>
     );
 }

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Upload, Download, FileSpreadsheet, AlertCircle, CheckCircle, Loader, Sparkles, FileText, ArrowRight } from 'lucide-react';
+import { Upload, Download, FileSpreadsheet, AlertCircle, CheckCircle, Loader, Sparkles, FileText, ArrowRight, ArrowLeft } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { supabase } from '../supabase';
 import { useToast } from '../contexts/ToastContext';
 import AdminLayout from '../components/admin/AdminLayout';
@@ -281,6 +282,10 @@ export default function StockManagerPage() {
             <div className="space-y-8 max-w-6xl mx-auto">
                 <div className="flex items-center justify-between">
                     <div>
+                        <Link to="/admin" className="inline-flex items-center text-gray-600 hover:text-gray-900 mb-4 transition-colors">
+                            <ArrowLeft className="w-4 h-4 mr-2" />
+                            Back to Dashboard
+                        </Link>
                         <h2 className="text-3xl font-serif font-bold text-gray-900 mb-2">Smart Product Import</h2>
                         <div className="flex items-center gap-2 text-sm text-gray-500">
                             <span className="font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded">Step 1</span>

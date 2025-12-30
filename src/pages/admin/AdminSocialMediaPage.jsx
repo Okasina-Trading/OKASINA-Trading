@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../supabase';
 import { useToast } from '../../contexts/ToastContext';
-import { Facebook, Instagram, Twitter, Youtube, MessageCircle, Save, ExternalLink } from 'lucide-react';
+import { Facebook, Instagram, Twitter, Youtube, MessageCircle, Save, ExternalLink, ArrowLeft } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import AdminLayout from '../../components/admin/AdminLayout';
 
 export default function AdminSocialMediaPage() {
@@ -113,6 +114,10 @@ export default function AdminSocialMediaPage() {
         <AdminLayout>
             <div className="max-w-4xl mx-auto">
                 <div className="mb-8">
+                    <Link to="/admin" className="inline-flex items-center text-gray-600 hover:text-gray-900 mb-4 transition-colors">
+                        <ArrowLeft className="w-4 h-4 mr-2" />
+                        Back to Dashboard
+                    </Link>
                     <h1 className="text-3xl font-bold text-gray-900 mb-2">Social Media Settings</h1>
                     <p className="text-gray-600">Manage your social media links. These will appear in the website footer.</p>
                 </div>

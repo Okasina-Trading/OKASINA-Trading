@@ -30,8 +30,10 @@ import {
     Plus,
     CheckCircle,
     AlertCircle,
-    Loader2
+    Loader2,
+    ArrowLeft
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export default function AdminMarketingPage() {
     const [activeTab, setActiveTab] = useState('overview');
@@ -254,6 +256,10 @@ export default function AdminMarketingPage() {
             <div className="space-y-6">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
+                        <Link to="/admin" className="inline-flex items-center text-gray-600 hover:text-gray-900 mb-4 transition-colors">
+                            <ArrowLeft className="w-4 h-4 mr-2" />
+                            Back to Dashboard
+                        </Link>
                         <h1 className="text-2xl font-bold text-gray-900">Marketing Hub</h1>
                         <p className="text-sm text-gray-500 mt-1">Manage your storefront promotions and social reach</p>
                     </div>

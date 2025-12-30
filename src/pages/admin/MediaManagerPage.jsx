@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import AdminLayout from '../../components/admin/AdminLayout';
-import { Upload, Download, Image as ImageIcon, CheckCircle, AlertCircle, Loader, Folder, Link as LinkIcon, Sparkles } from 'lucide-react';
+import { Upload, Download, Image as ImageIcon, CheckCircle, AlertCircle, Loader, Folder, Link as LinkIcon, Sparkles, ArrowLeft } from 'lucide-react';
 import { supabase } from '../../supabase';
 import { downloadCSV } from '../../utils/csvTemplate';
 
@@ -155,6 +156,10 @@ export default function MediaManagerPage() {
             <div className="space-y-8 max-w-6xl mx-auto">
                 <div className="flex justify-between items-center mb-8">
                     <div>
+                        <Link to="/admin" className="inline-flex items-center text-gray-600 hover:text-gray-900 mb-4 transition-colors">
+                            <ArrowLeft className="w-4 h-4 mr-2" />
+                            Back to Dashboard
+                        </Link>
                         <h1 className="text-2xl font-serif font-bold text-gray-900">Smart Media Linker</h1>
                         <p className="text-gray-500 mt-1">
                             Attach images to your <strong>existing</strong> products.
