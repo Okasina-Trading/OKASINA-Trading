@@ -12,7 +12,7 @@ async function runSentinelAudit() {
     console.log("🚀 TITAN Sentinel: Starting A-to-Z Audit...");
     const results = {
         timestamp: new Date().toISOString(),
-        environment: process.env.VITE_SITE_URL || 'http://localhost:5173',
+        environment: process.env.VITE_SITE_URL || 'https://okasinatrading.com',
         checks: []
     };
 

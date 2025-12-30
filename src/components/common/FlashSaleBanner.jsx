@@ -70,7 +70,7 @@ const FlashSaleBanner = () => {
     if (loading || !settings.is_active) return null;
 
     return (
-        <div className="bg-gradient-to-r from-orange-600 via-red-600 to-orange-600 text-white py-2 px-4 shadow-lg animate-gradient-x">
+        <div className="flash-sale-banner bg-gradient-to-r from-orange-600 via-red-600 to-orange-600 text-white py-2 px-4 shadow-lg animate-gradient-x">
             <div className="container mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
 
                 {/* Left: Message */}
