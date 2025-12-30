@@ -66,6 +66,23 @@ export default function AdminMarketingPage() {
     });
     const [savingBanner, setSavingBanner] = useState(false);
 
+    // Promotions State
+    const [promotions, setPromotions] = useState([]);
+    const [loadingPromotions, setLoadingPromotions] = useState(false);
+    const [newPromotion, setNewPromotion] = useState({
+        code: '',
+        discount_type: 'percentage',
+        discount_value: '',
+        usage_limit: '',
+        expires_at: ''
+    });
+
+    useEffect(() => {
+        if (activeTab === 'promotions') {
+            fetchPromotions();
+        }
+    }, [activeTab]);
+
     useEffect(() => {
         // Check if already connected
         if (metaService.isAuthenticated()) {
@@ -112,6 +129,73 @@ export default function AdminMarketingPage() {
             setSavingBanner(false);
         }
     };
+
+    const fetchPromotions = async () => {
+        setLoadingPromotions(true);
+        try {
+            const { data, error } = await supabase
+                .from('coupons')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) throw error;
+            setPromotions(data || []);
+        } catch (error) {
+            console.error('Error fetching promotions:', error);
+            alert('Failed to load promotions');
+        } finally {
+            setLoadingPromotions(false);
+        }
+    };
+
+    const handleCreatePromotion = async (e) => {
+        e.preventDefault();
+        try {
+            const { error } = await supabase
+                .from('coupons')
+                .insert([{
+                    code: newPromotion.code.toUpperCase(),
+                    discount_type: newPromotion.discount_type,
+                    discount_value: parseFloat(newPromotion.discount_value),
+                    usage_limit: newPromotion.usage_limit ? parseInt(newPromotion.usage_limit) : null,
+                    expires_at: newPromotion.expires_at || null,
+                    is_active: true
+                }]);
+
+            if (error) throw error;
+
+            alert('Promotion created successfully!');
+            setNewPromotion({
+                code: '',
+                discount_type: 'percentage',
+                discount_value: '',
+                usage_limit: '',
+                expires_at: ''
+            });
+            fetchPromotions();
+        } catch (error) {
+            console.error('Error creating promotion:', error);
+            alert(error.message);
+        }
+    };
+
+    const handleDeletePromotion = async (id) => {
+        if (!window.confirm('Are you sure you want to delete this promotion?')) return;
+        try {
+            const { error } = await supabase
+                .from('coupons')
+                .delete()
+                .eq('id', id);
+
+            if (error) throw error;
+            fetchPromotions();
+        } catch (error) {
+            console.error('Error deleting promotion:', error);
+            alert('Failed to delete promotion');
+        }
+    };
+
+
 
     const loadPages = async () => {
         try {
@@ -897,45 +981,118 @@ export default function AdminMarketingPage() {
                 {/* Promotions Tab */}
                 {activeTab === 'promotions' && (
                     <div className="bg-white rounded-xl p-6 border border-gray-200">
-                        <h2 className="text-xl font-semibold text-gray-900 mb-6">Active Promotions & Discount Codes</h2>
-                        <div className="space-y-4">
-                            {[
-                                { code: 'SUMMER20', discount: '20%', uses: 145, limit: 500, expires: '2025-12-31' },
-                                { code: 'NEWCUSTOMER', discount: '15%', uses: 89, limit: 200, expires: '2025-12-31' },
-                                { code: 'FLASH50', discount: '50%', uses: 234, limit: 300, expires: '2025-11-30' },
-                                { code: 'FREESHIP', discount: 'Free Shipping', uses: 567, limit: 1000, expires: '2025-12-31' },
-                                { code: 'VIP30', discount: '30%', uses: 45, limit: 100, expires: '2025-12-31' }
-                            ].map((promo, index) => (
-                                <div key={index} className="flex items-center justify-between p-4 bg-gradient-to-r from-orange-50 to-pink-50 rounded-lg border border-orange-200">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-pink-500 rounded-lg flex items-center justify-center">
-                                            <Tag className="text-white" size={24} />
-                                        </div>
-                                        <div>
-                                            <h3 className="font-bold text-gray-900 text-lg">{promo.code}</h3>
-                                            <p className="text-sm text-gray-600">{promo.discount} off</p>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-center gap-8">
-                                        <div className="text-center">
-                                            <p className="text-sm text-gray-600">Uses</p>
-                                            <p className="font-medium text-gray-900">{promo.uses}/{promo.limit}</p>
-                                        </div>
-                                        <div className="text-center">
-                                            <p className="text-sm text-gray-600">Expires</p>
-                                            <p className="font-medium text-gray-900">{promo.expires}</p>
-                                        </div>
-                                        <button className="px-4 py-2 bg-white text-gray-700 rounded-lg hover:bg-gray-100 transition-colors text-sm font-medium">
-                                            Edit
-                                        </button>
-                                    </div>
-                                </div>
-                            ))}
+                        <div className="flex justify-between items-center mb-6">
+                            <div>
+                                <h2 className="text-xl font-semibold text-gray-900">Active Promotions</h2>
+                                <p className="text-sm text-gray-500">Manage discount codes and coupons</p>
+                            </div>
                         </div>
-                        <button className="mt-6 px-6 py-3 bg-gradient-to-r from-orange-500 to-pink-500 text-white rounded-lg hover:from-orange-600 hover:to-pink-600 transition-colors flex items-center gap-2 font-medium">
-                            <Plus size={20} />
-                            Create New Promotion
-                        </button>
+
+                        {/* Create Promotion Form */}
+                        <form onSubmit={handleCreatePromotion} className="mb-8 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <h3 className="text-sm font-semibold text-gray-900 mb-4">Create New Promotion</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                                <div>
+                                    <label className="block text-xs font-medium text-gray-700 mb-1">Code</label>
+                                    <input
+                                        type="text"
+                                        value={newPromotion.code}
+                                        onChange={(e) => setNewPromotion({ ...newPromotion, code: e.target.value })}
+                                        placeholder="SUMMER20"
+                                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg uppercase"
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-medium text-gray-700 mb-1">Type</label>
+                                    <select
+                                        value={newPromotion.discount_type}
+                                        onChange={(e) => setNewPromotion({ ...newPromotion, discount_type: e.target.value })}
+                                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg"
+                                    >
+                                        <option value="percentage">Percentage (%)</option>
+                                        <option value="fixed">Fixed Amount (Rs)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-medium text-gray-700 mb-1">Value</label>
+                                    <input
+                                        type="number"
+                                        value={newPromotion.discount_value}
+                                        onChange={(e) => setNewPromotion({ ...newPromotion, discount_value: e.target.value })}
+                                        placeholder="20"
+                                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg"
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-medium text-gray-700 mb-1">Limit (Optional)</label>
+                                    <input
+                                        type="number"
+                                        value={newPromotion.usage_limit}
+                                        onChange={(e) => setNewPromotion({ ...newPromotion, usage_limit: e.target.value })}
+                                        placeholder="100"
+                                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg"
+                                    />
+                                </div>
+                                <div className="flex items-end">
+                                    <button
+                                        type="submit"
+                                        className="w-full px-3 py-2 bg-gradient-to-r from-orange-500 to-pink-500 text-white rounded-lg text-sm font-medium hover:from-orange-600 hover:to-pink-600 transition-colors flex items-center justify-center gap-2"
+                                    >
+                                        <Plus size={16} />
+                                        Create
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+
+                        {/* Promotions List */}
+                        {loadingPromotions ? (
+                            <div className="flex justify-center p-8">
+                                <Loader2 className="animate-spin text-gray-400" size={32} />
+                            </div>
+                        ) : promotions.length === 0 ? (
+                            <div className="text-center p-8 text-gray-500">
+                                No active promotions found. Create one above!
+                            </div>
+                        ) : (
+                            <div className="space-y-4">
+                                {promotions.map((promo) => (
+                                    <div key={promo.id} className="flex items-center justify-between p-4 bg-white border border-gray-100 rounded-lg shadow-sm hover:border-orange-100 transition-colors">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-12 h-12 bg-gradient-to-br from-orange-100 to-pink-100 rounded-lg flex items-center justify-center">
+                                                <Tag className="text-orange-600" size={24} />
+                                            </div>
+                                            <div>
+                                                <h3 className="font-bold text-gray-900 text-lg tracking-wide">{promo.code}</h3>
+                                                <p className="text-sm text-gray-600">
+                                                    {promo.discount_type === 'percentage' ? `${promo.discount_value}% OFF` : `Rs ${promo.discount_value} OFF`}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-8">
+                                            <div className="text-center hidden sm:block">
+                                                <p className="text-xs text-gray-500 uppercase">Used</p>
+                                                <p className="font-medium text-gray-900">{promo.usage_count || 0} {promo.usage_limit ? `/ ${promo.usage_limit}` : ''}</p>
+                                            </div>
+                                            <div className="text-center hidden sm:block">
+                                                <p className="text-xs text-gray-500 uppercase">Status</p>
+                                                <span className={`inline-flex px-2 py-0.5 rounded text-xs font-medium ${promo.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                                                    {promo.is_active ? 'Active' : 'Inactive'}
+                                                </span>
+                                            </div>
+                                            <button
+                                                onClick={() => handleDeletePromotion(promo.id)}
+                                                className="px-3 py-1.5 text-red-600 hover:bg-red-50 rounded-lg text-sm font-medium transition-colors"
+                                            >
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 )}
 
